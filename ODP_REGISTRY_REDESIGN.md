@@ -1,3 +1,5 @@
+> **Исторические решения/варианты ниже; не инструкции для ABI `0.7-redesign-7`.** Текущие правила: [SPEC](SPEC.md), [план](ODP_07_ACTION_PLAN.md), [таблица замен и открытых вопросов](ODP_07_ABI6_DOCUMENTATION_DELTA.md), [глоссарий](docs/ru/GLOSSARY.md). Profile stop и mint-agent удалены полностью: нет `revokeCreator`, `CreatorRevoked`, профильного `revokedAt` и `EC(131)`. Отзыв паспорта сохранён как отдельное право исходного issuer с ненулевой причиной: до 72 часов для профиля C и до 24 часов для B/P/M, и только пока нет необратимой фиксации печати (`finalizePassportForPrint`). Journal/proof требуют operationId. Цель — Polygon mainnet без обязательного Amoy; кошелёк и внешняя сеть сейчас запрещены. Старые решения и их обоснования сохранены, но не являются текущими полномочиями или разрешением на deployment.
+
 # Реестр ODP — переработка ядра
 
 **Статус:** проект решения. Код не написан, ничего не развёрнуто.
@@ -125,6 +127,13 @@ struct Passport {
 
 ### 4.2 Внешняя поверхность
 
+> **Заменено.** Реализованная поверхность отличается от проекта ниже: `revokeCreator` и весь набор
+> mint-agent (`requestMintAgentRole`, `confirmMintAgentRole`, `revokeMintAgentRole`,
+> `renounceMintAgentRole`, `mintAgentForCreator`) и параметр `onBehalfOf` отсутствуют; mint принимает
+> `(PassportMintInputs, bytes32 operationId)`; добавлены `getMintOperation`,
+> `finalizePassportForPrint` и `getPassportReleaseState`. Точные сигнатуры — `chain/abi/`,
+> правила — [SPEC §3/§8](SPEC.md).
+
 ```solidity
 // ── Профили ──────────────────────────────────────────────────────────────
 function registerCreator(bytes1 typePrefix) external returns (string memory creatorId);
@@ -165,6 +174,12 @@ function passportExists(string calldata passportId) external view returns (bool)
 
 ### 4.3 Окно отзыва
 
+> **Заменено.** Реализовано два окна вместо одного: `PERSONAL_REVOCATION_WINDOW = 72 hours` для профиля
+> `C` и `ISSUER_REVOCATION_WINDOW = 24 hours` для `B`/`P`/`M`. Проверки `revokedAt` профиля и `EC(131)`
+> в реализации нет — profile stop удалён целиком. Добавлен барьер `PassportPrintFinalized()`:
+> после `finalizePassportForPrint` отзыв невозможен независимо от срока. Действующее правило —
+> [SPEC §8](SPEC.md); основание и открытый вопрос — [дельта §2, §5.2](ODP_07_ABI6_DOCUMENTATION_DELTA.md).
+
 ```solidity
 uint256 internal constant REVOCATION_WINDOW = 72 hours;
 
@@ -188,6 +203,9 @@ function revokePassport(string calldata passportId, bytes32 reasonHash) external
 - окно считается от `p.timestamp`, то есть от блока выпуска, и не требует внешнего вызова.
 
 ### 4.4 События
+
+> **Заменено.** События `CreatorRevoked` в реализации нет. Добавлены `MintOperationCommitted` и
+> `PassportFinalizedForPrint`; `PassportMinted` несёт последним полем `operationId`.
 
 ```solidity
 event CreatorRegistered(string indexed creatorId, address indexed wallet, bytes1 typePrefix, uint256 timestamp);

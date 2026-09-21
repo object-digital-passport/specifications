@@ -1,3 +1,5 @@
+> **Historical / superseded for ABI `0.7-redesign-7`.** NFC hardware/transport is deferred for this release; this legacy guide does not establish implemented or physically verified support. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+
 # Android verifier MVP (scope)
 
 Minimum useful dedicated verifier for **ODP + NTAG 424 DNA TagTamper**: NFC runtime, separate trust rows (carrier, offline payload, chip session, `nfcPublicKey` binding, canonical `dataHash`), without becoming a full issuer workstation.

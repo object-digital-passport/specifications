@@ -1,3 +1,5 @@
+> **Historical / superseded for ABI `0.7-redesign-7`.** The old diagrams, unit-passport/owner hooks, first-activation revocation lock, passportId-based key derivation and ready-reader claims below are superseded. ABI6 uses nonce-based v2, typed commitment and no unit passports; copied signatures/activation are not clone detection or ownership proof. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+
 # Edition passports and unit activation keys
 
 *Design note for the **v0.7** line. **Non-normative** — this document records the decisions and their rationale. The binding rules are **[`SPEC.md` §20](../SPEC.md#20-edition-passports-and-unit-activation-keys-v07-line-b-profile-only)**; where the two disagree, the spec wins.*

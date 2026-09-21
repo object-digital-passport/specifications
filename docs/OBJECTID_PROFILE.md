@@ -1,3 +1,5 @@
+> **Historical / superseded for ABI `0.7-redesign-7`.** This optional draft is not an implemented ABI6 theft/status feature. Any added JSON fields must satisfy the current schema; no mutable object-event API exists in core. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+
 # ODP Object ID Compatibility Profile · v0.5 draft
 
 *Optional profile. Normative core rules remain in [`SPEC.md`](../SPEC.md).*

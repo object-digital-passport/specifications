@@ -1,38 +1,17 @@
-# Направления работы над протоколом (следствия аудита против выпущенных возможностей)
+# Границы реализации ODP 0.7 — ABI 0.7-redesign-7
 
-*Перевод справочно. Нормативный оригинал — только на английском: [`docs/PROTOCOL_TRACKS.md`](../PROTOCOL_TRACKS.md). Этот текст может содержать ошибки; при расхождении верен английский.*
+Нормативна [английская SPEC](../../SPEC.md); [английская версия](../PROTOCOL_TRACKS.md).
+Прежние Track A/B заменены; снимок сохранён в [аудиторском SOURCE](../../review/audit-handoff-abi6/SOURCE/docs/ru/PROTOCOL_TRACKS.md).
 
-*Ненормативный указатель. Обязывающие правила остаются в [`SPEC.md`](../../SPEC.md) ([перевод](SPEC.md)).*
+| Область | Реализовано локально | Отдельная незавершённая приёмка |
+|---|---|---|
+| Core | Прямой mint зарегистрированного issuer, operationId, immutable карточка/hashes, отзыв issuer до 72h для C и до 24h для B/P/M и только до фиксации печати, необратимая `finalizePassportForPrint`, неуникальные модели тиража только для B | Независимый аудит, пересобранный release-бандл для этой ABI и production generation |
+| Девять satellites | Journal/proof replay, собственный withdrawal, edition commitment/activation, hosting/directory/relations/concerns/author/wallet anchors | Клиент, identity и свежесть истории |
+| Tools | Canonical strict UTF-8, semantic/list/tree, custom bit31, digests, statement и распакованный bundle | Безопасный ZIP и полный путь приложения |
+| Deployment | Фиксированный release, manifest/resume, spend/nonce limits, два RPC/finality, итоговая проверка десяти контрактов | Новое разрешение и реальное production evidence |
 
-## Направление B — выпущено в этом репозитории (эталонный байткод)
-
-- **Агент минта (расширение v0.3):** делегированный минт после двухшагового рукопожатия; `Passport.mintAgent`, `mintOnBehalfOfCreatorId`; см. **SPEC** (сводка v0.3 плюс таблицы ACL).
-- **Инструменты и ABI:** [`backend/js/odp-contract.js`](https://github.com/object-digital-passport/object-digital-passport.github.io/blob/main/backend/js/odp-contract.js) и [`frontend/passport.html`](https://github.com/object-digital-passport/object-digital-passport.github.io/blob/main/frontend/passport.html) в репозитории сайта; `chain/tools/mint.py` и тесты в `chain/deploy/test/` здесь.
-
-## Направление A — бэклог после аудита (документация и будущий байткод)
-
-- **Модель безопасности:** [`SECURITY.md`](SECURITY.md) описывает эталонную линию **v0.4** (`CONTRACT_VERSION` **4**, опциональный **`ODPCounterfeitConcern`**, правила префикса UTC). Пересматривать при добавлении спутников или изменении границ доверия; английский оригинал: [`../SECURITY.md`](../SECURITY.md).
-- **Тексты верификатора:** предупреждение о доверии к профилям M/P в `verify.html` (ID в цепи ≠ проверенное имя институции).
-- **Опциональный протокол (нет в текущем `ObjectDigitalPassport.sol`):**
-  - Глобальная уникальность `dataHash` паспорта (продуктовое решение; потребует изменения контракта).
-  - Опциональное **подтверждение автора (ECDSA)** — описано в **SPEC** как *планируемое*; Solidity только после выбора стратегии по EIP-170 (см. ниже).
-
-## EIP-170 (лимит деплоя 24 КиБ)
-
-Артефакт эталонного **`ObjectDigitalPassport`** может превысить лимит байткода основной сети. Локальные тесты **Hardhat** могут пользоваться `allowUnlimitedContractSize`; **основные сети Polygon и Ethereum лимит принуждают**.
-
-Варианты (оптимизатор, разделение на спутники, поэтапный ввод возможностей) — в **[`docs/EIP170_STRATEGY.md`](EIP170_STRATEGY.md)**, до деплоя направления B или добавления возможностей направления A в цепь.
-
-## Реализация ECDSA
-
-Работа над контрактом **явно отложена** до тех пор, пока:
-
-1. Раздел **SPEC** *Author attestation (ECDSA)* не стабилизируется (`ecdsa-capability-spec` во внутреннем планировании).
-2. Не выбран путь по **EIP-170** (`eip170-strategy`).
-
-Проверки подписи автора в цепи в эталонном контракте сегодня нет.
-
-## Версионирование: линии 0.x против движения к v1
-
-- **Нормативно:** **[`SPEC.md`](../../SPEC.md)** — раздел *IMPORTANT: registry versions, 0.x incompatibility, and alignment toward v1*.
-- **Кратко:** **v0.3** **не** совместима снизу вверх ни с **v0.2**, ни с **v0.1** (отдельные реестры: адрес, байткод, ABI). Эталон **v0.3** задокументирован для того, чтобы **стабильный v1** позже смог описать миграцию или двойное чтение; до выхода v1 это **намерение**.
+Mint-agent, profile stop, governance/pause, owner transfer, восстановление ключа и unit-passport hooks отсутствуют.
+Фиксация печати — отметка в реестре: ядро не наблюдает принтер и не предотвращает внешнюю печать, а печатный
+шлюз приложения здесь не реализован. Запечатанный пакет `0.7-redesign-6` эту ABI не подтверждает;
+см. [дельту](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md).
+EIP-712 author attestation реализована отдельным спутником: one-shot слот с выбранным issuer ключом и отдельным signer withdrawal; личность человека не устанавливается. Core не вызывает спутники. EIP-170 проверяется локально: [политика размера](EIP170_STRATEGY.md). NFC, хранение/доставка и физическая проверка QR остаются открытыми или отложенными. Цель — Polygon mainnet без обязательного Amoy; сейчас кошелёк и сеть запрещены.
