@@ -1,0 +1,56 @@
+[
+  {
+    "contract": "ObjectDigitalPassport",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 23
+  },
+  {
+    "contract": "ODPEditionUnits",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 4
+  },
+  {
+    "contract": "ODPAuthorAttestation",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 5
+  },
+  {
+    "contract": "ODPPassportConcerns",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 1
+  },
+  {
+    "contract": "ODPHosting",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 5
+  },
+  {
+    "contract": "ODPProfileDirectory",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 3
+  },
+  {
+    "contract": "ODPRegistryRelations",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 2
+  },
+  {
+    "contract": "ODPPassportProofRegistry",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 5
+  },
+  {
+    "contract": "ODPWalletDocumentAnchor",
+    "exitCode": 255,
+    "success": true,
+    "detectors": 3
+  }
+]

@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://object-digital-passport.github.io/object-digital-passport/spec/schema/passport-0.7.schema.json",
+  "title": "Object Digital Passport — passport.json v0.7",
+  "description": "Machine-readable schema for the canonical v0.7 passport.json (SPEC.md §9, plus the edition anchors of §20). The minified, NFC-normalized, key-sorted bytes of this document anchor the on-chain dataHash; the `anchors` array is additionally anchored on-chain via anchorsHash + anchorTypesMask. Additional properties are allowed: SPEC permits optional namespaces (identifiers, iiif, sustainability, compliance) and additionalMetadata.",
+  "type": "object",
+  "required": [
+    "version",
+    "passportId",
+    "title",
+    "authorName",
+    "shortDescription",
+    "anchors",
+    "objectType",
+    "status",
+    "contentClass",
+    "aiStatus",
+    "verificationMethod",
+    "edition",
+    "idGranularity",
+    "year",
+    "month",
+    "registeredAt",
+    "registration"
+  ],
+  "properties": {
+    "version": {
+      "const": "0.7",
+      "description": "Document schema line. MUST be \"0.7\" for this schema."
+    },
+    "passportId": {
+      "type": "string",
+      "pattern": "^ODP-[0-9]{4}-(0[1-9]|1[0-2])-[0-9]{9}$",
+      "description": "On-chain Passport ID. YYYY-MM segments are the UTC mint month (SPEC §2)."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "On-chain card field. MUST equal the on-chain title byte-for-byte (1-128 bytes; maxLength here is a codepoint approximation of the byte limit)."
+    },
+    "authorName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "On-chain card field. Human-readable author/brand name. MUST equal on-chain authorName byte-for-byte."
+    },
+    "shortDescription": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "On-chain card field. One-line annotation (object kind, technique, creation year). MUST equal on-chain shortDescription byte-for-byte."
+    },
+    "domain": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "On-chain card field (optional). MUST equal on-chain domain byte-for-byte, including the empty string."
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description; free-text pre-registration history MAY live here (informative only, SPEC §9 provenance rule)."
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What is depicted / what the object is about (Object ID 'subject')."
+    },
+    "creationDate": {
+      "type": "string",
+      "minLength": 4,
+      "description": "Object creation date or creation-period anchor (Object ID 'date or period'). Not the mint date."
+    },
+    "authorship": {
+      "type": "object",
+      "required": ["author"],
+      "properties": {
+        "author": { "$ref": "#/$defs/person" },
+        "coAuthors": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/person" }
+        },
+        "team": { "type": "string" }
+      }
+    },
+    "anchors": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/anchor" },
+      "description": "Identification anchors bound on-chain via anchorsHash + anchorTypesMask (SPEC §9, §10)."
+    },
+    "objectType": {
+      "enum": ["physical", "digital", "mixed"]
+    },
+    "status": {
+      "enum": ["concept", "prototype", "produced_object", "archived"],
+      "description": "Lifecycle state at registration. The current lifecycle status afterwards is the latest on-chain STATUS event, not this field."
+    },
+    "contentClass": {
+      "enum": ["static", "time_based", "spatial", "textual", "composite", "executable"]
+    },
+    "aiStatus": {
+      "enum": ["none", "assisted", "generated"]
+    },
+    "verificationMethod": {
+      "enum": ["self_asserted", "institutional", "nfc", "c2pa", "hybrid"]
+    },
+    "edition": {
+      "type": "object",
+      "required": ["model"],
+      "properties": {
+        "model": { "enum": ["unique", "limited", "open", "dynamic"] },
+        "number": { "type": "integer", "minimum": 1 },
+        "total": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "idGranularity": {
+      "enum": ["model", "batch", "item"],
+      "description": "What this passport identifies: a model (a design; any unit of it), a batch (one production run), or an item (one physical object). SPEC §9. Independent of `edition.model`, which describes how large the run is, not what the record points at."
+    },
+    "translations": {
+      "type": "object",
+      "description": "Language-keyed translations/transliterations of title, shortDescription, description. The on-chain card stays in the author's original language.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "shortDescription": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "year": {
+      "type": "integer",
+      "minimum": 1970,
+      "description": "UTC mint year. MUST match on-chain mint inputs."
+    },
+    "month": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12,
+      "description": "UTC mint month. MUST match on-chain mint inputs."
+    },
+    "objectYear": {
+      "type": "integer",
+      "description": "Historical object year when it differs from the UTC mint year (SPEC §9)."
+    },
+    "registeredAt": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Unix seconds (UTC instant) at registration."
+    },
+    "registration": {
+      "type": "object",
+      "required": ["utcIso8601", "localIso8601", "ianaTimeZone"],
+      "properties": {
+        "utcIso8601": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+        },
+        "localIso8601": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\+00:00$",
+          "description": "Legacy name: value MUST still encode the same UTC instant with +00:00 offset only."
+        },
+        "ianaTimeZone": {
+          "const": "UTC",
+          "description": "Always UTC in reference privacy mode; device-local zones MUST NOT be recorded."
+        }
+      }
+    },
+    "refinementTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "physical": {
+      "type": "object",
+      "description": "Descriptive physical facts only (SPEC §9). Identification facts (dimensions, materials, marks, distinguishing features, seals, photos) belong in anchors[], not here.",
+      "properties": {
+        "category": { "type": "string" },
+        "medium": { "type": "string" },
+        "weight": {
+          "type": "object",
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "type": "string" }
+          }
+        }
+      }
+    },
+    "digital": {
+      "type": "object",
+      "properties": {
+        "subtype": { "type": "string" },
+        "format": { "type": "string" },
+        "fileHash": { "$ref": "#/$defs/sha256Prefixed" },
+        "fileSize": { "type": "integer", "minimum": 0 },
+        "c2pa": {
+          "type": "object",
+          "properties": {
+            "manifestHash": { "$ref": "#/$defs/sha256Prefixed" },
+            "activeManifest": { "type": "string" }
+          }
+        }
+      }
+    },
+    "additionalMetadata": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "objectType": { "enum": ["physical", "mixed"] } } },
+      "then": {
+        "properties": {
+          "anchors": {
+            "type": "array",
+            "allOf": [
+              { "type": "array", "contains": { "type": "object", "required": ["type"], "properties": { "type": { "const": "photo" } } } },
+              { "type": "array", "contains": { "type": "object", "required": ["type"], "properties": { "type": { "const": "dimensions" } } } },
+              { "type": "array", "contains": { "type": "object", "required": ["type"], "properties": { "type": { "const": "materials" } } } },
+              { "type": "array", "contains": { "type": "object", "required": ["type"], "properties": { "type": { "const": "distinguishing_features" } } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "objectType": { "enum": ["digital", "mixed"] } } },
+      "then": {
+        "required": ["digital"],
+        "properties": {
+          "anchors": {
+            "type": "array",
+            "contains": { "type": "object", "required": ["type"], "properties": { "type": { "const": "file_hash" } } }
+          },
+          "digital": { "type": "object", "required": ["fileHash"] }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "objectType": { "const": "mixed" } } },
+      "then": {
+        "required": ["physical", "digital"],
+        "description": "SPEC §9 mixed object semantics: the canonical JSON MUST contain both physical and digital blocks."
+      }
+    }
+  ],
+  "$defs": {
+    "person": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "wallet": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{40}$",
+          "description": "Full 42-char wallet address. Truncated display forms are not valid here."
+        },
+        "creatorId": {
+          "type": "string",
+          "pattern": "^[CBPM]-[0-9]{3}-[0-9]{3}-[0-9]{3}-[0-9]{3}$"
+        }
+      }
+    },
+    "anchor": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Anchor type (SPEC §9 anchor type registry): photo, dimensions, materials, distinguishing_features, marks, file_hash, perceptual_hash, c2pa, nfc, numbered_seal, fingerprint, dna, unit_key_set, unit_variant_commit, custom, or a future registry value. Bits 14-30 are reserved for future SPEC revisions, so unknown strings are intentionally not rejected here."
+        },
+        "data": {
+          "type": "object",
+          "description": "Type-specific fields (SPEC §9). Shape depends on `type` and is not exhaustively validated by this schema."
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "SHA-256 of the type-specific content, when applicable (e.g. the photo file, the file_hash original, the c2pa manifest)."
+        },
+        "verification": {
+          "type": "string",
+          "description": "Free text, or a profile id, describing how to check this anchor."
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "SPEC 0.7 §9 — dimensions. Measures carry a UN/CEFACT Rec 20 common code so software can compare them; a client renders the human-readable unit.",
+          "if": { "properties": { "type": { "const": "dimensions" } }, "required": ["type"] },
+          "then": {
+            "required": ["data"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": ["unit"],
+                "properties": {
+                  "unit": {
+                    "enum": ["MMT", "CMT", "MTR", "INH", "FOT"],
+                    "description": "UN/CEFACT Recommendation 20 common code: MMT millimetre, CMT centimetre, MTR metre, INH inch, FOT foot. Every measure in this anchor is in this unit."
+                  },
+                  "width": { "type": "number", "exclusiveMinimum": 0 },
+                  "height": { "type": "number", "exclusiveMinimum": 0 },
+                  "depth": { "type": "number", "exclusiveMinimum": 0 },
+                  "diameter": { "type": "number", "exclusiveMinimum": 0 },
+                  "upperTolerance": { "type": "number", "minimum": 0, "description": "How much larger than the stated measures the object may be and still match, in the same unit." },
+                  "lowerTolerance": { "type": "number", "minimum": 0, "description": "How much smaller than the stated measures the object may be and still match, in the same unit." }
+                }
+              }
+            }
+          }
+        },
+        {
+          "$comment": "SPEC 0.7 §20.3 — unit_key_set. B profiles only; the same Merkle root is registered on-chain in ODPEditionUnits and a verifier compares the two.",
+          "if": { "properties": { "type": { "const": "unit_key_set" } }, "required": ["type"] },
+          "then": {
+            "required": ["data"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "merkleRoot": { "$ref": "#/$defs/sha256Prefixed" },
+                  "unitCount": { "type": "integer", "minimum": 1, "maximum": 4294967295 },
+                  "hashAlg": { "const": "sha256" },
+                  "leafFormat": { "const": "sha256(uint32be(index) || address20)" },
+                  "addressListUrl": { "$ref": "#/$defs/httpsUrl" },
+                  "addressListHash": { "$ref": "#/$defs/sha256Prefixed" },
+                  "labelSignerKey": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "SPEC 0.7 §20.7 — address whose signature an offline reader checks a signed outer label against. Omit for plain labels."
+                  }
+                },
+                "required": ["merkleRoot", "unitCount", "hashAlg", "leafFormat", "addressListHash"]
+              }
+            }
+          }
+        },
+        {
+          "$comment": "SPEC 0.7 §20.4 — unit_variant_commit. The salt is carried inside the sealed package and never appears here.",
+          "if": { "properties": { "type": { "const": "unit_variant_commit" } }, "required": ["type"] },
+          "then": {
+            "required": ["data"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": ["merkleRoot", "unitCount", "hashAlg"],
+                "properties": {
+                  "merkleRoot": { "$ref": "#/$defs/sha256Prefixed" },
+                  "unitCount": { "type": "integer", "minimum": 1, "maximum": 4294967295 },
+                  "hashAlg": { "const": "sha256" },
+                  "leafFormat": { "const": "sha256(uint32be(index) || uint16be(len(variant)) || utf8(variant) || salt32)" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sha256Prefixed": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "httpsUrl": {
+      "type": "string",
+      "pattern": "^https://",
+      "maxLength": 512
+    }
+  }
+}

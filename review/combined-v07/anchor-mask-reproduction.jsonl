@@ -1,0 +1,5 @@
+{"type":"new_custom_type","baseline":287,"actual":2147483935,"expected":2147483935,"conformant":true}
+{"type":"constructor","baseline":287,"actual":287,"expected":2147483935,"conformant":false}
+{"type":"__proto__","baseline":287,"actual":287,"expected":2147483935,"conformant":false}
+{"type":"toString","baseline":287,"actual":287,"expected":2147483935,"conformant":false}
+{"type":"hasOwnProperty","baseline":287,"actual":287,"expected":2147483935,"conformant":false}

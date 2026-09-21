@@ -1,0 +1,37 @@
+[
+  {
+    "file": "review/combined-v07/sources/opus-REPORT.md",
+    "origin": "/tmp/codex-remote-attachments/01a0b2df-68b5-7ee0-a209-f46d01268ff2/CE5F17C7-3BBE-4BEC-9392-21EB2EFFFA17/1-REPORT.md",
+    "sha256": "aeeb3deedf16464724448c02d71027b8e1b458e8854c33a392f20989f2935b26"
+  },
+  {
+    "file": "review/combined-v07/sources/opus-FINDINGS.md",
+    "origin": "/tmp/codex-remote-attachments/01a0b2df-68b5-7ee0-a209-f46d01268ff2/CE5F17C7-3BBE-4BEC-9392-21EB2EFFFA17/2-FINDINGS.md",
+    "sha256": "03879d88aa351e78167c72ad6dc2072e81a7e0f4f8525842192ab58008a9fd2c"
+  },
+  {
+    "file": "review/combined-v07/sources/codex-REPORT.md",
+    "origin": "/Users/Andrei/.codex/visualizations/2026/09/18/01a0b2df-68b5-7ee0-a209-f46d01268ff2/odp-independent-v07/work/review/independent-v07/REPORT.md",
+    "sha256": "39ae2655b0f40b35ab16be316af750ef59da3d4d1920555cf477aa8840944643"
+  },
+  {
+    "file": "review/combined-v07/sources/codex-FINDINGS.md",
+    "origin": "/Users/Andrei/.codex/visualizations/2026/09/18/01a0b2df-68b5-7ee0-a209-f46d01268ff2/odp-independent-v07/work/review/independent-v07/FINDINGS.md",
+    "sha256": "c3d924beab5df411019c45a6a813a25b79ec5f46c05d619e56c8611049c460fb"
+  },
+  {
+    "file": "review/combined-v07/sources/codex-RELEASE_GATES.md",
+    "origin": "/Users/Andrei/.codex/visualizations/2026/09/18/01a0b2df-68b5-7ee0-a209-f46d01268ff2/odp-independent-v07/work/review/independent-v07/RELEASE_GATES.md",
+    "sha256": "d04526c2ec1ca91152d091cc67309a585cbcd0b9b9ed16e57af67d6b88750f46"
+  },
+  {
+    "file": "review/combined-v07/sources/codex-SCOPE.md",
+    "origin": "/Users/Andrei/.codex/visualizations/2026/09/18/01a0b2df-68b5-7ee0-a209-f46d01268ff2/odp-independent-v07/work/review/independent-v07/SCOPE.md",
+    "sha256": "bf64c043e9c2b04920757675badbdc1e6215975751cc8172eeddef9612c8151c"
+  },
+  {
+    "file": "review/combined-v07/sources/codex-COMPILER_AND_BUILD.md",
+    "origin": "/Users/Andrei/.codex/visualizations/2026/09/18/01a0b2df-68b5-7ee0-a209-f46d01268ff2/odp-independent-v07/work/review/independent-v07/COMPILER_AND_BUILD.md",
+    "sha256": "d04be1a715276f998105e7c643b7cd1392a3e0a48ddac653c72c67c2fb01d0ad"
+  }
+]

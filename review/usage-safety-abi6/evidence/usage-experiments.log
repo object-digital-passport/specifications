@@ -1,0 +1,3 @@
+PASS E1: copied printed code signs the same activation payload; no recipient is bound. No on-chain submission performed.
+PASS E2: a self-consistent list with the same key at two indexes passes address-list integrity. This does not verify unique secret provisioning.
+PASS E3: integrity=true coexists with revoked=true and unsupported verification, using synthetic chain views. This API does not authenticate chain evidence.

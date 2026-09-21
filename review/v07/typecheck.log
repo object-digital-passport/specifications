@@ -1,0 +1,2 @@
+PASS: tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck types/ethers-contracts/*.ts
+Exit 0; no diagnostics.

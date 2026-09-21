@@ -1,0 +1,131 @@
+
+Running Solidity tests
+
+
+Running Mocha tests
+
+
+  0.7 immutable core
+    ✔ has exact shared satellite ABI tuples
+    ✔ has no admin, external library, transfer, mutable card or callback entrypoints
+    ✔ reads five-field profiles and unknown identities safely
+    ✔ enforces profile type, permanent wallet registration and principal authorization
+    ✔ mints physical with immutable hashes, card and readable receipt
+    ✔ mints digital with immutable hashes, card and readable receipt
+    ✔ mints mixed with immutable hashes, card and readable receipt
+    ✔ rejects every invalid core enum and empty/oversized UTF-8 fields
+    ✔ checks hashes, required anchor masks and UTC
+    ✔ restricts edition anchor flags to B profiles
+    ✔ accepts issuer revocation at exactly 72h; requires nonzero reason and only once
+    ✔ rejects revocation after 72h, including by deployer of another issuer
+    ✔ stopping a profile blocks mint/revoke without erasing records
+    ✔ safe paging handles zero, max uint, end and page cap
+    ✔ never invokes external code during mint (trace opcode assertion)
+
+  0.7 concerns
+    ✔ independent P/M records, readable logs, withdraw/re-raise without duplicate indices
+    ✔ validates existence, roles, hashes, size and missing/withdrawn state
+    ✔ permits comments on revoked passports; stopped institution can withdraw but cannot raise again
+    ✔ 250 seeded state transitions preserve counter and unique index invariants (511ms)
+
+  0.7 hosting and directory
+    ✔ publishing permission is separate; expiry, replacement and revoke immediately apply
+    ✔ stopped issuer blocks URL changes; hashes stay fixed
+    ✔ domain declarations enforce organisation role and canonical DNS syntax
+
+  0.7 independent attestations and affiliation
+    ✔ proofs enforce P/M active state, passport state and paged access
+    ✔ document anchors reject stopped/unregistered issuer and duplicates; scopes hash to wallet
+    ✔ author signature binds domain and exact passport, cannot be front-run or replayed
+    ✔ stopped creator cannot bind arbitrary author key
+    ✔ affiliation handshake rejects cycles, is display-only, allows child to leave
+    ✔ stopped child cannot be confirmed; cleanup still works
+    ✔ ODPEditionUnits rejects EOA registry and fits EIP-170
+    ✔ ODPPassportConcerns rejects EOA registry and fits EIP-170
+    ✔ ODPPassportProofRegistry rejects EOA registry and fits EIP-170
+    ✔ ODPHosting rejects EOA registry and fits EIP-170
+    ✔ ODPProfileDirectory rejects EOA registry and fits EIP-170
+    ✔ ODPAuthorAttestation rejects EOA registry and fits EIP-170
+    ✔ ODPRegistryRelations rejects EOA registry and fits EIP-170
+    ✔ ODPWalletDocumentAnchor rejects EOA registry and fits EIP-170
+    ✔ ODPStatementJournal rejects EOA registry and fits EIP-170
+
+  0.7 additional adversarial boundaries
+    ✔ 101 real concern raisers cannot create oversized pages or occupy each other slots (960ms)
+    ✔ Gregorian month rollover rejects stale documents while a freshly prepared one mints
+    ✔ empty/max-length UTF-8 URL boundaries and missing-document semantics are enforced
+    ✔ author rejects high-s, wrong-v, wrong data and wrong passport signatures without occupying slot
+    ✔ activation rejects high-s, invalid-v, overlong proof and another-chain signature
+    ✔ affiliation rechecks cycle at confirmation after the pending graph changes
+
+  0.7 canonical bundle to local EVM and back
+    ✔ physical: real file bytes → JSON → mint → receipt → independent verification
+    ✔ digital: real file bytes → JSON → mint → receipt → independent verification
+    ✔ mixed: real file bytes → JSON → mint → receipt → independent verification
+    ✔ edition: real file bytes → JSON → mint → receipt → independent verification
+    ✔ all checked-in examples satisfy schema and semantic validation
+    ✔ rejects time, byte-length, assigned-ID and cross-anchor inconsistencies
+
+  0.7 quota and pagination boundaries
+    ✔ 1000 direct mints exhaust C bucket; rejected mint is atomic; pages stay bounded (3796ms)
+
+  0.7 edition preparation and activation
+    ✔ prepares immutable root before mint; printed seed reconstructs exactly the same key
+    ✔ permissionless courier gains no rights; duplicate, wrong index and bad signature fail
+    ✔ activation does not close issuer 72h revocation window; revoked edition cannot activate again
+    ✔ stopped issuer cannot open, but previously opened nonrevoked edition remains usable
+    ✔ rejects invalid edition model, flags, count, nonce, role and revoked passport
+    ✔ satellite-specific signatures cannot replay; historical namespace remains independently readable
+    ✔ all leaves in odd/even trees verify; mutations never activate or change state (258ms)
+
+  0.7 canonicalization
+    ✔ sorts integer-like keys by UTF-16, normalizes NFC, and uses ECMAScript numbers
+    ✔ rejects ambiguous or non-JSON inputs including normalized duplicate keys
+    ✔ matches checked-in canonical vectors
+
+  0.7 edition commitment enforced across core and satellite
+    ✔ matches independent JS typed encoding and persists the commitment in the core
+    ✔ rejects each mismatched parameter without occupying the slot or nonce
+    ✔ binds the satellite address and issuer, including malicious copied commitments
+    ✔ prevents one issuer nonce opening twice under different passports, even after revocation
+    ✔ does not let a different issuer reserve another issuer nonce
+    ✔ requires commitment exactly for unit-key anchors, and a supported edition model
+
+  0.7 measured registration costs
+V07_GAS {"registration":"166286","physicalMint":"599254","firstConcern":"238865","secondRaiser":"204711","withdraw":"46399","reRaise":"77720"}
+    ✔ records gas for the new indexed concern model rather than reusing the legacy number
+
+  0.7 direct issuance and durable operation identity
+    ✔ removes every mint-agent permission and records only the calling profile
+    ✔ rejects old on-behalf mint calldata instead of interpreting it as a new operation
+    ✔ reports the existing ID for exact replay, including after revocation and issuer stop
+    ✔ binds every mint field and the entrypoint to the operation
+    ✔ does not reserve an operation on a failed mint, and rejects zero operation IDs
+    ✔ scopes operation IDs to issuer and registry, without reserving global document hashes
+    ✔ recovers after a month rollover without re-preparing the committed document
+    ✔ two pending transactions for one operation cannot create two passports
+
+  0.7 statement lifecycle
+    ✔ author independently publishes; issuer cannot withdraw or replace their declaration
+    ✔ replacements preserve history, require matching subject/kind, reject stale branches
+    ✔ stop blocks publishing but permits own withdrawal, once, with nonzero reason
+    ✔ issuer correction on revoked or old passport cannot change core
+    ✔ rejects missing subjects, unregistered authors, wrong roles and empty commitments
+    ✔ bounded history pagination includes retracted and replaced records
+    ✔ institution can withdraw an old proof after stop and passport revocation
+    ✔ separate author signer withdraws one-shot consent without issuer authorization
+    ✔ contract-wallet caller can register, publish and retract after stop
+    ✔ seeded lifecycle sequence preserves terminal records and author isolation (307ms)
+
+  0.7 optional variant commitments
+    ✔ all sealed variants verify; a changed variant, salt or index fails
+    ✔ uses NFC UTF-8 byte length and rejects excess length
+    ✔ rejects mismatched counts between edition, unit keys and variant commitments
+
+
+  88 passing (8s)
+
+
+88 passing (88 mocha)
+
+WARNING: hre.network.connect() is deprecated and will be removed in a future version. Use hre.network.create() or hre.network.getOrCreate() instead.

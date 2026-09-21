@@ -1,0 +1,20 @@
+check-translations: 4 translation(s) missing identifiers
+
+  docs/ru/SPEC.md
+    missing from the Russian, present in SPEC.md:
+    passportIdText PassportMinted getCreator operationId ODPPassportProofRegistry proofWithdrawnAt proofWithdrawalReason getProof ODPRegistryRelations numbered_seal PassportMintInputs dataHash imageHash fileHash anchorsHash anchorTypesMask editionCommitment creatorId getPassportHeader getPassportClassification getPassportMedia idGranularity registeredAt ianaTimeZone distinguishing_features file_hash passportId verifyPassport chainId ODPHosting ODPProfileDirectory ODPPassportConcerns raisedBy ODPAuthorAttestation withdrawAuthorAttestation authorWithdrawalAt authorWithdrawalReason ODPWalletDocumentAnchor ODPStatementJournal payloadHash StatementNotActive getStatement CONTRACT_VERSION odpVersion generationId abiGeneration absentSatelliteRoles transactionHash blockNumber blockHash editionNonce commitmentFor openEdition editionPassportByNonce chainId32
+  docs/ru/ANDROID_NTAG424DNA_TAGTAMPER.md
+    missing from the Russian, present in docs/ANDROID_NTAG424DNA_TAGTAMPER.md:
+    nfcUid chipKeyMatch
+  docs/ru/GUIDE.md
+    missing from the Russian, present in docs/GUIDE.md:
+    v0.7
+  docs/ru/README-docs.md
+    missing from the Russian, present in docs/README.md:
+    v0.3 v0.2 v0.4 createPassportOdpBlob dataUrl
+
+check-translations: 1 translation(s) older than their original
+
+  docs/ru/RELEASE_v0.4.1.md last touched 2026-08-21, docs/RELEASE_v0.4.1.md last touched 2026-08-22
+
+check-translations: 59 English document(s) accounted for, 25 translated, 0 planned — 5 soft finding(s) above

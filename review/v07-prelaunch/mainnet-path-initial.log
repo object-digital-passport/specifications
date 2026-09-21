@@ -1,0 +1,26 @@
+Running Mocha tests
+
+
+  Polygon137 complete deployment path over two local HTTP RPCs
+    ✔ executes all ten pinned creations and finality/runtime checks through both HTTP providers (1387ms)
+    ✔ resumes planned failure on Polygon path without duplicate deployments (1126ms)
+    ✔ resumes broadcast failure on Polygon path without duplicate deployments (1118ms)
+    ✔ resumes pending failure on Polygon path without duplicate deployments (1009ms)
+    ✔ resumes verified failure on Polygon path without duplicate deployments (1051ms)
+    ✔ refuses unsupported finality and mismatched chain before any transaction (97ms)
+    ✔ secondary runtime mismatch interrupts and resumes only after agreement (941ms)
+    1) rechecks the first contract before completing when its evidence changes during the last deployment
+
+
+  7 passing (11s)
+  1 failing
+
+  1) Polygon137 complete deployment path over two local HTTP RPCs
+       rechecks the first contract before completing when its evidence changes during the last deployment:
+     AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Context.<anonymous> (file:///Users/Andrei/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/GitHub/Object%20Digital%20Passport/specifications/chain/deploy/test/ODP07MainnetPath.test.js:47:3)
+
+
+
+

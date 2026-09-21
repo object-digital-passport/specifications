@@ -1,0 +1,22 @@
+chain/contracts/ObjectDigitalPassport.sol:183: function registerCreator(bytes1 typePrefix)
+chain/contracts/ObjectDigitalPassport.sol:337: function revokePassport(string calldata passportId, bytes32 reasonHash) external {
+chain/contracts/ObjectDigitalPassport.sol:417: function _beginMint(string memory kind, PassportMintInputs calldata m, bytes32 operationId)
+chain/contracts/ObjectDigitalPassport.sol:435: function getMintOperation(address issuer, bytes32 operationId)
+chain/contracts/ODPEditionUnits.sol:49: function openEdition(
+chain/contracts/ODPEditionUnits.sol:103: function activate(
+chain/contracts/ODPEditionUnits.sol:163: function activationPayloadHash(string calldata editionPassportId, uint32 unitIndex)
+chain/contracts/ODPEditionUnits.sol:151: function getActivation(string calldata editionPassportId, uint32 unitIndex)
+chain/contracts/ODPAuthorAttestation.sol:60: function withdrawAuthorAttestation(string calldata passportId, bytes32 reasonHash) external {
+chain/contracts/ODPAuthorAttestation.sol:131: function attestAuthor(
+chain/contracts/ODPAuthorAttestation.sol:169: function getAuthorAttestation(string calldata passportId)
+chain/contracts/ODPStatementJournal.sol:51: function publishStatement(string calldata passportId, Kind kind, bytes32 payloadHash,
+chain/contracts/ODPStatementJournal.sol:94: function retractStatement(uint256 id, bytes32 reasonHash) external {
+chain/contracts/ODPStatementJournal.sol:105: function getStatementsForPassportPaged(string calldata id, uint256 offset, uint256 limit)
+chain/contracts/ODPHosting.sol:16: function delegatePublishing(address agent, uint256 expiresAt) external {
+chain/contracts/ODPHosting.sol:31: function updateLocations(string calldata id, string calldata dataUrl, string calldata imageUrl) external {
+chain/tools/bundle.mjs:19: export function validateBundleEntries(entries, { trustedGeneration } = {}) {
+chain/tools/bundle.mjs:73: let deployment = 'unverified';
+chain/tools/passport.mjs:39: export function verifyPassport(document,header,media,classification) {
+chain/tools/passport.mjs:66: export async function prepareIssuance(document,{issuer,addressListBytes}={}) {
+chain/tools/edition.mjs:20: export function unitWallet(seed,ctx) {
+chain/tools/edition.mjs:56: export function verifyAddressList(bytes, {addressListHash, unitCount, merkleRoot}) {

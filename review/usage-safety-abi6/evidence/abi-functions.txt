@@ -1,0 +1,11 @@
+IODPRegistry.json: getCreator, getCreatorByWallet, getPassportClassification, getPassportHeader, getPassportMedia, passportExists
+ODPAuthorAttestation.json: attestAuthor, authorWithdrawalAt, authorWithdrawalReason, domainSeparator, getAuthorAttestation, hashAuthorAttestation, odpRegistry, withdrawAuthorAttestation
+ODPEditionUnits.json: activate, activationPayloadHash, commitmentFor, editionPassportByNonce, getActivation, getEdition, isActivated, labelPayloadHash, odpRegistry, openEdition, unitLeaf
+ODPHosting.json: delegatePublishing, getLocations, getPublishingDelegation, odpRegistry, revokePublishing, updateLocations
+ODPPassportConcerns.json: activeConcernCount, getConcern, getConcernRaisersPaged, getConcernsByRaiserPaged, odpRegistry, raiseConcern, withdrawConcern
+ODPPassportProofRegistry.json: getProof, getProofsByInstitutionPaged, getProofsForPassportPaged, odpRegistry, proofAuthor, proofOperations, proofWithdrawalReason, proofWithdrawnAt, submitProof, withdrawProof
+ODPProfileDirectory.json: getDomain, odpRegistry, setDomain
+ODPRegistryRelations.json: cancelAffiliationRequest, confirmAffiliation, detachAffiliation, getAffiliatedChildren, getAffiliatedChildrenPaged, getAffiliatedParent, getAffiliationAudit, isAffiliationPending, leaveAffiliation, odpRegistry, proposeAffiliation
+ODPStatementJournal.json: getStatement, getStatementsByAuthorPaged, getStatementsForPassportPaged, odpRegistry, publishStatement, retractStatement, statementCount, statementOperations
+ODPWalletDocumentAnchor.json: attestExternalDocument, getExternalDocumentAttestation, odpRegistry
+ObjectDigitalPassport.json: CONTRACT_VERSION, MAX_PAGE_SIZE, REVOCATION_WINDOW, getCreator, getCreatorByWallet, getMintOperation, getPassportClassification, getPassportHeader, getPassportMedia, getPassportsByCreatorPaged, mintDigital, mintMixed, mintPhysical, passportExists, registerCreator, revokePassport

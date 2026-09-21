@@ -1,0 +1,16 @@
+{
+  "functionsWithBody": 127,
+  "resolvedCallEdges": 103,
+  "recursiveCycles": 0,
+  "inlineAssemblyFunctionDefinitions": 0,
+  "deleteOperandTypes": [
+    "struct ODPHosting.Delegation storage ref",
+    "bool",
+    "uint256",
+    "string storage ref",
+    "string storage ref",
+    "bool",
+    "string storage ref"
+  ],
+  "note": "Source AST precondition screen, not proof of compiler correctness"
+}

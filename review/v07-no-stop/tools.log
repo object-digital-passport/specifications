@@ -1,0 +1,116 @@
+
+> object-digital-passport@0.7.0 test:tools
+> node --test tools/test/*.test.mjs
+
+TAP version 13
+# Subtest: offline integrity never implies verified chain or issuer
+ok 1 - offline integrity never implies verified chain or issuer
+  ---
+  duration_ms: 9.567125
+  type: 'test'
+  ...
+# Subtest: omitting both payload and manifest item cannot hide a missing original
+ok 2 - omitting both payload and manifest item cannot hide a missing original
+  ---
+  duration_ms: 1.240667
+  type: 'test'
+  ...
+# Subtest: payload tamper and size mismatch fail
+ok 3 - payload tamper and size mismatch fail
+  ---
+  duration_ms: 2.301833
+  type: 'test'
+  ...
+# Subtest: duplicate paths, traversal, extra and missing roots fail
+ok 4 - duplicate paths, traversal, extra and missing roots fail
+  ---
+  duration_ms: 0.364125
+  type: 'test'
+  ...
+# Subtest: cross-file mismatch and missing/duplicate satellite roles fail
+ok 5 - cross-file mismatch and missing/duplicate satellite roles fail
+  ---
+  duration_ms: 3.653959
+  type: 'test'
+  ...
+# Subtest: duplicate JSON keys, malformed UTF-8, BOM and noncanonical passport fail
+ok 6 - duplicate JSON keys, malformed UTF-8, BOM and noncanonical passport fail
+  ---
+  duration_ms: 1.516583
+  type: 'test'
+  ...
+# Subtest: edition must use the declared generation and include public address list
+ok 7 - edition must use the declared generation and include public address list
+  ---
+  duration_ms: 10.181542
+  type: 'test'
+  ...
+# Subtest: manifest path/hash disagreement, unlisted bytes and duplicate deployments fail
+ok 8 - manifest path/hash disagreement, unlisted bytes and duplicate deployments fail
+  ---
+  duration_ms: 2.438083
+  type: 'test'
+  ...
+# Subtest: mainnet finality requires two separate RPC observations of the same finalized block
+ok 9 - mainnet finality requires two separate RPC observations of the same finalized block
+  ---
+  duration_ms: 0.724
+  type: 'test'
+  ...
+# Subtest: finality waits for lag but rejects a changed canonical block immediately
+ok 10 - finality waits for lag but rejects a changed canonical block immediately
+  ---
+  duration_ms: 2.168
+  type: 'test'
+  ...
+# Subtest: unknown anchor names including prototype properties set bit 31
+ok 11 - unknown anchor names including prototype properties set bit 31
+  ---
+  duration_ms: 7.286584
+  type: 'test'
+  ...
+# Subtest: strict bytes and CLI reject malformed UTF-8 and BOM
+ok 12 - strict bytes and CLI reject malformed UTF-8 and BOM
+  ---
+  duration_ms: 170.028
+  type: 'test'
+  ...
+# Subtest: zero root is rejected in passport and direct commitment preflight
+ok 13 - zero root is rejected in passport and direct commitment preflight
+  ---
+  duration_ms: 1.128459
+  type: 'test'
+  ...
+# Subtest: address list verifies odd tree and rejects count, order, root and format tampering
+ok 14 - address list verifies odd tree and rejects count, order, root and format tampering
+  ---
+  duration_ms: 1.100916
+  type: 'test'
+  ...
+# Subtest: statement validator rejects independently changed subject, journal, author and payload
+ok 15 - statement validator rejects independently changed subject, journal, author and payload
+  ---
+  duration_ms: 16.894083
+  type: 'test'
+  ...
+# Subtest: pinned operation vectors preserve encoding and separate caller, chain and satellite
+ok 16 - pinned operation vectors preserve encoding and separate caller, chain and satellite
+  ---
+  duration_ms: 13.418375
+  type: 'test'
+  ...
+# Subtest: issuance preflight requires and verifies full edition list before exposing mint tuple
+ok 17 - issuance preflight requires and verifies full edition list before exposing mint tuple
+  ---
+  duration_ms: 5.347541
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 403.265666

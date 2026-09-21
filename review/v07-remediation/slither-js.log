@@ -1,0 +1,123 @@
+
+Detector: weak-prng
+ODPPassportProofRegistry._generateProofId(uint32,uint8,string) (ODPPassportProofRegistry.sol#139-165) uses a weak PRNG: "n = uint32(uint256(keccak256(bytes)(abi.encodePacked(block.timestamp,block.prevrandao,msg.sender,baseNonce + i,key,passportIdHash,gasleft()()))) % 100_000_000) (ODPPassportProofRegistry.sol#149-157)" 
+ObjectDigitalPassport._currentMonth() (ObjectDigitalPassport.sol#491-498) uses a weak PRNG: "secsInYear = block.timestamp % 31_556_952 (ObjectDigitalPassport.sol#494)" 
+ObjectDigitalPassport._generateCreatorNumber() (ObjectDigitalPassport.sol#502-522) uses a weak PRNG: "n = uint64(uint256(keccak256(bytes)(abi.encodePacked(block.timestamp,block.prevrandao,msg.sender,baseNonce + i,gasleft()()))) % 1_000_000_000_000) (ObjectDigitalPassport.sol#509-515)" 
+ObjectDigitalPassport._generatePassportId(uint32,uint8) (ObjectDigitalPassport.sol#524-547) uses a weak PRNG: "n = uint32(uint256(keccak256(bytes)(abi.encodePacked(block.timestamp,block.prevrandao,msg.sender,baseNonce + i,key,gasleft()()))) % 1_000_000_000) (ObjectDigitalPassport.sol#532-539)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+Detector: incorrect-equality
+ODPPassportProofRegistry._requireUtcYearMonth(uint32,uint8) (ODPPassportProofRegistry.sol#134-137) uses a dangerous strict equality:
+	- ! (year == cy && month == cm) (ODPPassportProofRegistry.sol#136)
+ObjectDigitalPassport._activeProfile() (ObjectDigitalPassport.sol#554-558) uses a dangerous strict equality:
+	- bytes(id).length == 0 (ObjectDigitalPassport.sol#556)
+ObjectDigitalPassport._checkAndIncrementMintLimit(string,address) (ObjectDigitalPassport.sol#469-479) uses a dangerous strict equality:
+	- t == TYPE_P || t == TYPE_M (ObjectDigitalPassport.sol#471)
+ObjectDigitalPassport._checkAndIncrementMintLimit(string,address) (ObjectDigitalPassport.sol#469-479) uses a dangerous strict equality:
+	- (t == TYPE_B) (ObjectDigitalPassport.sol#474)
+ObjectDigitalPassport._requireUtcYearMonth(uint32,uint8) (ObjectDigitalPassport.sol#460-463) uses a dangerous strict equality:
+	- ! (year == cy && month == cm) (ObjectDigitalPassport.sol#462)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Detector: timestamp
+ODPAuthorAttestation.withdrawAuthorAttestation(string,bytes32) (ODPAuthorAttestation.sol#60-65) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _attestation[passportId].authorSigner != msg.sender || authorWithdrawalAt[passportId] != 0 || reasonHash == bytes32(0) (ODPAuthorAttestation.sol#61)
+ODPAuthorAttestation.attestAuthor(string,address,bytes) (ODPAuthorAttestation.sol#131-158) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _attestation[passportId].authorSigner != address(0) (ODPAuthorAttestation.sol#137)
+ODPHosting.delegatePublishing(address,uint256) (ODPHosting.sol#16-22) uses timestamp for comparisons
+	Dangerous comparisons:
+	- expiresAt <= block.timestamp (ODPHosting.sol#19)
+ODPHosting.updateLocations(string,string,string) (ODPHosting.sol#31-39) uses timestamp for comparisons
+	Dangerous comparisons:
+	- msg.sender != h.creator && (msg.sender != d.agent || block.timestamp >= d.expiresAt) (ODPHosting.sol#35)
+ODPPassportProofRegistry.withdrawProof(string,bytes32) (ODPPassportProofRegistry.sol#54-59) uses timestamp for comparisons
+	Dangerous comparisons:
+	- proofAuthor[proofId] != msg.sender || proofWithdrawnAt[proofId] != 0 || reasonHash == bytes32(0) (ODPPassportProofRegistry.sol#55)
+ODPPassportProofRegistry.getProof(string) (ODPPassportProofRegistry.sol#125-132) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (bytes(_proofs[proofId].proofId).length > 0) (ODPPassportProofRegistry.sol#130)
+ODPPassportProofRegistry._requireUtcYearMonth(uint32,uint8) (ODPPassportProofRegistry.sol#134-137) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (year == cy && month == cm) (ODPPassportProofRegistry.sol#136)
+ODPStatementJournal.publishStatement(string,ODPStatementJournal.Kind,bytes32,uint256,bytes32) (ODPStatementJournal.sol#51-91) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _lifecycle[previousId].status != Status.Active (ODPStatementJournal.sol#74)
+ODPStatementJournal.retractStatement(uint256,bytes32) (ODPStatementJournal.sol#94-100) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _statements[id].author != msg.sender (ODPStatementJournal.sol#95)
+	- _lifecycle[id].status != Status.Active (ODPStatementJournal.sol#96)
+ObjectDigitalPassport.revokeCreator() (ObjectDigitalPassport.sol#215-222) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (bytes(creatorId).length > 0) (ObjectDigitalPassport.sol#217)
+ObjectDigitalPassport.getCreator(string) (ObjectDigitalPassport.sol#224-229) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (bytes(_creators[creatorId].creatorId).length > 0) (ObjectDigitalPassport.sol#227)
+ObjectDigitalPassport.revokePassport(string,bytes32) (ObjectDigitalPassport.sol#353-365) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _creators[p.creatorId].revokedAt != 0 (ObjectDigitalPassport.sol#358)
+	- block.timestamp > p.timestamp + REVOCATION_WINDOW (ObjectDigitalPassport.sol#359)
+ObjectDigitalPassport._requireUtcYearMonth(uint32,uint8) (ObjectDigitalPassport.sol#460-463) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (year == cy && month == cm) (ObjectDigitalPassport.sol#462)
+ObjectDigitalPassport._checkAndIncrementMintLimit(string,address) (ObjectDigitalPassport.sol#469-479) uses timestamp for comparisons
+	Dangerous comparisons:
+	- t == TYPE_P || t == TYPE_M (ObjectDigitalPassport.sol#471)
+	- (t == TYPE_B) (ObjectDigitalPassport.sol#474)
+ObjectDigitalPassport._currentMonth() (ObjectDigitalPassport.sol#491-498) uses timestamp for comparisons
+	Dangerous comparisons:
+	- m > 12 (ObjectDigitalPassport.sol#496)
+ObjectDigitalPassport.passportExists(string) (ObjectDigitalPassport.sol#551-553) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _passports[id].creator != address(0) (ObjectDigitalPassport.sol#552)
+ObjectDigitalPassport._activeProfile() (ObjectDigitalPassport.sol#554-558) uses timestamp for comparisons
+	Dangerous comparisons:
+	- bytes(id).length == 0 (ObjectDigitalPassport.sol#556)
+	- _creators[id].revokedAt != 0 (ObjectDigitalPassport.sol#557)
+ObjectDigitalPassport._validateEditionBits(string,PassportMintInputs) (ObjectDigitalPassport.sol#559-565) uses timestamp for comparisons
+	Dangerous comparisons:
+	- (m.anchorTypesMask & (ODPAnchorBits.UNIT_KEY_SET | ODPAnchorBits.UNIT_VARIANT_COMMIT)) != 0 && _creators[id].typePrefix != TYPE_B (ObjectDigitalPassport.sol#560-561)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Detector: assembly
+ODPAuthorAttestation._recover(bytes32,bytes) (ODPAuthorAttestation.sol#188-203) uses assembly
+	- INLINE ASM (ODPAuthorAttestation.sol#193-197)
+ODPEditionUnits._recoverSigner(bytes32,bytes) (ODPEditionUnits.sol#188-207) uses assembly
+	- INLINE ASM (ODPEditionUnits.sol#193-197)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Detector: cyclomatic-complexity
+ODPEditionUnits.openEdition(string,bytes32,uint32,address,bytes32) (ODPEditionUnits.sol#49-86) has a high cyclomatic complexity (12).
+ODPStatementJournal.publishStatement(string,ODPStatementJournal.Kind,bytes32,uint256,bytes32) (ODPStatementJournal.sol#51-91) has a high cyclomatic complexity (14).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (IODPRegistry.sol#2)
+	- ^0.8.20 (ODPAuthorAttestation.sol#2)
+	- ^0.8.20 (ODPEditionUnits.sol#2)
+	- ^0.8.20 (ODPErrors.sol#2)
+	- ^0.8.20 (ODPHosting.sol#2)
+	- ^0.8.20 (ODPPassportConcerns.sol#2)
+	- ^0.8.20 (ODPPassportLib.sol#2)
+	- ^0.8.20 (ODPPassportProofRegistry.sol#2)
+	- ^0.8.20 (ODPPassportTypes.sol#2)
+	- ^0.8.20 (ODPProfileDirectory.sol#2)
+	- ^0.8.20 (ODPRegistryRelations.sol#2)
+	- ^0.8.20 (ODPSatellite.sol#2)
+	- ^0.8.20 (ODPStatementJournal.sol#2)
+	- ^0.8.20 (ODPWalletDocumentAnchor.sol#2)
+	- ^0.8.20 (ObjectDigitalPassport.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Detector: missing-inheritance
+ObjectDigitalPassport (ObjectDigitalPassport.sol#8-566) should inherit from IODPRegistry (IODPRegistry.sol#5-54)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+/Users/Andrei/Проекты/GitHub/Object Digital Passport/specifications/review/v07-remediation/static-input.json analyzed (14 contracts with 102 detectors), 33 result(s) found
+'/Users/Andrei/Проекты/GitHub/Object Digital Passport/specifications/review/v07-remediation/solcjs-cli.mjs --version' running
+'/Users/Andrei/Проекты/GitHub/Object Digital Passport/specifications/review/v07-remediation/solcjs-cli.mjs --standard-json --allow-paths /Users/Andrei/Проекты/GitHub/Object Digital Passport/specifications/chain/contracts' running

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "compact",
+    "payload": "ODP:TEST:07R1:202609000000027:27",
+    "bytes": 32,
+    "qrVersion": 3,
+    "dataModules": 29,
+    "totalModulesIncludingQuietZone": 37,
+    "errorCorrection": "Q",
+    "moduleSizeMm": {
+      "12": 0.3243,
+      "15": 0.4054,
+      "18": 0.4865,
+      "20": 0.5405
+    }
+  },
+  {
+    "name": "web",
+    "payload": "https://example.invalid/test/07R1/202609000000027/27",
+    "bytes": 52,
+    "qrVersion": 5,
+    "dataModules": 37,
+    "totalModulesIncludingQuietZone": 45,
+    "errorCorrection": "Q",
+    "moduleSizeMm": {
+      "12": 0.2667,
+      "15": 0.3333,
+      "18": 0.4,
+      "20": 0.4444
+    }
+  }
+]

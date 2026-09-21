@@ -1,0 +1,13 @@
+
+> object-digital-passport@0.1.0 compile
+> hardhat compile && node deploy/scripts/eip170-report.mjs
+
+◇ injected env (0) from deploy/.env // tip: ◈ encrypted .env [www.dotenvx.com]
+◇ injected env (0) from deploy/user-setup/private.local.env // tip: ◈ encrypted .env [www.dotenvx.com]
+WARNING: PRIVATE_KEY not set — copy chain/deploy/user-setup/private.local.env.example to chain/deploy/user-setup/private.local.env and fill PRIVATE_KEY (see chain/deploy/user-setup/README.md).
+
+Compiled 16 Solidity files with solc 0.8.20 (evm target: shanghai)
+
+[ODP] EIP-170: ObjectDigitalPassport = 16562 bytes (within 24576 limit).
+  ODPPassportLib: 7200 bytes (deploy separately, then link).
+

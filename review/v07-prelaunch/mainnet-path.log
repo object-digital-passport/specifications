@@ -1,0 +1,21 @@
+Running Mocha tests
+
+
+  Polygon137 complete deployment path over two local HTTP RPCs
+    ✔ executes all ten pinned creations and finality/runtime checks through both HTTP providers (2122ms)
+    ✔ resumes planned failure on Polygon path without duplicate deployments (1612ms)
+    ✔ resumes broadcast failure on Polygon path without duplicate deployments (1590ms)
+    ✔ resumes pending failure on Polygon path without duplicate deployments (1443ms)
+    ✔ resumes verified failure on Polygon path without duplicate deployments (1546ms)
+    ✔ refuses unsupported finality and mismatched chain before any transaction (99ms)
+    ✔ secondary runtime mismatch interrupts and resumes only after agreement (1441ms)
+    ✔ rechecks the first contract before completing when its evidence changes during the last deployment (979ms)
+    ✔ halts on finality lag and resumes after both observers finalize (1509ms)
+    ✔ rejects consumed nonce from another transaction before the next creation (166ms)
+    ✔ rejects address, budget, gas estimate and insufficient balance before broadcast (266ms)
+    ✔ rejects tampered plans and missing or noncanonical receipts on resume without further broadcasts (386ms)
+
+
+  12 passing (17s)
+
+

@@ -1,0 +1,30 @@
+{
+  "archive": "ODP-0.7-ABI6-AUDIT.zip",
+  "archiveSHA256": "746bfcdf0c073853ff8faf9e4de4c084328f984748fb90176066227b7784ca4f",
+  "manifestVerification": "PASS: 1687 files",
+  "manifestSHA256": "59bca4700d06dee4b2aa6564b9f0ab81c958efb06df47567ca1a641e97590988",
+  "sourceHashes": {
+    "SPEC.md": "f13e87032fc8131c2e03d70c74db116020a5f85402bb0ca8316e1d9dfcbe4630",
+    "ODP_07_APP_HANDOFF.md": "f86b9f5c5dae18e8d465393d969d24eb38305239fc029c4703773af5ac837924",
+    "chain/contracts/ODPPassportConcerns.sol": "1bb7a59a3ea11f9205c5d43f33b0c027a867235ee34f9b107fabfef2f3fe4b68",
+    "chain/contracts/ODPAuthorAttestation.sol": "b3c45e3e545bc61daa53cfb38127a6abfcf0f157f33ac891a3cf66f362a08bc9",
+    "chain/contracts/ODPPassportProofRegistry.sol": "5d481a6a6065f28ff7d2456a5a3178172bdc68ef449b437ba182c24c5817e4c5",
+    "chain/contracts/ODPEditionUnits.sol": "a9b63cb2831e8b44aa6e681f8b0d04b80e35c261a7500c14d0e874dc157cf6bf",
+    "chain/contracts/ODPProfileDirectory.sol": "f464e0002cf4157b2ef45bee0b454b7d7cff575e61328992483b877e40353a81",
+    "chain/contracts/ODPWalletDocumentAnchor.sol": "dea29ea359fa2a307c1d25ad05fd0a63274b1bf27beb9d9d37732aadd382efe7",
+    "chain/contracts/ODPStatementJournal.sol": "e337d1ff19ffb7b18087396be14b09ff5e282ffa4d5f15ff1bef5ccab7d0f22e",
+    "chain/contracts/ODPErrors.sol": "038f21816e05f11b664c4e79dc66c6786c4b519b0c4027cdbc81f3e1d7dc987a",
+    "chain/contracts/ODPHosting.sol": "3246e76750c4cb5fed01a7a9bb9d0b5e2ab73b401904b9c8e02e33f32c178ffb",
+    "chain/contracts/ODPSatellite.sol": "128c617782fbd80a0646bc38c5356f51a762f7cc33926e2043fd9c71093c37d1",
+    "chain/contracts/IODPRegistry.sol": "3e58eab0cded26c44aa47103cbec095dbd0ebaae15492d242b39d2a3da5994ed",
+    "chain/contracts/ODPPassportLib.sol": "0f8bb89adb05ec926493fe97fbd318072c7891dd2943cb4f3ca331337e3198bb",
+    "chain/contracts/ODPRegistryRelations.sol": "ac2f7a49a79eb667498fef5d46c27f3f2090d2688bca8d05fae249f4175e87c7",
+    "chain/contracts/ODPPassportTypes.sol": "982b78b24ad169bb6f6f5a29bbb2240e6b52742f152627d17f2dac79da6287b8",
+    "chain/contracts/ObjectDigitalPassport.sol": "437ef90147f3bd94d57998cfde2c8c09b6b955ae776ff2776484030bebe21e33",
+    "chain/tools/bundle.mjs": "e117fba197f25a852e85a26dd3e1daa5e2ee195ec47391b459f2b7e2ad1c09b9",
+    "chain/tools/passport.mjs": "9688163e16f6d3665769e3bb2413ea4c461e6e633a6d302088c7e3d157e15403",
+    "chain/tools/edition.mjs": "cc1f14b9dbc8b47f48a3639624dbd14356f4de76051a3fcf01c86473990de117",
+    "chain/tools/canonical.mjs": "6f6380a0eecba68b64f1f6011dd73703140ee2515fa4002a900ab323e3c7fdae",
+    "chain/tools/operations.mjs": "3d21cd941b6517e0c91ef606ccc51c617538a5595017be0ead4373ba418e32de"
+  }
+}

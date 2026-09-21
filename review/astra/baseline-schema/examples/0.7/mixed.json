@@ -1,0 +1,56 @@
+{
+  "version": "0.7",
+  "passportId": "ODP-2026-03-000555120",
+  "title": "Executable Sculpture #2",
+  "authorName": "Example Holder",
+  "shortDescription": "Sculpture with realtime software, aluminium/electronics, 2026",
+  "description": "Physical sculpture paired with executable realtime software.",
+  "creationDate": "2026-01-30",
+  "domain": "contemporary_art",
+  "objectType": "mixed",
+  "status": "prototype",
+  "contentClass": "composite",
+  "aiStatus": "assisted",
+  "verificationMethod": "hybrid",
+  "edition": { "model": "dynamic" },
+  "idGranularity": "item",
+  "authorship": {
+    "author": {
+      "name": "Example Holder",
+      "wallet": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      "creatorId": "C-482-930-174-005"
+    },
+    "coAuthors": [{ "name": "Collaborator A" }]
+  },
+  "anchors": [
+    { "type": "photo", "data": { "role": "primary" }, "hash": "sha256:1122bb33cc44dd55ee66ff778899aabbccddeeff001122334455667788990011" },
+    { "type": "dimensions", "data": { "width": 120, "height": 80, "depth": 40, "unit": "CMT" } },
+    { "type": "materials", "data": { "list": ["aluminium", "custom electronics"] } },
+    { "type": "distinguishing_features", "data": { "text": "Hand-soldered controller board, serial ES-2 engraved inside base" } },
+    { "type": "marks", "data": { "text": "Internal serial ES-2" } },
+    { "type": "numbered_seal", "data": { "number": "SL-00429831", "type": "holographic sticker" } },
+    { "type": "file_hash", "hash": "sha256:99aa77bb66cc55dd44ee33ff22110088aabbccddeeff001122334455667788aa" }
+  ],
+  "year": 2026,
+  "month": 3,
+  "registeredAt": 1748000000,
+  "registration": {
+    "ianaTimeZone": "UTC",
+    "localIso8601": "2026-03-22T18:30:45+00:00",
+    "utcIso8601": "2026-03-22T18:30:45Z"
+  },
+  "refinementTags": ["installation", "software", "sensor_based"],
+  "physical": {
+    "category": "object"
+  },
+  "digital": {
+    "subtype": "software",
+    "format": "ZIP",
+    "fileHash": "sha256:99aa77bb66cc55dd44ee33ff22110088aabbccddeeff001122334455667788aa",
+    "fileSize": 148392810
+  },
+  "additionalMetadata": {
+    "installationPower": "220V",
+    "controllerVersion": "2.3.1"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "source": "pre-existing local node_modules, read through symlink in disposable copy",
+  "versions": {
+    "ethers": "6.17.0",
+    "ajv": "8.20.0"
+  },
+  "cleanLockfileInstallReproduced": false
+}

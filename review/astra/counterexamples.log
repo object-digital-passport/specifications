@@ -1,0 +1,32 @@
+◇ injected env (0) from deploy/.env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+◇ injected env (0) from deploy/user-setup/private.local.env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+WARNING: PRIVATE_KEY not set — copy chain/deploy/user-setup/private.local.env.example to chain/deploy/user-setup/private.local.env and fill PRIVATE_KEY (see chain/deploy/user-setup/README.md).
+No contracts to compile
+Running Mocha tests
+
+
+  Astra independent counterexamples
+    ✔ R01: wiring the router alone does not enable the A1 exploit (68ms)
+    ✔ R02: after H1 the holder can sign for a fresh owner and then transfer to the original buyer (84ms)
+    ✔ R03: D1 omitted the second institution; it really is blocked, but proofs remain available
+    ✔ R04: edition opening and activation accept a revoked passport; arbitrary roots are not checked against anchors
+    ✔ R05: activation content is sender independent, but timestamp is not delay independent
+    ✔ R06: this all-pure library runtime equals the artifact (self-address hypothesis rejected)
+    ✔ R07: decoding a four-field CreatorRecord as five does not safely default revokedAt to zero
+    ✔ R08: stopped profile still writes wallet anchors and self-chosen author attestations
+ASTRA page(2) gas total=3 and synthetic total=1000000: 32273
+    ✔ R09: existing pagination gas depends on page size, not total; huge limit can overflow
+ASTRA gas {"registration":"154807","mint":"546546","oldConcern":"151340","activationFirst":"94069","activationNext":"60868"}
+    ✔ R10: gas receipts for the old code (not the unimplemented concerns design) (46ms)
+ASTRA Merkle rejected mutations 109
+    ✔ R11: property samples reject wrong Merkle indices, addresses and siblings including odd trees (460ms)
+    ✔ R12: edition derivation depends on the future ID even when top-level passportId is nulled
+    ✔ R13: private satellite addresses remain observable through storage
+
+
+  13 passing (881ms)
+
+
+13 passing (13 mocha)
+
+WARNING: hre.network.connect() is deprecated and will be removed in a future version. Use hre.network.create() or hre.network.getOrCreate() instead.
