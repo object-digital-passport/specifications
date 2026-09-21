@@ -13,7 +13,7 @@
     "deploy:testnet": "hardhat run deploy/scripts/deploy.js --no-compile --network amoy",
     "deploy:mainnet": "hardhat run deploy/scripts/deploy.js --no-compile --network polygon",
     "vectors": "node tools/check-vectors.mjs",
-    "check": "npm run compile && npm run vectors && npm run test:tools && npm test",
+    "check": "npm run compile && npm run vectors && npm run test:tools && hardhat test --no-compile",
     "test:tools": "node --test tools/test/*.test.mjs"
   },
   "devDependencies": {
