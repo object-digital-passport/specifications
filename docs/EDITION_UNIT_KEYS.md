@@ -347,7 +347,7 @@ One detail worth knowing early: the Merkle root has to be registered on-chain as
 | 1 | What does the secret prove? | Both one-time first use **and** repeatable possession — via a keypair, not a hash commitment. The secret never appears on-chain, so it cannot be front-run |
 | 2 | Passport granularity | One passport per **edition** + Merkle root of unit keys; per-unit passports **lazily minted** on demand |
 | 3 | Does the code identify a box or an object? | Both layers: box for everyone, object for those who lazily mint a unit passport |
-| 4 | Outer QR format | GS1 Digital Link **and** ODP identifiers in one symbol |
+| 4 | Outer QR format | ~~GS1 Digital Link and ODP identifiers in one symbol~~ Superseded 2026-09-21: `odp:` identifiers only, no web URL (SPEC §22.14) |
 | 5 | Who may publish activations? | Anyone — the contract checks the signature, not the sender |
 | 6 | Who owns a lazily minted unit passport? | The unit key (bearer), transferable to a real wallet later by signing with that key |
 | 7 | Behaviour on an already-activated code | Show the fact and the date. No verdict |

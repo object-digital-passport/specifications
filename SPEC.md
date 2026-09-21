@@ -259,7 +259,7 @@ A client must implement the remaining steps. Hosting unavailability must not inv
 
 ## 12. Locators and QR
 
-`odp://ODP-YYYY-MM-NNNNNNNNN` is a legacy shorthand that needs an external generation context.
+`odp://ODP-YYYY-MM-NNNNNNNNN` is the QR payload; its generation context is the single embedded deployment (§22.12, §22.14).
 A resolver MUST NOT silently select a registry when several match. The portable receipt explicitly carries
 `chainId`, `registry`, `passportId`, transaction hash and block number. HTTPS resolvers are optional carriers
 and not authorities. A QR can be photocopied; possession of the locator gives no record rights.
@@ -609,3 +609,278 @@ On Polygon, two separate RPC services verify transactions, canonical receipts, r
 all ten contracts are rechecked before a generation candidate is emitted. Unknown submissions must be
 reconciled, never blindly redeployed. Two RPCs remain a trust assumption, not a light-client proof.
 See [deployment procedure](chain/deploy/README.md). A local candidate is not production approval.
+
+## 22. Client application requirements (normative)
+
+Contracts cannot see screens, printers or people. These requirements bind any application that issues, prints
+or verifies ODP 0.7 passports; a client that breaks one of them is non-conformant even if every transaction is
+valid. Rationale and acceptance scenarios:
+[usage-safety audit](review/usage-safety-abi6/REPORT.ru.md), decisions: [closure log](review/usage-safety-abi6/CLOSURE.md).
+
+### 22.1 Issuer keys and recovery (D1)
+
+- CA-1.1. The client MUST state before the first mint that ODP cannot recover, block or move an issuer
+  profile, and that backup of the wallet is the issuer's responsibility (§17).
+- CA-1.2. The client MUST NOT ask for a seed phrase to "prove" a backup and MUST NOT mark a backup as verified.
+- CA-1.3. Issuer keys, master/unit secrets and seeds MUST NOT appear in `.odpass`, logs, crash reports,
+  analytics or exported previews.
+- CA-1.4. A new address MUST NOT be presented as the recovered old profile.
+
+### 22.2 Revocation window and print finalization (D2)
+
+- CA-2.1. The client MUST show the remaining revocation window of the issuer's role (C 72h, B/P/M 24h, §8).
+- CA-2.2. A print-ready label file MUST be produced only after `finalizePassportForPrint` is confirmed on
+  chain, the passport is nonrevoked and, for editions, the edition is open. Earlier previews MUST be visibly
+  unusable as final labels.
+- CA-2.3. A printer error, cancelled job or lost file MUST NOT be presented as undoing finalization.
+- CA-2.4. A revoked passport MUST NOT be offered for issuance, printing or as a valid passport; its history
+  stays readable and its QR MUST show the revocation on a fresh check.
+
+### 22.3 Authorship (D3)
+
+- CA-3.1. `authorName` MUST be shown as a name declared by the issuer, not as an established author.
+- CA-3.2. An author attestation MUST be shown as "key X signed; issuer Y published". The client MUST NOT
+  show a verified-author badge from the attestation alone, and MUST NOT treat issuer = signer as independent.
+- CA-3.3. A withdrawn attestation MUST be shown as withdrawn next to the historical signature
+  (`attested` stays true on chain).
+- CA-3.4. Independent author declarations from the statement journal MUST be shown alongside the slot,
+  with sources and lifecycle; the client MUST NOT pick a "true" author automatically.
+
+### 22.4 Activation and handover (D4)
+
+- CA-4.1. Activation MUST be described as "first proof of access to the unit key N in block B; buyer not
+  recorded". The client MUST NOT name the sender or the unit-key address as owner.
+- CA-4.2. Wording such as "your item", "ownership transferred" or "registered to you" MUST NOT be used.
+  Revealing the scratch code MUST NOT be described as acquiring rights.
+- CA-4.3. The client MUST NOT offer transfer of issuer or master keys as a way to hand over an item.
+
+### 22.5 Issuance job integrity (A1)
+
+- CA-5.1. Preview, hashing, signing and export MUST be built from one immutable issuance job.
+- CA-5.2. Changing any significant field (object, media, files, `authorName`, edition count, wallet, network)
+  MUST invalidate the job and its confirmation; the client MUST NOT silently recompute hashes.
+- CA-5.3. Immediately before signing, the client MUST decode the calldata and compare it, the connected
+  address and the chain ID with the job. A mismatch MUST block submission; a warning alone is not enough.
+- CA-5.4. The final confirmation screen MUST show the exact media, the author as an issuer declaration,
+  the edition count, the issuer profile, the network and the generation.
+- CA-5.5. For editions the client SHOULD offer an independent check on a second device: both devices show
+  the same job fingerprint and summary, and the fingerprint is entered before submission. The client MUST
+  state that this check does not prove that a second person took part.
+- CA-5.6. An issuer MAY register its profile to a multisig smart account (one issuer profile = one Safe
+  address with an M-of-N owner policy). A client MUST treat a multisig proposal awaiting co-signers as
+  pending, not as failed or stuck, and MUST NOT resubmit the job under a new `operationId` while it is pending.
+  Checked locally with canonical Safe v1.4.1, 2-of-3 (`chain/deploy/test/ODP07Safe.test.js`): registration,
+  mint and print finalization (B, P, M), revocation and `openEdition` (B), `submitProof`, `withdrawProof` and
+  `setDomain` (P, M) need two owners; one owner key alone does nothing.
+  Live wallets (hardware, Tangem via WalletConnect) and public networks are not yet verified.
+- CA-5.7. Clients MUST support Safe-registered B, P and M profiles for every action of that role. When a B, P
+  or M profile is being registered, the client SHOULD recommend a Safe with at least two owners on separate
+  (preferably hardware) devices, and explain that one stolen key then cannot act and that ODP still cannot
+  recover or move the profile (CA-1.1). A plain wallet remains allowed; the contract cannot tell a multisig
+  from a single key. C profiles are personal: the client MUST NOT register a C profile to a Safe or other
+  multisig account and MUST refuse to act as a C issuer for one. This is a client rule only; the contract
+  does not enforce it, so a reader MUST NOT infer anything from a C profile's wallet type.
+
+### 22.6 Interrupted issuance and recovery (A2)
+
+- CA-6.1. Before opening the wallet, the client MUST durably save the whole job: canonical bytes, media and
+  files, `operationId`, and for editions the seed/unit secrets and commitment inputs. The saved job MUST be
+  included in a backup that can be restored on another device (§3 retry rules apply).
+- CA-6.2. The client MUST track and show each stage separately: result unknown, passport minted, edition not
+  opened, archive not saved, not delivered. A single generic "error" state is non-conformant.
+- CA-6.3. "Retry" MUST continue the same job with the same `operationId` and exact parameters, after checking
+  `getMintOperation` and any pending transaction. A new passport MUST be a separate, explicit user action.
+- CA-6.4. `AlreadyCommitted` for the saved job MUST be shown as success ("passport already created") after
+  verifying the returned passport; for `openEdition`, which has no `operationId`, the client MUST compare
+  `getEdition` with the job instead of treating a revert as failure.
+- CA-6.5. A print-ready label file MUST NOT be released until mint, edition open (if any), and a verified
+  archive export are all confirmed (see also CA-2.2).
+
+### 22.7 Edition secrets and the `.odpsecret` file (A3)
+
+A valid Merkle root proves that the public address list was not altered. It does not prove that the secrets
+were kept, that every key is distinct, or that the right code was printed on the right label.
+
+- CA-7.1. Edition secrets (master seed, derivation context, label-signer key, unfinished jobs from CA-6.1) MUST
+  be stored only in a separate `.odpsecret` file, never inside `.odpass`. A `.odpsecret` file MUST always be
+  password-encrypted; the client MUST NOT write it unencrypted.
+- CA-7.2. Before mint, the client MUST restore the `.odpsecret` backup and check that it reproduces every
+  index→address pair of the list.
+- CA-7.3. A list with the same unit address on two indexes MUST block issuance; the reference
+  `verifyAddressList` rejects it (`Duplicate unit address`).
+- CA-7.4. The client MUST show separate states: list verified, secrets saved and restored, codes matched to
+  indexes, print checked. "List verified" MUST NOT be presented as edition readiness.
+- CA-7.5. The client MUST NOT open a `.odpsecret` file as a passport and MUST warn, before any share or
+  export, that it contains keys, not a passport. Secrets MUST NOT reach print spools, logs or analytics.
+- CA-7.6. Before hand-out, the issuer SHOULD scan a sample of the real printed batch; a screen preview is not
+  a print check. Rejected labels SHOULD be destroyed.
+
+### 22.8 Hand-out before print finalization (A4)
+
+With CA-2.2 a conforming issuer cannot hand out edition labels while the passport is still revocable. The
+remaining gap is labels printed outside a conforming client.
+
+- CA-8.1. The issuer client MUST NOT let items be marked as handed out or sold until the passport is finalized
+  for print.
+- CA-8.2. For edition passports (B) that are not finalized and still inside the revocation window, a verifier
+  client SHOULD show a neutral "recently issued" mark on the main screen and, in details only, "The issuer
+  may still correct this passport until <date/time>". It SHOULD NOT use alarming wording such as "may be
+  revoked" on the main screen. For single passports (C, P, M) no such notice is required.
+
+### 22.9 What each recovery path restores (A5)
+
+The chain holds the card and commitments, not the originals. A QR restores the chain card; an issuer key
+decrypts nothing and restores no files; only byte-identical copies restore the originals.
+
+- CA-9.1. The client MUST state what is actually present, e.g. "chain card available; photo missing" or "local
+  files intact; current status not checked". A partial set MUST NOT be called a restored passport.
+- CA-9.2. A bundle missing a required original or a manifest-listed payload MUST be reported as incomplete.
+- CA-9.3. On hand-out, the issuer client MUST give the recipient a copy of `.odpass` and SHOULD prompt the
+  issuer to keep its own copy in separate storage.
+- CA-9.4. The client SHOULD add the texts of corrections, revocation reasons and statements it knows about as
+  listed payloads under `files/<sha256>` (§15; `passport.json` unchanged). Readers match them to on-chain
+  keccak256 reason/payload hashes and MUST show a missing text as missing, not as absent history.
+- CA-9.5. Verification of a bundle MUST work without the issuer's site or an ODP account, using open tools
+  (`chain/tools/bundle.mjs` or an equivalent).
+
+### 22.10 Institution identity and independent directories (A6)
+
+Anyone may register a P/M profile, declare any syntactically valid domain (`ODPProfileDirectory`) and publish
+any number of statements. A domain check proves control of that domain only; a look-alike phishing domain
+passes it too. ODP has no central trust list. Identity comes from independent, operator-run directories in the
+[ODP Profile Directory format](https://github.com/object-digital-passport/odp-profile-directory), where the
+operator decides which domain is the organization's real one.
+
+Domain publication endpoint: an organization publishes its profile IDs at
+`https://<domain>/.well-known/odp.json` as a JSON object `{"chainId": <number>, "registry": "0x…",
+"profiles": [{"profileId": "…"}]}`; an entry MAY override `chainId`/`registry`. A profile counts as published
+only when `profileId`, `chainId` and `registry` all match the generation being verified.
+
+- CA-10.1. The client MUST show an organization name only from a directory row with status `active`, labelled
+  with the directory's operator. Otherwise it shows the profile ID and "self-declared type: museum/expert";
+  no verified badge from type prefix, declared domain or statement count.
+- CA-10.2. The client MUST show which directories are in use and SHOULD let the user add their own. A
+  directory MUST NOT be presented as protocol truth; absence from it MUST NOT be shown as a warning.
+- CA-10.3. Domains MUST be shown exactly, with non-ASCII labels in punycode (A-label) form, so that
+  look-alike domains are visible.
+- CA-10.4. Statement counts MUST NOT be presented as a rating. A statement without a document MUST be shown as
+  "no document attached". When a filter hides records, the client MUST say that not all records are shown.
+- CA-10.5. Directory statuses MUST be handled as the directory format defines them; in particular
+  `unreachable` MUST NOT be shown as an accusation and MUST NOT be merged with `removed`.
+
+### 22.11 Reading lifecycle and history completely (A7)
+
+- CA-11.1. Whenever the client shows an author attestation, institutional proof, journal statement or concern,
+  it MUST read and show that record's current lifecycle (withdrawal, retraction, replacement) next to the
+  historical record.
+- CA-11.2. All reads for one view MUST use one block and MUST page to the end. If a page, satellite or source
+  could not be read, the client MUST say "not all records loaded" instead of reporting none.
+- CA-11.3. "Could not load" and "no records" MUST be distinct messages.
+- CA-11.4. Cached data MUST be shown with its block/time ("as of <date>").
+- CA-11.5. Retracting or withdrawing a successor MUST NOT make its predecessor current again; terminal records
+  stay terminal.
+
+### 22.12 One network, one registry (A8)
+
+ODP 0.7 uses exactly one deployment: Polygon mainnet (chainId 137), one registry and its satellites, fixed by
+the single approved entry in `chain/generations.json` once deployed (§7). There is no second network and no
+alternative registry. A self-consistent `.odpass` can describe a fake deployment, so its own manifest and
+receipt are never a trust root.
+
+- CA-12.1. The client MUST embed this single generation (chainId 137, registry and satellite addresses) and
+  accept only it. Addresses from a bundle, QR or URL are only compared with it; any other chain or registry
+  MUST be shown as "not an ODP passport / not verified", never as verified.
+- CA-12.2. The client MUST show "files intact" and "registration confirmed on the ODP registry" as separate
+  results; the first alone MUST NOT be called an authentic passport.
+- CA-12.3. The client MUST check the receipt itself on chain: transaction, block, and that the event was
+  emitted by the embedded registry. A receipt from the bundle is never taken on trust.
+- CA-12.4. Verification MUST be read-only and MUST NOT ask the user to sign or send anything.
+
+### 22.13 Importing untrusted `.odpass` files (A9)
+
+A matching hash proves the bytes are unchanged since issuance, not that they are safe to open.
+
+- CA-13.1. Import MUST extract into an isolated temporary staging area; a failed or interrupted import MUST NOT
+  change the user's storage. The public bundle parser MUST be separate from the key store (`.odpsecret`).
+- CA-13.2. Before allocating memory or decompressing, the client MUST enforce: total uncompressed size
+  ≤ 512 MiB; any single entry ≤ 256 MiB; ≤ 1,000 entries; compression ratio ≤ 100:1 per entry and overall;
+  each JSON file ≤ 1 MiB with nesting depth ≤ 64. (The largest edition address list, 1,048,576 × 43 bytes,
+  is about 45 MB.)
+- CA-13.3. Symlinks, duplicate paths, absolute paths, `..` segments, local/central directory mismatches,
+  nested ZIPs and encrypted entries MUST be rejected with a specific reason.
+- CA-13.4. Payloads MUST be shown inertly (image or plain text) after content sniffing. HTML, SVG scripts,
+  active PDF content and executables MUST NOT run, and previews MUST make no network requests.
+- CA-13.5. Opening or importing a bundle MUST NOT trigger any wallet prompt.
+
+### 22.14 QR payloads and external links (A10)
+
+A genuine ODP QR carries identifiers only, never a web address: `odp://<passportId>` for a passport and, for
+an edition unit, the edition passport ID with the unit index in the same `odp:` form (exact unit-label
+encoding to be fixed with physical print tests, `review/qr-07`). GS1 Digital Link or other `https://` payloads
+are not used. A counterfeit label can still carry any URL, and the phone's camera, not the ODP app, reads it;
+passports also contain hosting and proof URLs that their publishers can change.
+
+- CA-14.1. Clients SHOULD register the `odp` URL scheme so the system camera offers to open the app. The
+  client MUST resolve the ID itself against the embedded registry (§22.12) and MUST NOT open any website to
+  verify. A scanned `https://` QR MUST be treated as "not an ODP label".
+- CA-14.2. The client MUST state that checking a passport never needs a seed phrase, password or wallet
+  signature. Any signing request MUST be a separate explicit action with a decoded description.
+- CA-14.3. External links MUST NOT open automatically; the exact destination host MUST be shown first.
+  Custom schemes other than `odp:` MUST NOT be followed.
+- CA-14.4. Hosted files MUST be fetched without cookies, referrer or user identifiers and with the limits of
+  CA-13.2. A fetched file whose hash does not match the chain commitment MUST NOT be shown as authentic.
+- CA-14.5. The concealed activation code MUST be entered only inside the app and MUST NOT appear in any URL,
+  QR, log or analytics event (§12).
+
+### 22.15 Permanent publication and privacy (A11)
+
+Chain data, events and distributed archives cannot be erased. A hash is a commitment, not encryption; a
+guessable personal value can be recovered from its hash by trying candidates.
+
+- CA-15.1. Before mint or any publication, the client MUST show exactly what becomes public permanently:
+  every field, every file and its metadata, and any URL.
+- CA-15.2. The client MUST detect location and device metadata (e.g. EXIF GPS) in media and offer to strip it
+  before hashing. After mint it MUST NOT silently replace an original with a cleaned copy.
+- CA-15.3. The client SHOULD warn about personal-looking data in text fields (phone numbers, addresses,
+  e-mail) before publication.
+- CA-15.4. After delete, revoke or withdraw the client MUST say exactly what happened ("local copy on this
+  device deleted"; "statement withdrawn, chain history kept") and MUST NOT use "deleted" without qualification.
+- CA-15.5. Verifying a passport MUST NOT require connecting a wallet, and the client MUST NOT collect analytics
+  beyond what the user enabled.
+
+### 22.16 No overall verdict (A12)
+
+Each check is honest on its own; merged into one success it invites the false conclusion "this object is
+genuine". A real label moved onto a counterfeit passes every chain check. Classification fields such as
+`verificationMethod` are issuer declarations, not performed checks.
+
+- CA-16.1. The client MUST NOT show a single overall success or the word "authentic/genuine". Results are
+  shown per part: files, registration, issuer identity, author, statements and lifecycle, activation,
+  freshness.
+- CA-16.2. The client MUST state that ODP does not prove this object is the one described, and ask the user to
+  compare the object with the photo and description.
+- CA-16.3. `verificationMethod` and similar fields MUST be shown as issuer declarations. A check the client
+  cannot perform (e.g. NFC) MUST be shown as "this app cannot perform this check" — neither a green mark nor
+  a counterfeit warning.
+- CA-16.4. Every part MUST carry one of: confirmed, not confirmed, unknown, could not check.
+- CA-16.5. The issuer's full profile ID MUST be shown on every verification, never shortened, with a prompt to
+  compare it personally with the ID the issuer publishes through its own channels (website, shop, documents).
+  The profile ID is public by design; this comparison is the user's own identity check and the client MUST
+  NOT replace it with a name alone.
+- CA-16.6. Before release, a client SHOULD run a usability test with a counterfeit object carrying a genuine
+  label; participants should be able to say what was and was not established. Pass criteria are set in
+  advance.
+
+### 22.17 Accepted residual risks (R1–R3)
+
+These risks remain by design and are accepted with the limits below.
+
+- R1. A genuine label can be moved to another object; no signature binds it to the physical item. Covered by
+  CA-16.2; independent physical inspection remains necessary for valuable transactions.
+- R2. ODP as a company may disappear. CA-17.1. Offline results MUST say "checked from saved data as of
+  <date>; current status unknown". CA-17.2. This specification, the fixed deployment addresses and the open
+  tools in `chain/tools` MUST remain sufficient for a third party to build an independent verifier without an
+  ODP account or service.
+- R3. Handing over an archive and a scratch code does not make a transaction fair; ODP records no owner (D4).
+  CA-17.3. On hand-over the client MUST list what was actually handed over (object, `.odpass` copy, unit
+  index, scratch state) and MUST NOT state that ownership was transferred.
