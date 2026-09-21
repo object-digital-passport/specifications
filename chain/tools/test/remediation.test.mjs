@@ -39,6 +39,12 @@ test('address list verifies odd tree and rejects count, order, root and format t
  for(const altered of [Buffer.from(addresses.reverse().join('\n')+'\n'),Buffer.from(bytes.toString().replaceAll('\n','\r\n')),Buffer.from(bytes.toString().slice(0,-1))])assert.throws(()=>verifyAddressList(altered,a));
 });
 
+test('address list with one address on two indexes is rejected even with a consistent root',()=>{
+ const addresses=['1','2','1'].map(x=>'0x'+x.repeat(40));const bytes=Buffer.from(addresses.join('\n')+'\n');
+ const a={unitCount:3,addressListHash:'sha256:'+sha256(bytes).slice(2),merkleRoot:'sha256:'+treeOf(addresses.map((a,i)=>leafOf(i,a))).root.slice(2)};
+ assert.throws(()=>verifyAddressList(bytes,a),/Duplicate unit address/);
+});
+
 test('statement validator rejects independently changed subject, journal, author and payload',async()=>{
  const {verifyStatement}=await import('../statement.mjs');const {canonicalize,canonicalHash}=await import('../canonical.mjs');
  const d={format:'odp-statement-0.7',subject:{chainId:'1',registry:'0x'+'1'.repeat(40),passportId:'ODP-2026-09-123456789',dataHash:'sha256:'+'a'.repeat(64)},journal:'0x'+'2'.repeat(40),kind:'issuer-correction',author:'0x'+'3'.repeat(40),previousId:'0',body:'Correction'};

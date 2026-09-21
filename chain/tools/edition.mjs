@@ -63,6 +63,8 @@ export function verifyAddressList(bytes, {addressListHash, unitCount, merkleRoot
  const addresses=text.slice(0,-1).split('\n');
  if (!text.endsWith('\n') || addresses.length!==unitCount || addresses.some(a=>!/^0x[0-9a-f]{40}$/.test(a))) throw new Error('Noncanonical address list');
  if (addresses.some(a=>BigInt(a)===0n)) throw new Error('Zero unit address');
+ // A consistent root does not prove distinct keys: one address on two indexes is a provisioning error (A3).
+ if (new Set(addresses).size!==addresses.length) throw new Error('Duplicate unit address');
  const tree=treeOf(addresses.map((address,index)=>leafOf(index,address)));
  if (tree.root!=='0x'+merkleRoot.slice(7)) throw new Error('Address list Merkle root mismatch');
  return {unitCount, merkleRoot, integrity:'verified'};
