@@ -1,0 +1,1116 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "name": "AlreadyCommitted",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
+        "name": "code",
+        "type": "uint16"
+      }
+    ],
+    "name": "EC",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidEditionCommitment",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidOperationId",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "MintOperationConflict",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PassportPrintFinalized",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "creatorId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "creatorIdText",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes1",
+        "name": "typePrefix",
+        "type": "bytes1"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "CreatorRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "digest",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "name": "MintOperationCommitted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "passportIdText",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "PassportFinalizedForPrint",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "passportIdText",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "creatorId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "authorName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "objectType",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "contentClass",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "year",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "month",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "dataHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "anchorsHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "anchorTypesMask",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "PassportMinted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "passportIdText",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "revokedBy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "reasonHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "PassportRevoked",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "CONTRACT_VERSION",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ISSUER_REVOCATION_WINDOW",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_PAGE_SIZE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PERSONAL_REVOCATION_WINDOW",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "name": "finalizePassportForPrint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "creatorId",
+        "type": "string"
+      }
+    ],
+    "name": "getCreator",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "creatorId",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes1",
+            "name": "typePrefix",
+            "type": "bytes1"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ObjectDigitalPassport.CreatorRecord",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      }
+    ],
+    "name": "getCreatorByWallet",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getMintOperation",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "digest",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportClassification",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint8",
+            "name": "contentClass",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "lifecycleStatus",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "aiStatus",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "verificationMethod",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "editionModel",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "revoked",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "revokedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "revocationReasonHash",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ObjectDigitalPassport.PassportClassificationView",
+        "name": "out",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportHeader",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "passportId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint8",
+            "name": "contractVersion",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "creator",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "creatorId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint32",
+            "name": "year",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "month",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "authorName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "shortDescription",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "domain",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "objectType",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ObjectDigitalPassport.PassportHeaderView",
+        "name": "out",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportMedia",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "dataHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "imageHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anchorsHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "anchorTypesMask",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "editionCommitment",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ObjectDigitalPassport.PassportMediaView",
+        "name": "out",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportReleaseState",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "revocationDeadline",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "printFinalizedAt",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ObjectDigitalPassport.PassportReleaseView",
+        "name": "out",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offset",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "limit",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPassportsByCreatorPaged",
+    "outputs": [
+      {
+        "internalType": "string[]",
+        "name": "result",
+        "type": "string[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "total",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "uint32",
+                "name": "year",
+                "type": "uint32"
+              },
+              {
+                "internalType": "uint8",
+                "name": "month",
+                "type": "uint8"
+              },
+              {
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "authorName",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "shortDescription",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "domain",
+                "type": "string"
+              },
+              {
+                "internalType": "uint8",
+                "name": "contentClass",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "lifecycleStatus",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "aiStatus",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "verificationMethod",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "editionModel",
+                "type": "uint8"
+              }
+            ],
+            "internalType": "struct PassportCoreMintInputs",
+            "name": "core",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "dataHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "imageHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anchorsHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "anchorTypesMask",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "editionCommitment",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct PassportMintInputs",
+        "name": "m",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "mintDigital",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "uint32",
+                "name": "year",
+                "type": "uint32"
+              },
+              {
+                "internalType": "uint8",
+                "name": "month",
+                "type": "uint8"
+              },
+              {
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "authorName",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "shortDescription",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "domain",
+                "type": "string"
+              },
+              {
+                "internalType": "uint8",
+                "name": "contentClass",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "lifecycleStatus",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "aiStatus",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "verificationMethod",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "editionModel",
+                "type": "uint8"
+              }
+            ],
+            "internalType": "struct PassportCoreMintInputs",
+            "name": "core",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "dataHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "imageHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anchorsHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "anchorTypesMask",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "editionCommitment",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct PassportMintInputs",
+        "name": "m",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "mintMixed",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "uint32",
+                "name": "year",
+                "type": "uint32"
+              },
+              {
+                "internalType": "uint8",
+                "name": "month",
+                "type": "uint8"
+              },
+              {
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "authorName",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "shortDescription",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "domain",
+                "type": "string"
+              },
+              {
+                "internalType": "uint8",
+                "name": "contentClass",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "lifecycleStatus",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "aiStatus",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "verificationMethod",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "editionModel",
+                "type": "uint8"
+              }
+            ],
+            "internalType": "struct PassportCoreMintInputs",
+            "name": "core",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "dataHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "imageHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anchorsHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "anchorTypesMask",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "editionCommitment",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct PassportMintInputs",
+        "name": "m",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "operationId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "mintPhysical",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "name": "passportExists",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes1",
+        "name": "typePrefix",
+        "type": "bytes1"
+      }
+    ],
+    "name": "registerCreator",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "creatorId",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "passportId",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "reasonHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "revokePassport",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

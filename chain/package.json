@@ -1,24 +1,29 @@
 {
   "name": "object-digital-passport",
-  "version": "0.1.0",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=22.10.0"
   },
-  "description": "Object Digital Passport — Solidity, Hardhat, deploy (run from chain/ or npm run compile at repo root)",
+  "description": "Object Digital Passport 0.7 redesigned contracts and offline conformance tools",
   "scripts": {
-    "compile": "hardhat compile && node deploy/scripts/eip170-report.mjs",
+    "compile": "hardhat compile && node deploy/scripts/eip170-report.mjs && node deploy/scripts/export-abi.mjs && node deploy/scripts/normalize-typechain.mjs",
     "test": "hardhat test",
-    "deploy:testnet": "hardhat run deploy/scripts/deploy.js --network amoy",
-    "deploy:mainnet": "hardhat run deploy/scripts/deploy.js --network polygon"
+    "deploy:testnet": "hardhat run deploy/scripts/deploy.js --no-compile --network amoy",
+    "deploy:mainnet": "hardhat run deploy/scripts/deploy.js --no-compile --network polygon",
+    "vectors": "node tools/check-vectors.mjs",
+    "check": "npm run compile && npm run vectors && npm run test:tools && npm test",
+    "test:tools": "node --test tools/test/*.test.mjs"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.7",
+    "ajv": "8.20.0",
     "hardhat": "^3.15.0"
   },
   "dependencies": {
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "ethers": "6.17.0"
   },
   "overrides": {
     "diff": "^8.0.2",

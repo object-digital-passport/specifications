@@ -1,0 +1,7 @@
+{
+  "schema": "odp-generation-directory-v1",
+  "spec": "0.7",
+  "abiGeneration": "0.7-redesign-7",
+  "approvedGenerations": [],
+  "note": "No approved deployment of this rewrite. Never infer an address from version byte 7 or substitute an older registry."
+}

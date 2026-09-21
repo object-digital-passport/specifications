@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
+import "./ODPSatellite.sol";
 
 import "./ODPErrors.sol";
 import "./ODPPassportLib.sol";
@@ -8,45 +9,14 @@ import "./ODPPassportLib.sol";
  * Satellite: passport-bound institutional attestations (P / M profiles).
  * Deploy after `ObjectDigitalPassport`; constructor takes the registry address.
  *
- * Attestation model 0.6 (docs/ru/REQUIREMENTS_FIELDS_V0.6.md §4.3): an attestation states
+ * Attestation model (SPEC.md §4): an attestation states
  * "this passport/object has been examined" as a whole — no per-anchor granularity.
  * `documentHash` optionally anchors a signed expertise document (PDF, report);
  * details of what exactly was examined belong in that document.
  */
-interface IODPRegistryForProofs {
-    struct CreatorRecord {
-        string creatorId;
-        address wallet;
-        bytes1 typePrefix;
-        uint256 timestamp;
-    }
 
-    struct PassportClassificationView {
-        uint8 contentClass;
-        uint8 lifecycleStatus;
-        uint8 aiStatus;
-        uint8 verificationMethod;
-        uint8 editionModel;
-        uint256 timestamp;
-        bool revoked;
-        uint256 revokedAt;
-        bytes32 revocationReasonHash;
-        address mintAgent;
-    }
+contract ODPPassportProofRegistry is ODPSatellite {
 
-    function getCreatorByWallet(address wallet) external view returns (string memory);
-    function getCreator(string calldata creatorId) external view returns (CreatorRecord memory);
-    function getPassportClassification(string calldata passportId)
-        external
-        view
-        returns (PassportClassificationView memory);
-}
-
-contract ODPPassportProofRegistry {
-    IODPRegistryForProofs public immutable odpRegistry;
-
-    bytes1 private constant TYPE_P = "P";
-    bytes1 private constant TYPE_M = "M";
     // Must match the registry this satellite is wired to (SPEC §8): packed
     // `SPEC_MAJOR * 16 + SPEC_MINOR`, each < 16. Derived rather than written out so
     // the two cannot drift the way they did between the 0.6 and 0.7 lines.
@@ -68,17 +38,37 @@ contract ODPPassportProofRegistry {
     mapping(string => ProofRecord) private _proofs;
     mapping(string => string[]) private _passportProofs;
     mapping(string => string[]) private _institutionProofs;
+    struct Operation { bytes32 digest; string proofId; }
+    mapping(address => mapping(bytes32 => Operation)) public proofOperations;
+    error InvalidProofOperation();
+    error ProofAlreadyCommitted(bytes32 operationId, string proofId);
+    error ProofOperationConflict(bytes32 operationId);
+    event ProofOperationCommitted(address indexed author, bytes32 indexed operationId, string proofId, bytes32 digest);
     uint256 private _proofNonce;
+    mapping(string => address) public proofAuthor;
+    mapping(string => uint256) public proofWithdrawnAt;
+    mapping(string => bytes32) public proofWithdrawalReason;
+    event ProofWithdrawn(string indexed proofId, string proofIdText, address indexed author, bytes32 reasonHash, uint256 timestamp);
+    error InvalidProofWithdrawal();
+
+    function withdrawProof(string calldata proofId, bytes32 reasonHash) external {
+        if (proofAuthor[proofId] != msg.sender || proofWithdrawnAt[proofId] != 0 || reasonHash == bytes32(0)) revert InvalidProofWithdrawal();
+        proofWithdrawnAt[proofId] = block.timestamp;
+        proofWithdrawalReason[proofId] = reasonHash;
+        emit ProofWithdrawn(proofId, proofId, msg.sender, reasonHash, block.timestamp);
+    }
 
     event ProofSubmitted(
         string indexed proofId,
         string indexed passportId,
         string indexed prover,
+        string proofIdText,
+        string passportIdText,
+        string proverText,
         uint256 timestamp
     );
 
-    constructor(address registry_) {
-        odpRegistry = IODPRegistryForProofs(registry_);
+    constructor(address registry_) ODPSatellite(registry_) {
     }
 
     function submitProof(
@@ -86,19 +76,25 @@ contract ODPPassportProofRegistry {
         bytes32 documentHash,
         string calldata documentUrl,
         uint32 year,
-        uint8 month
+        uint8 month,
+        bytes32 operationId
     ) external returns (string memory proofId) {
-        IODPRegistryForProofs.PassportClassificationView memory classification = odpRegistry.getPassportClassification(passportId);
+        if (operationId == bytes32(0)) revert InvalidProofOperation();
+        bytes32 digest = keccak256(abi.encode("ODP-PROOF-OPERATION-0.7", block.chainid,
+            address(odpRegistry), address(this), msg.sender, passportId, documentHash, documentUrl, year, month));
+        Operation storage operation = proofOperations[msg.sender][operationId];
+        if (bytes(operation.proofId).length != 0) {
+            if (operation.digest != digest) revert ProofOperationConflict(operationId);
+            revert ProofAlreadyCommitted(operationId, operation.proofId);
+        }
+        IODPRegistry.PassportClassificationView memory classification = odpRegistry.getPassportClassification(passportId);
         if (classification.revoked) revert EC(11);
         if (!(bytes(documentUrl).length <= 512)) revert EC(10);
         if (!(year > 0)) revert EC(9);
         if (!(month >= 1 && month <= 12)) revert EC(8);
         _requireUtcYearMonth(year, month);
 
-        string memory callerId = odpRegistry.getCreatorByWallet(msg.sender);
-        if (!(bytes(callerId).length > 0)) revert EC(7);
-        bytes1 tp = odpRegistry.getCreator(callerId).typePrefix;
-        if (!(tp == TYPE_P || tp == TYPE_M)) revert EC(6);
+        string memory callerId = _institution();
 
         if (documentHash == bytes32(0)) {
             if (!(bytes(documentUrl).length == 0)) revert EC(5);
@@ -116,18 +112,14 @@ contract ODPPassportProofRegistry {
             timestamp: block.timestamp
         });
 
+        proofAuthor[proofId] = msg.sender;
         _passportProofs[passportId].push(proofId);
         _institutionProofs[callerId].push(proofId);
 
-        emit ProofSubmitted(proofId, passportId, callerId, block.timestamp);
-    }
-
-    function getProofsForPassport(string calldata passportId)
-        external
-        view
-        returns (string[] memory)
-    {
-        return _passportProofs[passportId];
+        operation.digest = digest;
+        operation.proofId = proofId;
+        emit ProofOperationCommitted(msg.sender, operationId, proofId, digest);
+        emit ProofSubmitted(proofId, passportId, callerId, proofId, passportId, callerId, block.timestamp);
     }
 
     function getProof(string calldata proofId)
@@ -137,14 +129,6 @@ contract ODPPassportProofRegistry {
     {
         if (!(bytes(_proofs[proofId].proofId).length > 0)) revert EC(4);
         return _proofs[proofId];
-    }
-
-    function getProofsByInstitution(string calldata creatorId)
-        external
-        view
-        returns (string[] memory)
-    {
-        return _institutionProofs[creatorId];
     }
 
     function _requireUtcYearMonth(uint32 year, uint8 month) private view {
@@ -179,4 +163,8 @@ contract ODPPassportProofRegistry {
         }
         revert EC(60);
     }
+    function getProofsForPassportPaged(string calldata id, uint256 offset, uint256 limit)
+        external view returns (string[] memory, uint256) { return _page(_passportProofs[id], offset, limit); }
+    function getProofsByInstitutionPaged(string calldata id, uint256 offset, uint256 limit)
+        external view returns (string[] memory, uint256) { return _page(_institutionProofs[id], offset, limit); }
 }
