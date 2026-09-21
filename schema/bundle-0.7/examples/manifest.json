@@ -1,0 +1,13 @@
+{
+  "format": "odp-bundle-manifest-0.7",
+  "passportFile": "passport.json",
+  "generationFile": "generation.json",
+  "receiptFile": "receipt.json",
+  "files": [
+    {
+      "path": "files/ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "sha256": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "byteLength": "1234"
+    }
+  ]
+}

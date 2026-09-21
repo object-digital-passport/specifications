@@ -1,0 +1,11 @@
+{
+  "format": "odp-bundle-receipt-0.7",
+  "generationId": "0.7-local-fixture",
+  "chainId": "31337",
+  "registry": "0x1111111111111111111111111111111111111111",
+  "passportId": "ODP-2026-09-000000027",
+  "transactionHash": "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "blockNumber": "20",
+  "blockHash": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "operationId": "0x9999999999999999999999999999999999999999999999999999999999999999"
+}

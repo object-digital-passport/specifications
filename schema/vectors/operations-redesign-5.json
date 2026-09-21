@@ -1,0 +1,60 @@
+{
+  "format": "odp-operation-vectors-redesign-5",
+  "statement": {
+    "input": {
+      "chainId": "137",
+      "registry": "0x1111111111111111111111111111111111111111",
+      "satellite": "0x2222222222222222222222222222222222222222",
+      "author": "0x3333333333333333333333333333333333333333",
+      "passportId": "ODP-2026-09-123456789",
+      "kind": 1,
+      "payloadHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "previousId": "0"
+    },
+    "digest": "0xa4b86726432ddd9f67b4e86a8468160e2477c5e322d0207c3f0863ba89b19ea1"
+  },
+  "proof": {
+    "input": {
+      "chainId": "137",
+      "registry": "0x1111111111111111111111111111111111111111",
+      "satellite": "0x2222222222222222222222222222222222222222",
+      "author": "0x3333333333333333333333333333333333333333",
+      "passportId": "ODP-2026-09-123456789",
+      "documentHash": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "documentUrl": "ipfs://example",
+      "year": 2026,
+      "month": 9
+    },
+    "digest": "0xa8e0649a370a93052fe123ed35d5f78131cc1da1a3e84accfbd10c009725d563"
+  },
+  "mint": {
+    "input": {
+      "chainId": "137",
+      "registry": "0x1111111111111111111111111111111111111111",
+      "issuer": "0x3333333333333333333333333333333333333333",
+      "objectType": "physical",
+      "mint": {
+        "core": {
+          "year": 2026,
+          "month": 3,
+          "title": "Object Community #1",
+          "authorName": "Example Holder",
+          "shortDescription": "Mixed-media painting, canvas/oil, 2025",
+          "domain": "contemporary_art",
+          "contentClass": 1,
+          "lifecycleStatus": 3,
+          "aiStatus": 2,
+          "verificationMethod": 3,
+          "editionModel": 2
+        },
+        "dataHash": "0x4dafcdca6617f583087e5fbbbb650165f66a81123b2cd1d526f5c68b600f975e",
+        "imageHash": "0xa3f1c2d4e5b6978810aabbccddeeff00112233445566778899aabbccddeeff00",
+        "fileHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "anchorsHash": "0xa0be7545063f44f42ee6b759d432fc8e9155c81e48dc31e539c6248e47aa267b",
+        "anchorTypesMask": 287,
+        "editionCommitment": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "digest": "0x0ae38823db571548ce2451ce50b7ed3ff99c3ff6036fce904854de5ec43ff8b7"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ODP 0.7 statement payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "subject", "journal", "kind", "author", "previousId", "body"],
+  "properties": {
+    "format": {"const": "odp-statement-0.7"},
+    "subject": {
+      "type": "object", "additionalProperties": false,
+      "required": ["chainId", "registry", "passportId", "dataHash"],
+      "properties": {
+        "chainId": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "registry": {"$ref": "#/$defs/address"},
+        "passportId": {"type": "string", "pattern": "^ODP-[0-9]{4}-(0[1-9]|1[0-2])-[0-9]{9}$"},
+        "dataHash": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "journal": {"$ref": "#/$defs/address"},
+    "kind": {"enum": ["issuer-correction", "author-declaration", "institutional-assessment"]},
+    "author": {"$ref": "#/$defs/address"},
+    "previousId": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"},
+    "body": {"type": "string", "minLength": 1},
+    "relatedPassport": {
+      "type": "object", "additionalProperties": false,
+      "required": ["chainId", "registry", "passportId"],
+      "properties": {
+        "chainId": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "registry": {"$ref": "#/$defs/address"},
+        "passportId": {"type": "string", "pattern": "^ODP-[0-9]{4}-(0[1-9]|1[0-2])-[0-9]{9}$"}
+      }
+    }
+  },
+  "$defs": {
+    "address": {"type": "string", "pattern": "^0x(?!0{40}$)[0-9a-f]{40}$"},
+    "hash": {"type": "string", "pattern": "^sha256:(?!0{64}$)[0-9a-f]{64}$"}
+  }
+}
