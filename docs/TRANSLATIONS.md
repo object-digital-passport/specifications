@@ -115,6 +115,7 @@ The current `docs/ru/SPEC.md` is a migration pointer. Its full old translation i
 full translation of the rewritten normative SPEC is pending. Historical guides do not define the redesigned ABI.
 
 | `ODP_07_ACTION_PLAN.md` | — | russian only |
+| `ODP_07_APP_CHANGES.md` | — | russian only |
 | `ODP_07_APP_HANDOFF.md` | — | russian only |
 | `ODP_07_ARCHITECTURE_OPTIONS.md` | — | russian only |
 | `ODP_07_ARCHITECTURE_REVIEW.md` | — | russian only |

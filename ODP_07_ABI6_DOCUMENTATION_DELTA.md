@@ -7,6 +7,10 @@ B-only rule for every non-unique edition model. **The sealed ABI6 audit does not
 records the code delta, the documentation delta, the local check results and the unresolved conflicts.
 It is not an audit, not a deployment approval and not a statement that any generation is deployed.
 
+**Update 2026-09-24.** The current generation is `0.7-redesign-8`. It adds one immutable mint input,
+`previewHash`, the SHA-256 of a lighter public copy of the primary photo, with errors `EC(142)` and `EC(143)`.
+Section 6 records that ABI7 → ABI8 delta. The approved `0.7-redesign-7` bundle does not certify ABI8 either.
+
 Дата этой редакции: **2026-09-20**. Базовый снимок: `review/audit-handoff-abi6/` (запечатан 2026-09-19).
 Ничего внутри запечатанного пакета, ZIP, его MANIFEST/hashes и прежних отчётов не изменялось.
 
@@ -246,3 +250,61 @@ physical `dataHash` `0x4dafcd…975e` → `0xcecd76bc…10d7`, mixed `0xc23a77�
   три разных статуса, ни один из которых не подтверждён этой работой.
 - Приложение не реализует печатный шлюз. `finalizePassportForPrint` нельзя описывать как работающую
   защиту от печати отзываемого паспорта, пока клиент этого не реализовал и это не принято.
+
+---
+
+## 6. Дельта ABI7 → ABI8 (`0.7-redesign-8`, 2026-09-24)
+
+Основание — решения владельца от 2026-09-24 о хранении фото, оплате публикации и спонсоре газа. Исследования
+хранения и оплаты лежат вне репозитория; их выводы перенесены в SPEC §22.19 и §22.20. Контракты, схемы,
+инструменты и новый release-бандл меняет отдельная работа (`chain/**`, `schema/**`, `review/v07-abi8-release/`).
+Этот раздел описывает утверждённый интерфейс и документацию; код он не проверяет.
+
+### 6.1 Интерфейс
+
+| № | Изменение | Где |
+|---|---|---|
+| D3-1 | В `PassportMintInputs` новое поле `bytes32 previewHash` сразу после `imageHash`. Порядок: `core, dataHash, imageHash, previewHash, fileHash, anchorsHash, anchorTypesMask, editionCommitment`. | `IODPRegistry.sol`, `ObjectDigitalPassport.sol` |
+| D3-2 | `PassportMediaView` (`getPassportMedia`) возвращает `previewHash` сразу после `imageHash`. | `IODPRegistry.sol` |
+| D3-3 | `previewHash` — SHA-256 точных байтов облегчённой публичной копии главного фото (JPEG ≤ 1 048 576 байт, без GPS и метаданных местоположения). `bytes32(0)` — копии нет. Поле неизменяемо. | SPEC §8 |
+| D3-4 | Ненулевой `previewHash` при нулевом `imageHash` отклоняется с `EC(142)`; `previewHash == imageHash` (ненулевые) — с `EC(143)`. Размер, формат и метаданные контракт не проверяет. | SPEC §8, §21.1 |
+| D3-5 | Mint-digest охватывает поле, потому что оно входит в кортеж `m`. Digest операций выпуска из ABI7 для ABI8 не годится; digest journal и proof не меняются. | SPEC §3 |
+| D3-6 | Событие `PassportMinted` не меняется. `CONTRACT_VERSION` остаётся 7. Идентификатор поколения — `0.7-redesign-8`. | SPEC §7, §14 |
+| D3-7 | В `passport.json` копия описывается не более чем одним якорем `{"type":"photo","data":{"role":"preview"},"hash":"sha256:<hex>"}`, только при наличии `photo` с `role: "primary"`. Якорь есть тогда и только тогда, когда `previewHash != 0`, и его хеш равен `previewHash`. Новый бит маски не добавляется. | SPEC §9, §11 |
+| D3-8 | Файл копии — обычный payload `files/<sha256hex>`; `.odpass` содержит и оригинал, и копию. | SPEC §15 |
+
+### 6.2 Правила клиента
+
+| Раздел SPEC | Что добавлено |
+|---|---|
+| §22.19, CA-19.1–19.11 | Копия делается только при решении опубликовать фото; превью именно копии перед публикацией; копия в `.odpass`; публикация `.odpass` без копии; IPFS-адрес из хеша (CIDv1, raw, sha2-256, один блок ≤ 1 МиБ); несколько адресов в `ODPHosting`; несколько шлюзов и проверка по хешу; загрузка после подтверждения mint; три способа оплаты (бесплатный лимит, POL из кошелька пользователя, спонсор) без продаж и секретов в приложении; приватность. |
+| §22.20, CA-20.1–20.6 | Кошелёк только через WalletConnect; спонсор газа в 0.7 только пополняет адрес POL; «Запросить POL» на адрес приёма спонсора с подписью `personal_sign`; запасной путь через меню «Поделиться»; что видит спонсор; relayer отложен. |
+| §22.5, CA-5.8–5.10; §22.6, CA-6.6 | Граница UTC-месяца для Safe-предложений mint и `submitProof`: предупреждение, статус «неисполнимо» (Safe 1.4.1, `GS013`, nonce не расходуется), отклоняющая транзакция с тем же nonce, переподготовка с тем же `operationId`; риск не успеть к 24-часовому окну отзыва. Основание — `review/logic-recheck-abi7/REPORT.ru.md`, п. 2. |
+| §7, §21.2 | Amoy не используется (решение владельца 2026-09-24). Deployment не выполнялся, адресов нет. Бандлы ABI6 и ABI7 текущие исходники не описывают. |
+
+`ODPHosting.sol` проверен на совместимость с несколькими адресами в одном поле: контракт ограничивает только
+длину (`EC(138)` при > 512 байт) и строку не разбирает, так что список через пробел допустим без изменения кода.
+
+### 6.3 Документация
+
+| Где | Было | Стало |
+|---|---|---|
+| `SPEC.md` шапка, §7, §13, §21 | `0.7-redesign-7` как текущее поколение | `0.7-redesign-8`; ABI7 названо прошлым снимком |
+| `SPEC.md` §8, §9, §11, §15, §19 | Нет `previewHash`; «Storage providers and distribution policy remain undecided» | Поле, якорь `preview`, проверка в алгоритме, копия в бандле, ссылка на §22.19; сервисы и шлюзы — заменяемое удобство |
+| `SPEC.md` §21.1 | Таблица ошибок ABI7 | Добавлены `EC(142)` и `EC(143)` |
+| `README.md`, `README.ru.md`, `docs/README.md`, `docs/ru/README-docs.md`, `docs/GLOSSARY.md`, `docs/ru/GLOSSARY.md`, `docs/SECURITY.md`, `docs/ru/SECURITY.md`, `docs/PROTOCOL_TRACKS.md`, `docs/ru/PROTOCOL_TRACKS.md`, `docs/VERSIONING_AND_RELEASES.md`, `docs/ru/VERSIONING_AND_RELEASES.md`, `docs/EIP170_STRATEGY.md`, `docs/ru/EIP170_STRATEGY.md`, `docs/ru/SPEC.md` | `0.7-redesign-7`; «Amoy не обязателен» | `0.7-redesign-8`; `previewHash`, спонсор газа; Amoy не используется |
+| Шапки исторических документов в `docs/` и `docs/ru/`, `ODP_07_RELEASE_DECISIONS.md`, `ODP_07_CONSOLIDATED_REMEDIATION_PLAN.md`, `ODP_07_ARCHITECTURE_OPTIONS.md` | «не инструкции для `0.7-redesign-7`» | «не инструкции для `0.7-redesign-8`» |
+| `ODP_07_IMPLEMENTATION.md`, `ODP_07_ACTION_PLAN.md`, `ODP_07_INDEPENDENT_AUDIT_TASK.md` | Текущая ABI `0.7-redesign-7`; единственный бандл — ABI6 | Текущая ABI `0.7-redesign-8`; бандлы ABI6 и ABI7 прошлые; добавлен тестовый вектор CID как открытый пункт |
+
+Разделы 1–5 выше не переписывались: они описывают переход ABI6 → ABI7 и остаются историей.
+
+### 6.4 Открыто
+
+- Эквивалентность CID из хеша и CID от `ipfs add` (Kubo, Helia) выведена из спецификаций IPFS, но не проверена.
+  До релиза нужен тестовый вектор, включая файл ровно 1 048 576 байт.
+- Release-бандл для `0.7-redesign-8` не собран и не утверждён; deployment по-прежнему неисполним и требует
+  отдельного разрешения.
+- Код ABI8, схема `passport-0.7`, `chain/tools` и векторы меняются отдельной работой. Совпадение кода с этим
+  разделом и с SPEC нужно проверить после неё.
+- Оплата публикации криптовалютой в приложении — серая зона правил App Store (п. 3.1.1); бесплатный путь и
+  спонсор этой зоны не касаются.

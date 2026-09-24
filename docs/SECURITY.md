@@ -1,4 +1,4 @@
-# Security model — redesigned 0.7, ABI `0.7-redesign-7`
+# Security model — redesigned 0.7, ABI `0.7-redesign-8`
 
 Normative behavior: [SPEC](../SPEC.md). Terms: [glossary](GLOSSARY.md). Release evidence: [sealed `0.7-redesign-6` checks](../review/audit-handoff-abi6/TESTS_AND_ANALYSIS.md), which do not cover the current sources, and [the delta after that package](../ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian).
 The earlier security guide is archived under `review/astra/legacy-docs/docs/SECURITY.md`.
@@ -36,6 +36,14 @@ core observes no printer, cannot prevent external printing, and the application-
 implemented in this repository. A compromised key can finalize a passport and thereby close the legitimate
 issuer's own correction window.
 
+`previewHash`, added in `0.7-redesign-8`, commits a lighter public copy of the primary photo. The core checks
+only that a nonzero value comes with a nonzero `imageHash` and differs from it; it cannot check size, metadata
+or that the copy shows the same picture. Upload services, pinning services, gateways and sponsors are
+replaceable conveniences, and every fetched file is accepted by hash only (SPEC §22.19). A gas sponsor in 0.7
+only sends POL to a user's address; it sees that address and its public actions and gets no wallet access
+(SPEC §22.20). A Safe proposal for mint or `submitProof` that crosses a UTC month boundary cannot execute and
+blocks later proposals of that Safe until a rejection transaction uses its nonce (SPEC CA-5.8 to CA-5.10).
+
 
 Payload hashes/cards and past events remain immutable; passport revocation, statement lifecycle and hosting
 locations have their own mutable state. Revocation is one-shot at or before mint+259200 seconds for C or mint+86400 seconds for B/P/M, only before print finalization, with a
@@ -48,6 +56,6 @@ AlreadyCommitted error. Exact replay survives later lifecycle/calendar changes a
 Strict UTF-8, custom bit31 and full list/tree validation are implemented in reference tools; safe ZIP,
 URL fetch/redirect/private-IP limits, client finality and identity UI remain separate open work.
 
-Polygon mainnet is the selected target without mandatory Amoy. No production generation is approved here.
+Polygon mainnet is the selected target; Amoy is not used. Nothing is deployed and no production generation is approved here.
 Pinned release, verified resume, nonce/spend limits and two-RPC finality reduce deployment mistakes; they do
 not prove RPC honesty or constitute permission to deploy. Current work forbids wallet/network access.

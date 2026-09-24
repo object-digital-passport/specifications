@@ -1,4 +1,4 @@
-> Current ABI is `0.7-redesign-7`: [post-audit-package delta](ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian), [documentation index](docs/README.md), [glossary](docs/GLOSSARY.md). The sealed audit handoff describes the earlier `0.7-redesign-6` and does not certify this ABI. Target: Polygon mainnet (137), no mandatory Amoy. Current authorization prohibits wallet connection, external-network access, deployment and publication.
+> Current ABI is `0.7-redesign-8`: [post-audit-package delta](ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian), [documentation index](docs/README.md), [glossary](docs/GLOSSARY.md). The sealed audit handoff describes the earlier `0.7-redesign-6`, and the approved release bundle describes `0.7-redesign-7`; neither certifies this ABI. Target: Polygon mainnet (137); Amoy is not used and nothing is deployed. Current authorization prohibits wallet connection, external-network access, deployment and publication.
 
 # Object Digital Passport
 
@@ -9,7 +9,7 @@ assessments are verified separately; the registry does not adjudicate ownership 
 ## Redesigned 0.7
 
 **Local contract candidate for independent audit. No deployed, approved production generation is produced by this work.**
-The ABI is `0.7-redesign-7`, incompatible with the earlier 0.7 code even though the packed version byte is7.
+The ABI is `0.7-redesign-8`, incompatible with the earlier 0.7 code, including `0.7-redesign-7`, even though the packed version byte is7.
 
 - [Normative specification](SPEC.md)
 - [Implementation, tests and remaining release boundaries](ODP_07_IMPLEMENTATION.md) (Russian)

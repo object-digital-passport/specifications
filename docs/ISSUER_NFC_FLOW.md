@@ -1,4 +1,4 @@
-> **Historical / superseded for ABI `0.7-redesign-7`.** NFC hardware/transport is deferred for this release; this legacy guide does not establish implemented or physically verified support. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+> **Historical / superseded for ABI `0.7-redesign-8`.** NFC hardware/transport is deferred for this release; this legacy guide does not establish implemented or physically verified support. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
 
 # Issuer NFC flow — scan chip before mint
 

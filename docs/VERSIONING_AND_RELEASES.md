@@ -6,7 +6,7 @@
 
 See also **[`docs/README.md`](README.md)** for an index of all docs in this folder and pointers to **`SPEC.md`**.
 
-Current ODP 0.7 uses ABI `0.7-redesign-7` and packed byte 7. Earlier ABI0.7 generations are incompatible. Select a decoder by independently trusted chain/address/runtime/ABI, never the version byte. No production generation is approved. Normative rules: [SPEC §7/§14](../SPEC.md).
+Current ODP 0.7 uses ABI `0.7-redesign-8` and packed byte 7. Earlier ABI0.7 generations, including `0.7-redesign-7`, are incompatible. Select a decoder by independently trusted chain/address/runtime/ABI, never the version byte. No production generation is approved. Normative rules: [SPEC §7/§14](../SPEC.md).
 
 This document explains how **product versions** (e.g. **v0.1**), **`main`**, and **git tags** work together — and what “I don’t want to change v0.1 anymore” means in practice.
 

@@ -1,4 +1,4 @@
-> **Historical / superseded for ABI `0.7-redesign-7`.** The glossary, bundle layout, mutable status/owner model and web commands below belong to v0.6; they do not establish current website or app readiness. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+> **Historical / superseded for ABI `0.7-redesign-8`.** The glossary, bundle layout, mutable status/owner model and web commands below belong to v0.6; they do not establish current website or app readiness. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
 
 # Object Digital Passport — detailed guide (English)
 

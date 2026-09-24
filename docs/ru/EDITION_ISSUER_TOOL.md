@@ -1,4 +1,4 @@
-> **Исторический материал, заменён для ABI `0.7-redesign-7`.** Не реализуйте прежние derivation, openEdition и anchor-пример ниже. В ABI6 nonce/context/root/list готовятся до mint, используются operationId и editionCommitment; open включает nonce. Точные сигнатуры — chain/abi. Текущий app handoff заменяет эту задачу. Нормативна [английская SPEC](../../SPEC.md); см. [app handoff](../../ODP_07_APP_HANDOFF.md), [глоссарий](GLOSSARY.md), [дельту](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md). Эта страница не разрешает кошелёк или внешнюю сеть.
+> **Исторический материал, заменён для ABI `0.7-redesign-8`.** Не реализуйте прежние derivation, openEdition и anchor-пример ниже. В ABI6 nonce/context/root/list готовятся до mint, используются operationId и editionCommitment; open включает nonce. Точные сигнатуры — chain/abi. Текущий app handoff заменяет эту задачу. Нормативна [английская SPEC](../../SPEC.md); см. [app handoff](../../ODP_07_APP_HANDOFF.md), [глоссарий](GLOSSARY.md), [дельту](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md). Эта страница не разрешает кошелёк или внешнюю сеть.
 
 # Инструмент эмитента выпуска — передача в реализацию
 

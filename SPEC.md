@@ -1,6 +1,7 @@
 # Object Digital Passport — specification 0.7
 
-**Redesigned generation `0.7-redesign-7`. Local contract candidate for independent audit; no deployed, approved production generation.**
+**Redesigned generation `0.7-redesign-8`. Local contract candidate for independent audit; no deployed, approved production generation.**
+The earlier `0.7-redesign-7` snapshot and its approved release bundle are history; they do not describe the current sources.
 
 This document is normative for the sources in `chain/contracts/`. MUST, MUST NOT and SHOULD express
 requirements. The previous 0.7 ABI is incompatible. Its specification is preserved for audit in
@@ -106,11 +107,11 @@ Detailed legacy hardware guides are informative and require separate implementat
 ## 7. Networks and generations
 
 There is no approved deployment produced by this change. Never substitute a 0.6 address or infer an address
-from the version byte. The selected target is Polygon mainnet (chainId 137), with fixed registry/satellite addresses after a separately authorized deployment. A preliminary Amoy deployment is not required. The current instruction prohibits wallet connection, public-network access, deployment and publication; a target network is not authorization.
+from the version byte. The selected target is Polygon mainnet (chainId 137), with fixed registry/satellite addresses after a separately authorized deployment. Polygon Amoy is not used, neither as a preliminary deployment nor for testing (owner decision 2026-09-24). No deployment has been performed and no addresses exist; deployment requires its own explicit authorization. The current instruction prohibits wallet connection, public-network access, deployment and publication; a target network is not authorization.
 Its deployment manifest MUST bind the generation identifier to chain ID, registry address, deployed runtime
 hashes, ABI identities, deployment blocks and source/build identity. A generation identifier MUST NOT later
 be reassigned to different addresses. Clients may embed the authenticated fixed manifest; an online mutable
-generation directory is not required for this model. The current sources identify as 0.7-redesign-7;
+generation directory is not required for this model. The current sources identify as 0.7-redesign-8;
 this does not claim that the release is already deployed. Document version 0.7 alone does not identify an ABI.
 
 Every issued .odpass MUST carry its generation and full contract addresses as specified in §15. An embedded
@@ -125,7 +126,9 @@ Three mint entrypoints take the same `PassportMintInputs` plus a nonzero bytes32
 
 - `core`: year, month, title, authorName, shortDescription, domain, contentClass, lifecycleStatus,
   aiStatus, verificationMethod, editionModel.
-- `dataHash`, `imageHash`, `fileHash`, `anchorsHash`: bytes32; SHA-256 commitments supplied by the issuer.
+- `dataHash`, `imageHash`, `previewHash`, `fileHash`, `anchorsHash`: bytes32; SHA-256 commitments supplied by the
+  issuer. The tuple order is `core, dataHash, imageHash, previewHash, fileHash, anchorsHash, anchorTypesMask,
+  editionCommitment`.
 - `anchorTypesMask`: uint32.
 - `editionCommitment`: bytes32; mandatory nonzero for unit_key_set, zero otherwise. It binds the typed
   edition parameters defined in §20; unit_key_set requires editionModel limited(2) or open(3).
@@ -146,6 +149,14 @@ Core classification encodings are the one-based positions in these lists:
 Digital requires nonzero fileHash and mask bit32; imageHash is optional. Mixed requires both hashes and all
 bits in mask47. The mask checks presence of required bits, not truth of the anchors. Edition anchor bits
 4096/8192 and every non-unique editionModel (limited/open/dynamic), even without unit anchors, require a B issuer. C/P/M may mint unique passports only. The immutable `creator`, `creatorId`, card, hashes and classifications never change.
+
+`previewHash` is the SHA-256 of the exact bytes of a lighter public copy of the primary photo (§9, §22.19),
+a JPEG of at most 1,048,576 bytes without GPS or other location metadata. Zero means that no such copy exists.
+A nonzero `previewHash` requires a nonzero `imageHash` (`EC(142)`) and MUST differ from it (`EC(143)`). The
+contract checks only these two relations; it cannot check size, format, metadata or that the copy shows the
+same picture. `previewHash` is immutable like the other hashes and is covered by the mint-operation digest (§3)
+as part of `m`. `PassportMinted` is unchanged; readers obtain the value from `getPassportMedia`, whose
+`PassportMediaView` places `previewHash` directly after `imageHash`.
 
 `revokePassport(id, reasonHash)` is available only to the original issuer, at or before
 `mintTimestamp + 259200` for C or `mintTimestamp + 86400` for B/P/M, and only while print finalization is absent. Reason is nonzero keccak256 of an external UTF-8 explanation. It is one-shot.
@@ -187,6 +198,13 @@ positive width/height/depth/diameter. Materials/features must describe the objec
 placeholders. Digital/mixed need exactly one original `file_hash` matching `digital.fileHash`.
 The photo selected as primary MUST be unambiguous: one photo or exactly one `data.role == "primary"`.
 Photo/file hashes refer to original bytes, not URLs. Metadata-only examples are not evidence of file possession.
+
+The lighter public copy of the primary photo (§8 `previewHash`) is described by at most one anchor
+`{"type": "photo", "data": {"role": "preview"}, "hash": "sha256:<hex>"}`. It is allowed only when a `photo`
+anchor with `data.role == "primary"` exists, and it is never a primary candidate. The anchor is present if and
+only if `previewHash` is nonzero, and its hash MUST equal `previewHash`. It uses the existing photo bit; no mask
+bit is added. The copy is derived from the primary photo but is a separate file with its own hash; the primary
+photo and `imageHash` keep referring to the original bytes.
 
 | Anchor type | Mask bit |
 |---|---:|
@@ -238,7 +256,8 @@ produce a different commitment. The protocol is not RFC8785 verbatim because it 
 2. Read the immutable card/classification/media. A missing record, unavailable chain and revoked record
    are different results. Read a consistent block, handle reorgs/finality, and display observation time.
 3. Parse/validate/canonicalize the document. Check dataHash, anchorsHash, mask, all card fields, object type,
-   UTC month and numeric classifications. Check original file bytes where available. Report missing files.
+   UTC month and numeric classifications. Check `previewHash` against the preview anchor (§9); they are either both
+   absent or both present and equal. Check original file bytes where available. Report missing files.
 4. Compare receipt identity with the selected registry and on-chain ID; receipt is a locator, not authority.
 5. Establish issuer identity from independently trusted public sources. Profile type, name, domain declaration,
    authorSigner and affiliation are not sufficient alone. Check passport revocation and each statement lifecycle separately.
@@ -259,7 +278,9 @@ A client must implement the remaining steps. Hosting unavailability must not inv
 
 ## 12. Locators and QR
 
-`odp://ODP-YYYY-MM-NNNNNNNNN` is the QR payload; its generation context is the single embedded deployment (§22.12, §22.14).
+`odp://ODP-YYYY-MM-NNNNNNNNN` is the preferred QR payload. An issuer MAY instead print its own `https://` link that
+carries the same ID in exactly one `odp` query parameter (§22.14). Either way the generation context is the single
+embedded deployment (§22.12); the link's website is never a verification authority.
 A resolver MUST NOT silently select a registry when several match. The portable receipt explicitly carries
 `chainId`, `registry`, `passportId`, transaction hash and block number. HTTPS resolvers are optional carriers
 and not authorities. A QR can be photocopied; possession of the locator gives no record rights.
@@ -268,7 +289,7 @@ Never put the concealed activation code in a public QR, URL query, analytics log
 
 ## 13. SDK and satellite requirements
 
-Use the compiled ABI for `0.7-redesign-7`, not the historical version-byte-only ABI. Build mint inputs from
+Use the compiled ABI for `0.7-redesign-8`, not an earlier redesign or the historical version-byte-only ABI. Build mint inputs from
 the same canonical document that will be distributed. Independently decode receipts and verify them.
 Page reads are capped at100 and tolerate arbitrary offset/limit without overflow. Zero limit gives an empty
 page and total. Unbounded core/proof/concern list reads are absent. The affiliation full list is bounded100.
@@ -279,6 +300,8 @@ page and total. Unbounded core/proof/concern list reads are absent. The affiliat
 unexpired publishing agent may update. Expiry is exclusive (`now < expiresAt`). Publishing grants do not grant mint authority; issuers can revoke them, at any time. URLs can be cleared and can be
 updated for a revoked passport to keep explanations accessible, without changing issuer rights. Hashes never change.
 A new hosting satellite does not have authority over old hashes. Treat URLs as untrusted transport input.
+The contract does not parse the strings. By convention (§22.19, CA-19.6) each field MAY hold several
+`ipfs://`, `ar://` or `https://` addresses of the same bytes, separated by single spaces, within the 512-byte limit.
 
 ### Profile directory
 
@@ -410,7 +433,8 @@ repair conflicts by substituting their current default contracts. Unknown genera
 or unauthenticated, not permission to guess. A copied manifest or receipt alone is not proof of chain state.
 
 The full original photo/files MUST be available within a complete bundle; reading that local bundle does not
-require fetching a separate photo URL. Mirrors may distribute the same document/files or a repackaged bundle,
+require fetching a separate photo URL. When `previewHash` is nonzero, the lighter public copy (§9) is a required
+payload as well, so a complete bundle holds both the original primary photo and its copy. Mirrors may distribute the same document/files or a repackaged bundle,
 but MUST NOT change the committed content. Receipt, generation manifest, external transport locations and ZIP
 metadata are outside dataHash; every field inside passport.json remains subject to canonical hashing (§10).
 
@@ -424,7 +448,7 @@ already extracted entries: strict JSON, canonical passport, cross-file identity,
 payload hashes/lengths and required originals, full edition address-list tree, and optional exact comparison
 with an independently trusted generation manifest. It does not parse ZIP or authenticate chain evidence.
 The safe ZIP importer/exporter and client integration remain required before claiming complete bundle conformance.
-Storage providers and distribution policy remain undecided; the format does not mandate a hosting service.
+Storage, publication and retrieval follow §22.19; the format does not mandate a hosting service or provider.
 
 ## 16. Limits and external statements
 
@@ -456,6 +480,12 @@ status needs a node/RPC and finality policy. Institutions, domain registries, ho
 and relayers are separate trust surfaces. Relayers cannot forge a unit signature, but can delay/censor submission,
 observe a submitted activation or consume its one-shot record earlier than another courier. Submission time is
 not acquisition time. A paid relay is optional: any caller can submit a valid signed activation.
+
+Storage networks, pinning and upload services, gateways and sponsors are replaceable conveniences, not trust
+sources. The owner's `.odpass` is the primary copy; a published file is accepted only when its bytes match the
+committed hash, whatever route delivered them (CA-14.4). A client MUST NOT depend on one gateway or one service,
+and the loss of every online copy MUST NOT be reported as a change of the chain record (§22.19). A gas sponsor
+can stop funding a wallet but cannot act for it (§22.20).
 
 ## 20. Edition keys and activation
 
@@ -555,7 +585,7 @@ There is no unit-passport mint or transfer. Edition activation remains possible 
 First activation does not close the B issuer 24h revocation window. Only expiry or explicit print finalization closes revocation. Display activation, revocation and print finalization independently.
 Readers must retain the pinned satellite even after client defaults change. No satellite can write to the core.
 
-## 21. Pre-release validation boundaries (ABI 0.7-redesign-7)
+## 21. Pre-release validation boundaries (ABI 0.7-redesign-8)
 
 JSON input bytes MUST be decoded with fatal UTF-8 validation; replacement decoding and BOM are forbidden.
 An edition Merkle root MUST be nonzero. Issuance preflight MUST obtain the complete address-list bytes (from local storage or an independently permitted transport),
@@ -574,12 +604,13 @@ author wallet, kind, previousId and payloadHash. The supplied record/context mus
 Its successful report verifies content integrity only; author identity/lifecycle remain unverified and truth unsupported.
 Schema validation alone is insufficient for these semantic checks or for edition/address-list validation.
 
-The following is a focused integration table for ABI `0.7-redesign-7`, not an exhaustive list of Solidity
+The following is a focused integration table for ABI `0.7-redesign-8`, not an exhaustive list of Solidity
 errors. Decode against the selected contract ABI in `chain/abi/`; the same EC number can have
-context-specific uses. The earlier `0.7-redesign-6` line emitted neither `PassportPrintFinalized` nor the
+context-specific uses. The earlier `0.7-redesign-7` line had no `previewHash` and emitted neither `EC(142)` nor
+`EC(143)`. The `0.7-redesign-6` line before it emitted neither `PassportPrintFinalized` nor the
 non-unique-edition rejection below, and used a single 72-hour window for every profile type.
 
-| Call / condition | Result in `0.7-redesign-7` |
+| Call / condition | Result in `0.7-redesign-8` |
 |---|---|
 | Zero operationId: mint / journal / proof | `InvalidOperationId()` / `InvalidStatementOperation()` / `InvalidProofOperation()` |
 | Exact committed mint | `AlreadyCommitted(bytes32 operationId,string passportId)` |
@@ -590,6 +621,8 @@ non-unique-edition rejection below, and used a single 72-hour window for every p
 | finalizePassportForPrint: missing / wrong caller / revoked | `EC(12)` / `EC(17)` / `EC(18)`; a repeat on an already finalized passport succeeds as a no-op |
 | getPassportReleaseState on a missing passport | `EC(12)` |
 | Non-unique editionModel (limited/open/dynamic) or bits 4096/8192 from a non-B profile | `EC(121)` |
+| Mint with nonzero `previewHash` and zero `imageHash` | `EC(142)` |
+| Mint with nonzero `previewHash` equal to `imageHash` | `EC(143)` |
 | New mint/proof in a different UTC month | `EC(68)` (committed operation lookup precedes this check) |
 | Replacement of own terminal statement | `StatementNotActive()` |
 | Wrong edition disclosure / reused issuer nonce | `EditionCommitmentMismatch()` / `EditionNonceAlreadyUsed(string passportId)` |
@@ -600,9 +633,11 @@ non-unique-edition rejection below, and used a single 72-hour window for every p
 The ten-contract roster is the core plus concerns, hosting, profile directory, institutional proofs,
 author attestation, wallet document anchor, relations, edition units and statement journal.
 A release bundle pins complete compiler input/output and exact ABI/creation/runtime/immutable bindings.
-The only bundle that exists is the earlier `0.7-redesign-6` one; the deployment scripts require a
-`0.7-redesign-7` bundle and reject it. Until a bundle is rebuilt and independently approved for the current
-sources, no pinned release corresponds to this specification, and the procedure below is unexecutable.
+The existing bundles describe earlier sources: `0.7-redesign-6` (sealed audit package) and `0.7-redesign-7`
+(`review/v07-abi7-release/`, hash approved by the owner on 2026-09-21). Neither matches `0.7-redesign-8`.
+Until a bundle is built and approved for the current sources, no pinned release corresponds to this
+specification, and the procedure below is unexecutable. No deployment has been performed; approving a bundle
+does not authorize one.
 Deployment uses pinned release bytes with compilation disabled, a checked manifest/resume identity,
 write-ahead transaction plans, exclusive manifest lock, nonce sequence and explicit gas/fee/total spend caps.
 On Polygon, two separate RPC services verify transactions, canonical receipts, runtime and finalized blocks;
@@ -680,6 +715,22 @@ valid. Rationale and acceptance scenarios:
   from a single key. C profiles are personal: the client MUST NOT register a C profile to a Safe or other
   multisig account and MUST refuse to act as a C issuer for one. This is a client rule only; the contract
   does not enforce it, so a reader MUST NOT infer anything from a C profile's wallet type.
+- CA-5.8. Mint and `submitProof` succeed only in the UTC month named in their inputs (§2, `EC(68)`). For a Safe
+  proposal of either, the client MUST show the execution deadline (00:00 UTC on the first day of the next
+  month, also in local time) and MUST warn when the proposal is created close to that deadline, because the
+  last co-signer may sign too late.
+- CA-5.9. A pending mint or `submitProof` proposal whose UTC month has passed MUST be shown as unexecutable,
+  not as pending (this narrows CA-5.6). With `safeTxGas = 0` and `gasPrice = 0`, Safe v1.4.1 reverts the whole
+  transaction (`GS013`) and does not consume the Safe nonce, so the stale proposal blocks every later proposal
+  of that Safe. The client MUST offer a rejection transaction with the same Safe nonce and a re-preparation of
+  the job for the new month under the same `operationId`. Before reuse, it MUST confirm through
+  `getMintOperation` or `proofOperations` that the operation is not committed; the reverted proposal reserved
+  nothing (§3). Re-preparation changes hashed bytes (§2) and needs a new confirmation by the co-signers (CA-5.2).
+- CA-5.10. A Safe revocation proposal can execute only inside the role's window (§8; 24 hours for B/P/M). The
+  client MUST show the window's end on the proposal and warn that slow co-signers can miss it. After the end the
+  proposal MUST be shown as unexecutable (`EC(132)`), with the rejection transaction of CA-5.9 offered to free
+  the Safe nonce. When a Safe issuer mints, the client SHOULD remind it that co-signers must be reachable during
+  the revocation window.
 
 ### 22.6 Interrupted issuance and recovery (A2)
 
@@ -695,6 +746,9 @@ valid. Rationale and acceptance scenarios:
   `getEdition` with the job instead of treating a revert as failure.
 - CA-6.5. A print-ready label file MUST NOT be released until mint, edition open (if any), and a verified
   archive export are all confirmed (see also CA-2.2).
+- CA-6.6. An unexecutable Safe proposal (CA-5.9, CA-5.10) is a stage of its own under CA-6.2, distinct from
+  "result unknown" and from failure. The saved job MUST keep the Safe address, Safe nonce and proposal hash, so
+  that the rejection transaction and any re-prepared job can be matched to the original proposal.
 
 ### 22.7 Edition secrets and the `.odpsecret` file (A3)
 
@@ -814,15 +868,20 @@ A matching hash proves the bytes are unchanged since issuance, not that they are
 
 ### 22.14 QR payloads and external links (A10)
 
-A genuine ODP QR carries identifiers only, never a web address: `odp://<passportId>` for a passport and, for
-an edition unit, the edition passport ID with the unit index in the same `odp:` form (exact unit-label
-encoding to be fixed with physical print tests, `review/qr-07`). GS1 Digital Link or other `https://` payloads
-are not used. A counterfeit label can still carry any URL, and the phone's camera, not the ODP app, reads it;
-passports also contain hosting and proof URLs that their publishers can change.
+An ODP QR has one of two forms. The preferred form is `odp://<passportId>` for a passport and, for an edition
+unit, the edition passport ID with the unit index in the same `odp:` form (exact unit-label encoding to be fixed
+with physical print tests, `review/qr-07`). The issuer link form is the issuer's own `https://` address that
+carries the same identifier in an `odp` query parameter, for example
+`https://issuer.example/p?odp=ODP-2026-09-123456789`: the system camera opens the issuer's website or app,
+and an ODP scanner reads the identifier and verifies it without the website. GS1 Digital Link and other
+`https://` payloads without a valid `odp` parameter are not ODP labels. A counterfeit label can still carry
+any URL, including a look-alike domain with a genuine passport ID, and the phone's camera, not the ODP app,
+reads it; passports also contain hosting and proof URLs that their publishers can change.
 
-- CA-14.1. Clients SHOULD register the `odp` URL scheme so the system camera offers to open the app. The
-  client MUST resolve the ID itself against the embedded registry (§22.12) and MUST NOT open any website to
-  verify. A scanned `https://` QR MUST be treated as "not an ODP label".
+- CA-14.1. Clients SHOULD register the `odp` URL scheme so the system camera offers to open the app. For both
+  forms the client MUST resolve the ID itself against the embedded registry (§22.12) and MUST NOT open any
+  website to verify. A scanned `https://` QR that is not a valid issuer link (CA-14.6) MUST be treated as
+  "not an ODP label".
 - CA-14.2. The client MUST state that checking a passport never needs a seed phrase, password or wallet
   signature. Any signing request MUST be a separate explicit action with a decoded description.
 - CA-14.3. External links MUST NOT open automatically; the exact destination host MUST be shown first.
@@ -831,6 +890,22 @@ passports also contain hosting and proof URLs that their publishers can change.
   CA-13.2. A fetched file whose hash does not match the chain commitment MUST NOT be shown as authentic.
 - CA-14.5. The concealed activation code MUST be entered only inside the app and MUST NOT appear in any URL,
   QR, log or analytics event (§12).
+- CA-14.6. An issuer link is valid only if: the scheme is `https`; the URL has no user-info part; the query
+  contains exactly one parameter whose name is exactly `odp`; and its percent-decoded value is exactly an
+  identifier accepted in the `odp://` form (for a passport, the Passport ID format of §2, uppercase, with no
+  spaces or other characters). Anything else, including `http`, a repeated `odp` parameter or an `odp`
+  value in the fragment, MUST be rejected as "not an ODP label" with the reason shown. The path, the other
+  parameters and the fragment MUST NOT influence verification.
+- CA-14.7. The link host is context, not trust. The client MUST show the exact host (CA-10.3) and report
+  separately from the verification result: "the link leads to the issuer's domain" only if the host equals,
+  or is a subdomain of, a domain the issuer declared in `ODPProfileDirectory` whose `/.well-known/odp.json`
+  lists this issuer profile for this generation (§22.10); otherwise "the link leads to <host>; the issuer
+  published <domain>" or "the issuer published no domain". A mismatch MUST NOT change the passport's own
+  checks, and a match MUST NOT be shown as proof that the object is genuine (§22.16).
+- CA-14.8. Scanning an issuer link inside an ODP client MUST NOT open the issuer's website automatically;
+  "open the issuer's site" is a separate action under CA-14.3. An issuer using this form SHOULD print the
+  readable passport ID next to the QR, so the passport stays checkable if the website disappears. An issuer's
+  website or app MAY show ODP data but MUST NOT be presented by ODP clients as a verification source.
 
 ### 22.15 Permanent publication and privacy (A11)
 
@@ -884,3 +959,105 @@ These risks remain by design and are accepted with the limits below.
 - R3. Handing over an archive and a scratch code does not make a transaction fair; ODP records no owner (D4).
   CA-17.3. On hand-over the client MUST list what was actually handed over (object, `.odpass` copy, unit
   index, scratch state) and MUST NOT state that ownership was transferred.
+
+### 22.18 Warnings before irreversible actions
+
+ODP has no support desk that can undo an action. As with a crypto wallet, the client is the only place where
+a person learns what cannot be taken back. Warnings are therefore required at a few fixed moments, not
+everywhere, so that they are still read.
+
+- CA-18.1. Before each of these actions the client MUST show a dedicated confirmation screen: profile
+  registration, passport mint, print finalization, passport revocation and edition opening. The screen MUST
+  say in plain words what cannot be undone, MUST NOT be dismissible by tapping outside it, and MUST require
+  an explicit action whose control names the action (for example "Issue permanently"), not "OK". Nothing on
+  it may be pre-selected in favour of continuing.
+- CA-18.2. Registration: the screen MUST state that the profile type is permanent, that the profile is bound
+  to this account forever, that ODP cannot recover, block or move it (CA-1.1), and that losing access to the
+  account ends issuance under this profile ID.
+- CA-18.3. Mint: the screen MUST list what becomes public permanently (CA-15.1), state that the on-chain card
+  can never be edited, and show the role's revocation window with its exact end time (CA-2.1).
+- CA-18.4. Print finalization: the screen MUST state that after it the passport can never be revoked, even if
+  printing fails or the file is lost (CA-2.3).
+- CA-18.5. Revocation: the screen MUST state that revocation cannot be undone, that the passport and its
+  history stay readable, and that the reason hash becomes public.
+- CA-18.6. Backup: the client holds no keys (§22.20), so it cannot check the wallet's backup. It MUST show a
+  reminder on the profile screen and on every mint confirmation that recovery of the connected wallet is the
+  user's own responsibility, until the user dismisses it for this profile. It MUST NOT claim that a backup is
+  verified and MUST NOT ask for a seed phrase or any other secret (CA-1.2).
+- CA-18.7. The warnings of CA-18.2–18.5 MUST NOT have a "do not show again" option. For a batch of passports
+  prepared as one issuance job, the mint warning MAY be shown once per job. Other dialogs and promotional text
+  MUST NOT imitate the style of these warnings.
+
+### 22.19 Photo copy, storage and publication
+
+The chain holds commitments, never files. The owner's `.odpass` is the primary copy of every file; each network
+location is a replaceable convenience that is checked by hash. Publication is permanent in practice. Arweave data
+cannot be deleted, and IPFS copies held by others cannot be recalled.
+
+- CA-19.1. The issuance job MUST record whether the user wants the primary photo published. Only in that case
+  does the client create the lighter public copy (§8, §9) and set `previewHash`; otherwise there is no copy and
+  `previewHash` is zero. The choice is fixed at mint; a copy cannot be added to an existing passport.
+- CA-19.2. The copy MUST be a JPEG of at most 1,048,576 bytes without GPS or other location metadata, and it
+  MUST differ in bytes from the primary photo (`EC(143)`), even when the primary already meets these limits.
+  The client SHOULD also remove device metadata. Before the user confirms publication, the client MUST show the
+  copy itself, with its size and resolution, not the original; this is part of the disclosure of CA-15.1 and
+  CA-18.3.
+- CA-19.3. The copy is an ordinary payload `files/<sha256hex>` of the `.odpass`, listed in the manifest, so the
+  bundle holds both the original and the copy (§15). The client MUST publish only the committed copy.
+- CA-19.4. Without a copy the user MAY still publish the `.odpass`; readers then take the photo from the archive.
+  Before that the client MUST show that the published archive contains the original photo and every other
+  payload with their metadata (CA-15.1, CA-15.2).
+- CA-19.5. The IPFS address of the copy is the CIDv1 derived from `previewHash` with codec raw (`0x55`),
+  multihash sha2-256 (`0x12`, length 32) and one block, that is the bytes `0x01 0x55 0x12 0x20 || previewHash`
+  in base32 lower case with the prefix `b`. The same derivation applies to any other committed file of at most 1,048,576
+  bytes, including canonical `passport.json` by `dataHash`. A publisher that puts such a file on IPFS MUST
+  publish it as a single raw block. A client SHOULD try this address before hosting URLs. That common IPFS tools
+  produce the same CID for such files is derived from their published profiles and has not been tested; it MUST
+  be confirmed by a test vector, including a file of exactly 1,048,576 bytes, before release.
+- CA-19.6. `ODPHosting.dataUrl` and `imageUrl` MAY each hold several URIs of the same bytes, separated by single
+  U+0020 spaces, within the 512-byte limit (§13). Recognized schemes are `ipfs`, `ar` and `https`; other entries
+  are ignored (CA-14.3). Order is a hint, not trust. `imageUrl` addresses the copy; `dataUrl` addresses canonical
+  `passport.json` or an `.odpass`, which the client tells apart by content.
+- CA-19.7. Every route is untrusted. Fetched bytes are accepted only if their SHA-256 equals the committed hash
+  (CA-14.4). The client MUST NOT depend on one gateway, pinning service or upload service; public gateways can
+  close at short notice. It MUST try more than one source, SHOULD fetch IPFS content in verifiable form (raw
+  block or CAR) and MUST let the user edit the gateway list. "No online copy found" MUST be reported as such,
+  never as revocation or a change of the chain record.
+- CA-19.8. The client SHOULD upload the copy and `passport.json` only after the mint is confirmed, so that a
+  failed mint leaves no permanent orphan file.
+- CA-19.9. The client MUST NOT sell storage, upload credits or publication, and MUST NOT hold a service key, a
+  sponsor key or any other publishing secret. Publication is paid in one of three ways: (a) free, where an
+  upload service accepts small files without charge (Turbo's free tier covers a typical `passport.json`, up to
+  105 KiB per upload); (b) by the user from their own Polygon wallet through WalletConnect, for example by topping
+  up Turbo with POL and signing each upload with `personal_sign`; (c) by a sponsor through a delegation held by
+  the service, such as a Turbo Credit Share Approval, without giving the client any key. Before a payment the
+  client MUST show the amount and state that it goes to the storage service, not to ODP, and MUST check the
+  destination address against a value pinned in the client, not only against a service response.
+- CA-19.10. Services are replaceable. A published file stays checkable by its hash after the service is gone, and
+  service endpoints MUST be changeable by configuration or client update without a protocol change. Before a
+  top-up the client SHOULD say that unused credits depend on that service.
+- CA-19.11. Only the copy is published by default, and only after the consent of CA-19.2. The client MUST state
+  that published bytes cannot be recalled (CA-15.4), that an upload signed by the user's wallet publicly links
+  that address to the file, and that a sponsor's approval publicly links the sponsor to the user. These rules
+  add to §22.15 and do not relax it.
+
+### 22.20 Wallet connection and gas sponsorship
+
+ODP runs no servers and no relayer in 0.7. A sponsor, such as a university or publisher, pays for gas only by
+sending POL from its own wallet to the addresses of the people it supports.
+
+- CA-20.1. A release client MUST NOT create, import or store wallet keys. It connects the user's wallet only
+  through WalletConnect.
+- CA-20.2. The contracts offer no gas payment on a user's behalf. The client MUST NOT present a sponsor as
+  submitting or signing the user's transactions. Actions signed by the user and submitted by a relayer are
+  deferred to a later generation and need their own audit.
+- CA-20.3. The client MAY offer "Request POL". It sends to the sponsor's intake address, which the sponsor owns
+  and operates, only the sponsor's address, the user's wallet address and a `personal_sign` signature by that
+  wallet over a text naming the wallet address, the sponsor, chainId 137 and the time. The request carries no
+  passport data and sends no transaction.
+- CA-20.4. When no intake address is set or it cannot be reached, the client MUST open the system share sheet
+  with the wallet address as text. There is no ODP fallback server.
+- CA-20.5. Before the first request the client MUST state that the sponsor will see the wallet address and all
+  its public actions, and that the sponsor gets no access to the wallet and can only stop funding it.
+- CA-20.6. The client MUST show the POL balance and an approximate number of operations it covers, and MUST NOT
+  make any action depend on sponsorship; the user can always fund the wallet themselves.

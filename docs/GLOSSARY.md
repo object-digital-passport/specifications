@@ -1,4 +1,4 @@
-# Glossary — ODP 0.7, ABI `0.7-redesign-7`
+# Glossary — ODP 0.7, ABI `0.7-redesign-8`
 
 Informative. [SPEC.md](../SPEC.md) is normative; where this page and SPEC disagree, SPEC wins.
 Terms from v0.6 guides and from the sealed ABI6 audit package are marked where they no longer apply.
@@ -22,8 +22,9 @@ institutional proofs, concerns and institutional assessments. Nothing verifies t
 to chain ID, registry address, satellite addresses, deployed runtime hashes, ABI identity, deployment blocks
 and source/build identity. A generation identifier is never reassigned.
 
-**ABI generation** — the exact interface identifier of the registry code, currently `0.7-redesign-7`.
-The earlier `0.7-redesign-6` (the sealed audit package) and the original 0.7 line are **incompatible**.
+**ABI generation** — the exact interface identifier of the registry code, currently `0.7-redesign-8`.
+The earlier `0.7-redesign-7` (approved release bundle), `0.7-redesign-6` (the sealed audit package) and the
+original 0.7 line are **incompatible**.
 
 **Packed version byte / `CONTRACT_VERSION`** — `major*16 + minor`, currently `7`. It does **not** identify an
 ABI, a build or a generation. Never select a contract or a decoder from it.
@@ -43,6 +44,12 @@ external explanation, not by an edit.
 
 **`dataHash` / `anchorsHash` / `imageHash` / `fileHash`** — SHA-256 commitments supplied by the issuer.
 The contract stores them; it cannot open a hash, read JSON or recover any original bytes.
+
+**`previewHash`** — SHA-256 of a lighter public copy of the primary photo, a JPEG of at most 1,048,576 bytes
+without location metadata, made only when the user chooses to publish the photo. Zero means no copy. A nonzero
+value needs a nonzero `imageHash` (`EC(142)`) and must differ from it (`EC(143)`). In `passport.json` it is the
+single `photo` anchor with `data.role: "preview"`; the `.odpass` holds both the original and the copy. Its IPFS
+address is derived from the hash (SPEC §22.19).
 
 **`anchorTypesMask`** — a uint32 OR of anchor-type bits. It records which anchor kinds are *present*,
 not that any anchor is true. Bits 14–30 are reserved; bit 31 marks a custom or unknown anchor type.
@@ -108,7 +115,8 @@ withdrawal does not free the slot. Readers MUST check `authorWithdrawalAt`.
 
 **`ODPHosting`** — mutable data/image URLs (≤512 bytes) writable by the original issuer or its own unexpired
 publishing agent. Publishing delegation grants no mint rights. Hashes never change; URLs are untrusted
-transport input.
+transport input. Each field may list several `ipfs://`, `ar://` or `https://` addresses of the same bytes,
+separated by spaces (SPEC CA-19.6).
 
 **`ODPProfileDirectory`** — a self-declared lower-case ASCII DNS name for `B`/`P`/`M`. Syntax only: it proves
 no domain control and no institutional status.
@@ -169,7 +177,7 @@ set. An `open` model does not authorize appending units to an existing passport.
 | Mint agent, `on-behalf` issuance, `tx.origin` path, extension router | Absent. Issuance delegation is deferred, not implemented. |
 | Unit passports, owner, transfer, activation-triggered revocation lock | Absent. Only expiry or explicit print finalization closes revocation. |
 | `governance`, freeze, admin pause, wallet rotation, key recovery | Absent. A lost or stolen key has no recovery path. |
-| Mandatory Amoy testnet deployment | Not required. Polygon mainnet (137) is the selected target; selecting a target is not authorization. |
+| Amoy testnet deployment | Not used, including for testing (owner decision 2026-09-24). Polygon mainnet (137) is the selected target; selecting a target is not authorization, and nothing is deployed. |
 | v0.6 mutable status / owner model, old glossary in `GUIDE.md` | Historical. See [GUIDE.md](GUIDE.md) for the v0.6 line only. |
 
 ## Status words used in this repository
@@ -182,7 +190,11 @@ certify the current ABI. See [the delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md).
 **Unsupported** — a reader that cannot perform a declared check MUST report it as `unsupported`, distinct
 from failed, from missing evidence and from a counterfeiting verdict.
 
-**Deferred** — decided to be out of scope for this release (NFC hardware/transport, issuance delegation).
+**Gas sponsor** — an organization that sends POL from its own wallet to users' addresses. It sees the address
+and its public actions, gets no wallet access and cannot submit transactions for the user in 0.7 (SPEC §22.20).
+
+**Deferred** — decided to be out of scope for this release (NFC hardware/transport, issuance delegation,
+user-signed actions submitted by a relayer).
 Deferred is not implemented.
 
 Russian version: [`ru/GLOSSARY.md`](ru/GLOSSARY.md).
