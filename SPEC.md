@@ -583,8 +583,10 @@ nonce: <random unique string>
 
 The verifier recovers the address, compares it with `creator` from `getPassportHeader`, and checks that
 `passportId`, `chainId` and `contract` match what it is verifying and that the nonce is fresh. A match proves
-key control, not authorship. ERC-1271 is not defined for this message, so an issuer registered to a contract
-wallet such as a Safe cannot produce this proof. It is a request to the issuer; a verifier MUST NOT ask the
+key control, not authorship. For an issuer registered to a contract wallet such as a Safe, the verifier MUST
+instead call `isValidSignature(bytes32 hash, bytes signature)` (ERC-1271) on `creator`, with `hash` the same
+EIP-191 message hash, and accept only the return value `0x1626ba7e`. The answer reflects the wallet's current
+owners and threshold at the block read, not those at mint time; the verifier MUST record that block. It is a request to the issuer; a verifier MUST NOT ask the
 person checking a passport to sign anything (CA-12.4).
 
 ### Wallet document anchor
@@ -1291,6 +1293,13 @@ were kept, that every key is distinct, or that the right code was printed on the
   export, that it contains keys, not a passport. Secrets MUST NOT reach print spools, logs or analytics.
 - CA-7.6. Before hand-out, the issuer SHOULD scan a sample of the real printed batch; a screen preview is not
   a print check. Rejected labels SHOULD be destroyed.
+- CA-7.7. In addition to the encrypted `.odpsecret` file, the client MAY offer a paper backup of the master seed
+  split into shares under SLIP-39 (for example 2-of-3) kept in separate places. The shares are an extra copy:
+  they MUST NOT replace the `.odpsecret` file, and the client MUST NOT print or display a share together with
+  the password of the file.
+- CA-7.8. An issuer printing a large edition through an external printer SHOULD use a printer with
+  security-printing management certified to ISO 14298 or an equivalent scheme, and SHOULD keep the printer's
+  run records with the edition. This is an issuer recommendation; clients MUST NOT treat it as verified.
 
 ### 22.8 Hand-out before print finalization (A4)
 
@@ -1329,9 +1338,12 @@ passes it too. ODP has no central trust list. Identity comes from independent, o
 operator decides which domain is the organization's real one.
 
 Domain publication endpoint: an organization publishes its profile IDs at
-`https://<domain>/.well-known/odp.json` as a JSON object `{"chainId": <number>, "registry": "0x…",
-"profiles": [{"profileId": "…"}]}`; an entry MAY override `chainId`/`registry`. A profile counts as published
-only when `profileId`, `chainId` and `registry` all match the generation being verified. The file is served
+`https://<domain>/.well-known/odp.json` as a JSON object `{"odp": 1, "chainId": <number>, "registry": "0x…",
+"profiles": [{"profileId": "…", "wallet": "0x…"}]}`. `odp` is the format version and MUST be `1`; an entry MAY
+override `chainId`/`registry`. Each entry SHOULD carry `wallet`, the full 42-character address bound to the
+profile (§3, public identity). A profile counts as published only when `profileId`, `chainId` and `registry` all
+match the generation being verified; when `wallet` is present it MUST also equal `getCreator(profileId).wallet`
+(case-insensitive), otherwise the entry does not count. The file is served
 over HTTPS as `application/json` from the organization's own domain, not a shared hosting or social-network
 domain; a static file at this reserved path (RFC 8615) is readable without a browser engine and writable only
 by whoever controls the server. The endpoint is advisory: no mint, statement or verification result depends
