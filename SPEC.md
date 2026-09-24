@@ -117,10 +117,10 @@ for `i = 0…24` and takes the first unused `n`; otherwise it reverts `EC(62)`. 
 
 A profile has a short form, the profile ID, and a full form, the complete 42-character wallet address that
 the registry binds to it. A name is an off-chain label only; the registry stores no names. Profile IDs and
-wallets are public by design. An issuer that wants to be identified SHOULD publish both forms on channels it
-controls (website, shop, packaging, documents), and organizations (`B`, `P`, `M`) SHOULD also serve
-`/.well-known/odp.json` (§22.10). Anyone can register, so a profile whose ID cannot be found in its claimed
-owner's own channels is unidentified. Clients show the full profile ID and ask the user to compare it (CA-16.5).
+wallets are public by design. Every issuer MUST publish both forms on at least one channel it controls
+(website, shop, packaging, documents handed over with the object), and organizations (`B`, `P`, `M`) MUST
+also serve `/.well-known/odp.json` (§22.10). The registry cannot enforce this; a conforming issuer follows it.
+Anyone can register, so a profile whose ID cannot be found in its claimed owner's own channels is unidentified. Clients show the full profile ID and ask the user to compare it (CA-16.5).
 A passport ID and profile ID printed together on packaging are a convenience, not an identity proof (§5).
 
 ### Direct issuance and repeat protection
