@@ -2,7 +2,7 @@
 
 # Edition passports and unit activation keys
 
-*Design note for the **v0.7** line. **Non-normative** — this document records the decisions and their rationale. The binding rules are **[`SPEC.md` §20](../SPEC.md#20-edition-passports-and-unit-activation-keys-v07-line-b-profile-only)**; where the two disagree, the spec wins.*
+*Design note for the **v0.7** line. **Non-normative** — this document records the decisions and their rationale. The binding rules are **[`SPEC.md` §20](../SPEC.md#20-edition-keys-and-activation)**; where the two disagree, the spec wins.*
 
 *Status: draft · Author: Andrei Chernikov · RU mirror: [`ru/EDITION_UNIT_KEYS.md`](ru/EDITION_UNIT_KEYS.md)*
 

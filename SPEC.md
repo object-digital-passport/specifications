@@ -9,6 +9,8 @@ requirements. The previous 0.7 ABI is incompatible. Its specification is preserv
 The older audit/design documents describe inputs to this implementation; [ODP_ASTRA_REVIEW.md](ODP_ASTRA_REVIEW.md)
 records which claims survived independent reproduction. Deployment and client integration status live in
 [ODP_07_IMPLEMENTATION.md](ODP_07_IMPLEMENTATION.md).
+This English file is the only normative text. Translations under `docs/<language>/` are informative and may
+contain mistakes; see [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md).
 
 ## 1. Overview
 
@@ -21,6 +23,35 @@ callback. Its internal library is compiled into its bytecode. Satellites read a 
 the core does not know their addresses. There is no protocol fee. Transactions incur network fees.
 Reads and offline checks require no transaction, but RPC and data providers can charge or become unavailable.
 Long-term verification requires the original chain state and document bytes to remain accessible.
+Verification is offline-capable, not offline-complete: a bundle can be checked against itself without a
+network, but confirming that it is the registered document needs the chain (§15.3). No images or files are
+stored on chain; the core holds a short card and hash commitments.
+
+ODP complements human expertise and other standards; it does not replace them (§18). Spam and indexing noise
+are only partly limited (mint caps, independent directories). Visual design of apps, labels and websites is
+not specified here.
+
+### 1.1 Terminology
+
+| Term | Meaning in this specification |
+|---|---|
+| Passport ID | The `ODP-…` identifier assigned by the core at mint (§2). The hashed `passport.json` carries `passportId: null`; the assigned ID lives in the receipt (§15) and on chain. |
+| Profile ID | The issuer identifier `C-…`, `B-…`, `P-…` or `M-…` (§3); `creatorId` on chain. A document MAY name profiles in `authorship` persons; such a value is a declaration. |
+| Registration | `registerCreator(type)`: binds the calling wallet to one permanent profile ID. Network fee only. |
+| Mint | A transaction to `mintPhysical`, `mintDigital` or `mintMixed` that creates one immutable passport record: card, classification and hash commitments (§8). It uploads no document or file. |
+| Generation | One deployed set of a core and its satellites, identified by chain ID, addresses and ABI generation (§7). Profiles and passports belong to exactly one generation. |
+| Passport | The on-chain record plus, when available, the `passport.json` bytes and original files whose hashes it commits. |
+| `passport.json` | The canonical off-chain document (§9, §10); its SHA-256 is `dataHash`. |
+| `.odpass` | The ZIP bundle carrying `passport.json`, its original files and the service files that tie it to a generation (§15). It is the primary copy; network locations are conveniences (§19). |
+| Gas | The network fee in POL on Polygon. ODP charges no protocol fee. |
+| Verification | Read-only checks of chain records and locally available bytes (§11). It never needs a signature (CA-12.4) and yields per-part results, not one verdict (§22.16). |
+| Revocation window | The period after mint in which the original issuer may revoke: 72 hours for `C`, 24 hours for `B`/`P`/`M`, closed earlier by print finalization (§8). |
+| Print finalization | The irreversible `finalizePassportForPrint` mark that closes revocation before labels are printed (§8, CA-2). |
+| Edition passport | One `B` passport registering a production run, carrying a `unit_key_set` anchor (§20). Its anchors describe the run, not one item. |
+| Unit | One physical item of an edition, identified by its index. A unit has no passport of its own. |
+| Unit key | The key pair of one unit (§20.5). Its seed is the code printed under the concealment layer. |
+| Activation | The one-time public record that a unit key signed for its slot (§20.8–20.9). It is not a mint, not a verification and not ownership (CA-4). |
+| Relayer | Anyone who submits someone else's signed activation. It gains no rights over the unit (§19). |
 
 ## 2. Passport ID
 
@@ -35,6 +66,21 @@ reverts. Reprepare the document and its hashes after a month boundary; do not si
 The supported calendar is 1970 through 2570. A conforming client obtains the assigned ID from the non-indexed
 `passportIdText` in `PassportMinted` and checks the emitting registry and successful receipt.
 
+| Part | Meaning | Example |
+|---|---|---|
+| `ODP` | Fixed prefix | `ODP` |
+| `YYYY` | UTC year of the mint block | `2026` |
+| `MM` | UTC month (01–12) of the mint block | `03` |
+| `NNNNNNNNN` | Nine decimal digits, zero-padded | `004829301` |
+
+The reference core computes, with `abi.encodePacked`:
+`key = year*100 + month`;
+`n = uint32(keccak256(block.timestamp, block.prevrandao, msg.sender, nonce+i, key, gasleft())) % 1e9`
+for `i = 0…24`, taking the first `n` not yet used in that `key`; otherwise it reverts `EC(61)`. The number
+carries no order or count of registrations. The ID is assigned by the contract, never chosen by the issuer,
+and never changes. `YYYY-MM` states when the record was mined, not when the object was made; historical dates
+belong in `creationDate` or `objectYear` (§9). The chain enforces only consistency with the block time.
+
 ## 3. Profile ID
 
 A wallet registers exactly once as `C`, `B`, `P`, or `M`. The ID is `T-NNN-NNN-NNN-NNN` and remains fixed.
@@ -48,6 +94,34 @@ These are per issuing wallet, not Sybil resistance. Bucket calculation is exactl
 `month = min(12, floor((timestamp % 31556952)/2629746)+1)`. This deliberately retained rule differs from
 Gregorian months (measured discrepancies in the audit). Clients MUST NOT label its reset as a Gregorian
 calendar promise. Passport IDs still use the real UTC calendar.
+
+### Type prefixes and format
+
+| Prefix | Intended use | Contract-enforced differences |
+|---|---|---|
+| `C` | Individual creator: artist, photographer, maker | 1000 mints per bucket; unique passports only; 72-hour revocation window |
+| `B` | Brand, company, studio, label | 100000 mints per bucket; the only type that may issue editions (§8, §20) |
+| `P` | Expert, auction house, certification body | No mint cap; institutional proofs and concerns (§4, §13) |
+| `M` | Museum or collection, including holdings by deceased authors | Same as `P` |
+
+Museums and large inventories SHOULD register as `M`, not `B` or `C`. Only these four prefixes exist.
+`registerCreator` rejects any other byte (`EC(54)`) and a second registration of the same wallet (`EC(53)`).
+A new prefix requires a specification update and a new registry.
+
+`NNN-NNN-NNN-NNN` is a twelve-digit number in four groups, for example `C-482-930-174-005`,
+`B-029-384-751-224`, `P-001-293-847-119`, `M-204-839-112-441`. The core computes
+`n = uint64(keccak256(block.timestamp, block.prevrandao, msg.sender, nonce+i, gasleft())) % 1e12`
+for `i = 0…24` and takes the first unused `n`; otherwise it reverts `EC(62)`. The number carries no meaning.
+
+### Public identity
+
+A profile has a short form, the profile ID, and a full form, the complete 42-character wallet address that
+the registry binds to it. A name is an off-chain label only; the registry stores no names. Profile IDs and
+wallets are public by design. An issuer that wants to be identified SHOULD publish both forms on channels it
+controls (website, shop, packaging, documents), and organizations (`B`, `P`, `M`) SHOULD also serve
+`/.well-known/odp.json` (§22.10). Anyone can register, so a profile whose ID cannot be found in its claimed
+owner's own channels is unidentified. Clients show the full profile ID and ask the user to compare it (CA-16.5).
+A passport ID and profile ID printed together on packaging are a convenience, not an identity proof (§5).
 
 ### Direct issuance and repeat protection
 
@@ -75,6 +149,17 @@ uniqueness of documents or physical objects. Reads/receipts still require the cl
 A document hash is optional; a URL requires a nonzero hash. URLs are at most 512 UTF-8 bytes. The statement
 payload is immutable. Its submitting wallet can call `withdrawProof(proofId, reasonHash)` once, including after passport revocation; a nonzero SHA-256 reason is required. Readers MUST read `proofWithdrawnAt` and `proofWithdrawalReason` alongside `getProof`; an existing record does not imply a current endorsement. IDs are `PRF-YYYY-MM-NNNNNNNN`; the current UTC month is checked. The contract does not assert
 that an examination occurred. Clients MUST establish the institution's identity independently.
+A statement does not modify the passport; statements accumulate beside it and stay readable after withdrawal.
+
+`getProof(proofId)` returns `ProofRecord(proofId, contractVersion, prover, passportId, documentHash,
+documentUrl, timestamp)`: `prover` is the submitting profile ID, `documentHash` is the SHA-256 of the
+institution's document or zero, `documentUrl` is empty when the hash is zero, and `timestamp` is the block time.
+`contractVersion` is 7 and MUST equal the core's `CONTRACT_VERSION`; the satellite derives it from the same
+`SPEC_MAJOR`/`SPEC_MINOR` rule (§14). The proof number is
+`uint32(keccak256(block.timestamp, block.prevrandao, msg.sender, nonce+i, key, keccak256(passportId),
+gasleft())) % 1e8` with `key = year*100 + month`, first unused of 25 candidates, otherwise `EC(60)`.
+Lists are read with `getProofsForPassportPaged` and `getProofsByInstitutionPaged` (§13). Submission costs
+only the network fee.
 
 `ODPRegistryRelations` stores display-only affiliation for B/P/M. A child proposes; the parent confirms.
 Both profiles must be registered B/P/M when creating a relation. There is at most one active parent per child,
@@ -84,12 +169,32 @@ walk bound, not a global maximum tree height. Parent detach and child leave/canc
 available to their original participants. No rights, quota or trust are inherited. Children lists use swap-and-pop on detach;
 read multiple pages at the same block. Private Solidity storage is publicly observable.
 
+A link that would close a cycle reverts `EC(67)`; an ancestor walk that reaches no root within eight hops
+reverts `EC(69)`. `C` profiles cannot take part on either side (`EC(71)`). Affiliation records that two
+profiles agreed to be linked and in which direction, nothing more: a parent confirms belonging, not quality.
+A verifier MUST NOT present a child as endorsed, certified or vouched for by its parent, and MUST NOT invent a
+relationship type (subsidiary, member, franchise) that the contract does not store. It SHOULD show only the
+immediate parent by default and MAY show the full chain on request. A parent can detach a child at any time.
+
 ## 5. Verification label
 
 An optional label carries a readable passport ID and a QR locator. It is a convenience, not identity proof.
 An issuer profile printed on packaging is not an independent trust source. Copying a valid label is possible.
 A client SHOULD show issuer identity, integrity, revocation and individual statements separately.
 It MUST NOT transform a concern count or first activation into a verdict about the physical object.
+
+If a label is used, it MUST carry:
+
+| Element | Rule |
+|---|---|
+| QR code | One of the payloads of §12 and CA-14.6, error correction level Q or higher |
+| Passport ID | The full `ODP-…` identifier as readable text, so the passport stays checkable without the QR or a website |
+| Protocol mark | `ODP` or `Object Digital Passport` |
+
+A label MAY add the profile ID, title, author name, year, edition number, a logo, an NFC tag or a seal
+number; none of these is a trust anchor. If a numbered seal is used, the label SHOULD overlap it so that
+removing the label removes the seal. Size, shape, colour, material, typography, layout and manufacturer are
+implementation decisions. Edition unit labels follow §20.7 and §22.14; a print-ready file follows CA-2.2.
 
 ## 6. Physical seal
 
@@ -103,6 +208,44 @@ is not a public-key signature and does not make all observed NFC responses unfor
 MUST NOT appear in the public document. Passive UID matching alone is not cryptographic authentication.
 Readers MUST distinguish a live verified response, a reported seal state, and an unavailable check.
 Detailed legacy hardware guides are informative and require separate implementation/hardware validation.
+
+A seal is optional. The identification minimum of a physical or mixed object is `photo`, `dimensions`,
+`materials` and `distinguishing_features` (§8, §9); a seal anchor adds evidence on top of it. Digital objects
+use no seal; the file hash is their binding. Seal anchors have no dedicated on-chain fields: they are bound by
+`dataHash` and `anchorsHash` and visible as mask bits 256 (`nfc`) and 512 (`numbered_seal`).
+
+### `numbered_seal` anchor
+
+A printed-number seal (holographic sticker, wax or lead seal, tamper-evident label) gives a physical
+reference, not cryptographic proof. `data` carries `number` (exactly as printed) and `type` (for example
+`holographic sticker`), and MAY carry `color`, `size` and `notes`. A verifier shows the committed number for a
+person to compare with the object; the check cannot be automated. The issuer chooses a seal that cannot be
+removed without visible damage.
+
+### `nfc` anchor (informative until NFC verification ships)
+
+The data shape below appears in the conformance vectors, so its field names are fixed:
+`uid` (7-byte chip UID, lower-case hex), `publicKey`, `model` (`NTAG424DNA` or `NTAG424DNA_TAGTAMPER`),
+`installedAt` (ISO 8601 date) and optional `notes` (installation method and location). Generic Type 2 tags
+such as NTAG 213 are not a conforming `nfc` anchor. For NTAG 424 DNA, `publicKey` holds a 16-byte AES
+application key for EV2 mutual authentication (profile `odp-ntag424-ev2-symmetric-cr-v1`); the name is kept
+for future asymmetric ICs. Consequences:
+
+- It is a shared secret. Anyone who reads the published anchor can compute the tag's answers and program a
+  second tag that answers identically. Publishing the bundle publishes the key; an issuer of a high-value
+  object MUST be told that this is a per-passport security decision.
+- It MUST be a non-master application key (`01h`–`04h`). Key `00h` authorizes `ChangeKey` for every key and
+  MUST NOT be published.
+- Before mint the issuer SHOULD confirm on the live tag the UID, that the key authenticates and, for
+  TagTamper, that the tamper loop reads intact. The carrier written to the tag after mint is the `odp://` URI
+  of §12, and its file SHOULD then be write-protected.
+
+An NFC-capable verifier obtains the anchor, checks it against `dataHash` or `anchorsHash`, and runs
+`AuthenticateEV2First` with that key. Success shows only that the chip holds the committed key. For
+`NTAG424DNA_TAGTAMPER` a high-assurance result additionally requires an authenticated tamper state of intact
+and a live UID equal to `data.uid`. `Read_Sig` shows manufacturer originality, not binding to a passport.
+A web verifier cannot perform this check and MUST report it as unsupported (§11, CA-16.3). Other tag
+technologies need their own specified model string and verification recipe before they can be claimed.
 
 ## 7. Networks and generations
 
@@ -119,6 +262,34 @@ manifest is an identification artifact, not its own trust root: clients MUST aut
 identity independently before reporting chain authenticity. A replacement satellite is a different namespace;
 it cannot silently replace the one committed by an existing edition. Historical records and activation state
 remain associated with their original addresses, regardless of later client software or hosting changes.
+
+Profile IDs and passports belong to the generation that created them. A new generation does not carry them
+over: the same wallet registers again and receives a different profile ID. Every verification path ends at a
+read from this one chain; §15.3 states what remains possible without it.
+
+### Superseded lines (informative)
+
+Earlier lines are separate registries with incompatible ABIs; their records do not migrate and are not ODP
+0.7 passports. They remain readable on Polygon PoS (chain ID 137), and a document issued under them still
+verifies against their own on-chain hashes. They are listed only so that historical records can be read.
+A 0.7 client MUST NOT use them for issuance, MUST NOT substitute them for a 0.7 address and, under CA-12.1,
+does not report their records as verified 0.7 passports. The 0.7 audit findings were not rechecked against
+these deployments.
+
+| Line | Contract | Address |
+|---|---|---|
+| v0.6, deployed 2026-07-24, `CONTRACT_VERSION` 6 | `ObjectDigitalPassport` | `0x012aC6393464A73EC16131D701ff2e000695b91b` |
+| | `ODPPassportLib` | `0xB7D7B8485eeb385c375ABd91035F5a6914171ccE` |
+| | `ODPWalletDocumentAnchor` | `0x35df3773919D9F10e5F8838abaa453DE120e6Cb4` |
+| | `ODPCounterfeitConcern` | `0x692935d6c1532b47cE0459bF1E9549991d0eD2C9` |
+| | `ODPRegistryRelations` | `0x2ea6f05a050973afa14E61b1Ea19De92621e3661` |
+| | `ODPPassportProofRegistry` | `0x990FCc2E587d9f2cDb9c73083E9f90793CeF7F49` |
+| | `ODPExtensionMintRouter` | `0x3fa8f213399a2A9f7Da4bF7D8a9D7D42E8AEF822` |
+| | `ODPAuthorAttestation` | `0x1972E68D0A5B19C5ee2af54F8b792c426985F7d7` |
+| v0.5 and earlier | `ObjectDigitalPassport` | `0x413aEeBB2ac437483Bc68791EaAab492C2a4B346` |
+
+Release notes of these lines are kept as written: [docs/RELEASE_v0.6.md](docs/RELEASE_v0.6.md),
+[docs/V0.6.md](docs/V0.6.md).
 
 ## 8. Immutable on-chain record
 
@@ -176,6 +347,12 @@ confirmed finalization, nonrevoked status and, for unit editions, matching confi
 it must first durably preserve the exact job, archive and secrets. External printing cannot be prevented.
 Readers MUST pin the generation and current evidence before claiming that revocation is closed.
 
+The stored record adds to the mint inputs: `passportId`, `contractVersion` (7), `creator` (the issuing
+wallet), `creatorId`, `objectType` (`physical`, `digital` or `mixed`, set by the entrypoint), `timestamp` (the
+mint block time, the only proof of the registration moment), and `revoked`, `revokedAt`,
+`revocationReasonHash` (zero until revocation). Block times are UTC; there is no stored time-zone field.
+`lifecycleStatus` is the state at registration and never changes.
+
 `getPassportHeader`, `getPassportClassification`, `getPassportMedia`, `getPassportReleaseState` are defined by `IODPRegistry.sol`.
 Dynamic indexed strings in events are hashes; events also carry readable non-indexed IDs. No caller should
 recover an ID by treating an indexed string topic as text.
@@ -186,6 +363,52 @@ recover an ID by treating an indexed string topic as text.
 hashed document ALWAYS has `passportId: null`; the assigned ID is in an external receipt (§15).
 Card fields MUST match the normalized mint strings byte for byte. `status` is the state at registration.
 `idGranularity` is `model`, `batch` or `item`; it is independent of edition size.
+Canonical examples: [physical](schema/examples/0.7/physical.json), [physical with a public photo
+copy](schema/examples/0.7/physical-preview.json), [digital](schema/examples/0.7/digital.json),
+[mixed](schema/examples/0.7/mixed.json) and [edition](schema/examples/0.7/edition.json); their exact canonical
+bytes and hashes are in `schema/vectors/`. The document follows the Object ID identification principle: object
+type, materials and technique, measurements, inscriptions and markings, distinguishing features, title, subject,
+date or period, maker and photographs are first-class fields and anchors, not an external mapping.
+
+| Field | Required | Rule |
+|---|---|---|
+| `version` | yes | `"0.7"` |
+| `passportId` | yes | `null` in the hashed document |
+| `title`, `authorName`, `shortDescription`, `domain` | yes, yes, yes, no | Card fields, equal to the mint strings; `domain` MAY be empty |
+| `description` | no | Full description, unbounded |
+| `subject` | no | What is depicted or what the object is about |
+| `creationDate` | no | Date or period of the object's creation, not the mint date |
+| `objectYear` | no | Integer historical year when it differs from the mint `year` |
+| `authorship` | no | `author` and optional `coAuthors` (each `name`, optional full `wallet` and `creatorId`) and `team`; declarations (CA-3) |
+| `anchors` | yes | Identification anchors, below |
+| `objectType` | yes | `physical`, `digital` or `mixed`, equal to the mint entrypoint |
+| `status`, `contentClass`, `aiStatus`, `verificationMethod` | yes | Controlled values of §8 |
+| `edition` | yes | `model` (§8 values), optional `number` ≤ `total` |
+| `idGranularity` | yes | What the passport identifies |
+| `translations` | no | Language-keyed `title`, `shortDescription`, `description`; the card stays in the original language |
+| `year`, `month` | yes | UTC year and month of preparation, equal to the mint inputs |
+| `registeredAt`, `registration` | yes | Preparation time, below |
+| `refinementTags` | no | Free labels; not a replacement for the controlled values |
+| `physical` | no; yes for `mixed` | Descriptive facts such as `category`, `medium`, `weight`. Identification facts belong in `anchors[]` |
+| `digital` | yes for `digital` and `mixed` | `fileHash` (required), `subtype`, `format`, `fileSize`, optional `c2pa` |
+| `additionalMetadata` | no | String-keyed string values not modelled elsewhere |
+
+`physical.category` and `digital.subtype` are secondary descriptors; classification comes from `domain`,
+`objectType`, `status`, `contentClass` and `refinementTags`. A `mixed` passport MUST contain both `physical`
+and `digital` blocks: it has a physical layer bound by its anchors and a digital layer bound by `fileHash`.
+`mixed` is not a fallback for uncertain classification.
+
+`contentClass` describes the content, not a file format: `static` fixed still output, `time_based` fixed
+sequence over time, `spatial` 3D structure or geometry, `textual` symbolic content, `composite` structured
+multi-file bundle, `executable` logic that runs and produces output.
+
+`idGranularity` says what the record points at: `model` any unit of a design, `batch` one production run,
+`item` one physical object. A verifier comparing an object with a `model` or `batch` passport matches the
+class, not the individual, and MUST NOT present the result as identifying that specific object.
+
+Pre-registration history (previous owners, exhibitions, publications) is not a structured part of this
+standard; the protocol cannot check it. It MAY appear in `description` as issuer text. Optional fields and
+`additionalMetadata` are issuer statements: a price or similar value is not an offer.
 
 For compatibility the field `registeredAt` retains its name but means **document preparation time**.
 It MUST agree with `registration.utcIso8601` and `registration.localIso8601` (UTC with +00:00), and
@@ -229,6 +452,46 @@ meaning for reserved bits. Array order is significant. Unit-key anchors addition
 Additional namespaces are allowed but participate in canonical hashing. Descriptions of custody, sales and
 restoration are issuer statements; no core transaction establishes that the real-world event occurred.
 
+An anchor is `{"type", "data"?, "hash"?, "verification"?}`: `type` is required, `hash` is `sha256:` plus 64
+lower-case hex digits of the committed bytes, and `verification` is free text or a profile ID saying how to
+check it. Type-specific content:
+
+| Type | Content |
+|---|---|
+| `photo` | `hash` of the image file (required); `data.role` `primary`, `preview` (§8) or another descriptive role such as `detail` |
+| `dimensions` | `data.unit` and measures, below |
+| `materials` | `data.list`, at least one non-empty material or technique |
+| `distinguishing_features` | `data.text`: defects, craquelure, repairs, what a copy would not reproduce |
+| `marks` | Signatures, stamps, serial numbers and where they are |
+| `file_hash` | `hash` of the digital original (required), equal to `digital.fileHash` and on-chain `fileHash` |
+| `perceptual_hash` | `data.algorithm` (for example `phash-dct-64`, `pdq`) and `data.value`; supplementary only |
+| `c2pa` | `hash` of a C2PA manifest, optional `data.activeManifest`; supplementary only |
+| `nfc`, `numbered_seal` | Seal data (§6) |
+| `fingerprint` | Measurable object fingerprint: method, hash of the measurement, methodology reference |
+| `dna` | Synthetic DNA tag or microdot marking |
+| `unit_key_set`, `unit_variant_commit` | Edition commitments (§20); `B` only |
+| `custom` or any other name | Outside the registry; a `custom` anchor SHOULD name its type in `data.customType` |
+
+Supplementary anchors never satisfy the identification minimum, and neither do the edition anchors: an edition
+passport still describes the run with photo, dimensions, materials and distinguishing features.
+
+Dimensions carry a UN/CEFACT Recommendation 20 code in `data.unit` (`MMT` millimetre, `CMT` centimetre, `MTR`
+metre, `INH` inch, `FOT` foot); every measure in the anchor uses it. Free text such as `"cm"` is not conforming.
+Optional `upperTolerance` and `lowerTolerance`, in the same unit, state how far a measured object may exceed or
+fall short of the figures and still match. Without them a verifier applies its own judgement and MUST NOT
+treat a small discrepancy alone as a failed check. A client SHOULD display the unit in the reader's language
+(`60 × 40 cm`, not `60 × 40 CMT`); the code is what the document carries.
+
+If any card field, object type or UTC month in `passport.json` differs from the chain record, a verifier MUST
+report the integrity check as failed, not as a warning (§11).
+
+C2PA: when a file carries an embedded C2PA manifest, `fileHash` or `imageHash` over the unmodified bytes
+covers content and manifest together. An issuer MAY also commit the manifest separately in
+`digital.c2pa.manifestHash` or a `c2pa` anchor, so that a C2PA-capable verifier can show that provenance beside
+ODP results. Presence of C2PA data SHOULD be determined by a C2PA parser, not by byte signatures; without it,
+`digital.c2pa` is omitted. `verificationMethod: "c2pa"` is an issuer declaration (CA-16.3). ODP defines no
+C2PA assertion of its own.
+
 ## 10. Hashing (normative)
 
 `chain/tools/canonical.mjs` and `schema/vectors/` provide conformance vectors.
@@ -249,6 +512,17 @@ The receipt, generation manifest, ZIP container and external transport paths/URL
 have their own SHA-256. A reader MUST recompute hashes from the available bytes; trusting a declared hash
 alone is not a file integrity check. Pretty-print changes can canonicalize identically; semantic changes
 produce a different commitment. The protocol is not RFC8785 verbatim because it additionally requires NFC.
+
+Two failures seen in practice: a serializer that escapes `/` (Foundation `JSONSerialization` writes `\/`) cannot
+reproduce the hash of a title such as `Портрет 1/25`, and one that prints 17 significant digits renders `0.1` as
+`0.10000000000000001`. Compare canonical bytes with the vectors before comparing hashes; a byte diff locates
+the fault.
+
+`fileHash`, `imageHash` and `previewHash` are the SHA-256 of the exact file bytes. Do not recompress, resize,
+strip or otherwise modify a file before hashing it; the preview copy is a separate file with its own hash
+(§22.19). In `passport.json` a hash is written `sha256:` plus lower-case hex; on chain it is the raw `bytes32`.
+`anchorsHash` lets a verifier check the identification block alone, for example a compact payload delivered by
+a low-bandwidth carrier, without the full document; `dataHash` still requires the whole canonical document.
 
 ## 11. Verification algorithm
 
@@ -276,6 +550,53 @@ from failed, missing evidence, and a counterfeit verdict.
 It deliberately does not authenticate the RPC/generation, fetch files or decide identity/trust.
 A client must implement the remaining steps. Hosting unavailability must not invalidate a locally held bundle.
 
+### Checks against the object
+
+Chain and hash checks establish what was registered. Whether the object in front of the reader is the one
+described is a human comparison, and a client MUST ask for it (CA-16.2):
+
+- Physical anchors: compare photos, measured dimensions (within declared tolerances), materials, marks and
+  distinguishing features with the object. This is the core check for an object without a seal.
+- Numbered seal: compare the committed number with the seal on the object (§6).
+- Digital original: hash the file the reader holds and compare with `fileHash`; a match shows these are the
+  registered bytes, a mismatch that they are not.
+- Photos: a photo file matches when its SHA-256 equals `imageHash`, `previewHash` or its anchor hash. A zero
+  `imageHash` means no primary photo was committed (possible only for digital objects).
+- NFC seal: only in an NFC-capable verifier (§6); otherwise `unsupported`.
+
+On-chain `creator`, `creatorId` and hashes show which wallet registered which bytes under which generation.
+They are not copyright, moral rights or title to an object (§16).
+
+### Creator wallet proof (optional, off-chain)
+
+An issuer MAY prove control of the issuing wallet without a transaction by signing, with EIP-191
+`personal_sign`, the UTF-8 text:
+
+```
+Object Digital Passport — creator wallet proof (EIP-191) v1
+
+passportId: <Passport ID>
+chainId: <decimal chain ID>
+contract: <registry address>
+nonce: <random unique string>
+```
+
+The verifier recovers the address, compares it with `creator` from `getPassportHeader`, and checks that
+`passportId`, `chainId` and `contract` match what it is verifying and that the nonce is fresh. A match proves
+key control, not authorship. ERC-1271 is not defined for this message, so an issuer registered to a contract
+wallet such as a Safe cannot produce this proof. It is a request to the issuer; a verifier MUST NOT ask the
+person checking a passport to sign anything (CA-12.4).
+
+### Wallet document anchor
+
+`ODPWalletDocumentAnchor.attestExternalDocument(documentHash, documentUri)` lets any registered profile commit
+the SHA-256 of any file (for example a contract PDF) once per `(wallet, documentHash)`, with an optional URI of
+at most 512 bytes (`EC(50)` zero hash, `EC(51)` long URI, `EC(52)` repeat). `getExternalDocumentAttestation(wallet,
+documentHash)` returns `(attested, creatorId, timestamp, documentUri)`. `ExternalDocumentAttested` indexes
+`documentHash`, so a verifier can find attestations of a locally computed hash in the logs. A match means that
+wallet recorded that hash at that time; it is not a qualified electronic signature. A document about a specific
+passport belongs in an institutional proof (§4) or a journal statement (§13).
+
 ## 12. Locators and QR
 
 `odp://ODP-YYYY-MM-NNNNNNNNN` is the preferred QR payload. An issuer MAY instead print its own `https://` link that
@@ -287,12 +608,37 @@ and not authorities. A QR can be photocopied; possession of the locator gives no
 Unit labels additionally carry the edition index and sufficient generation/satellite context (§20).
 Never put the concealed activation code in a public QR, URL query, analytics log or public address list.
 
+The `odp` scheme has one unencoded authority token: a Passport ID (§2), for example
+`odp://ODP-2026-03-004829301`, or a Profile ID (§3), for example `odp://P-482-930-174-005`. A client tells
+them apart by prefix (`ODP-` versus `C-`, `B-`, `P-`, `M-`). Other paths and query keys are reserved, except the
+unit-label form still to be fixed (§22.14); implementations MUST NOT rely on them. A printed QR uses UTF-8 and
+error correction level Q or higher. The `odp` URI names a record; resolving it always uses the embedded
+generation (§22.12). There is no on-chain index from a file hash to a passport; such a lookup needs an off-chain
+indexer and is not part of conformance.
+
 ## 13. SDK and satellite requirements
 
 Use the compiled ABI for `0.7-redesign-8`, not an earlier redesign or the historical version-byte-only ABI. Build mint inputs from
 the same canonical document that will be distributed. Independently decode receipts and verify them.
 Page reads are capped at100 and tolerate arbitrary offset/limit without overflow. Zero limit gives an empty
 page and total. Unbounded core/proof/concern list reads are absent. The affiliation full list is bounded100.
+
+Principal reads, all without a transaction:
+
+| Contract | Reads |
+|---|---|
+| Core | `getCreator(creatorId)`, `getCreatorByWallet(wallet)`, `passportExists(id)`, `getPassportHeader`, `getPassportClassification`, `getPassportMedia`, `getPassportReleaseState`, `getMintOperation(issuer, operationId)`, `getPassportsByCreatorPaged(wallet, offset, limit)`, `CONTRACT_VERSION` |
+| `ODPPassportProofRegistry` | `getProof`, `getProofsForPassportPaged`, `getProofsByInstitutionPaged`, `proofWithdrawnAt`, `proofWithdrawalReason`, `proofOperations` |
+| `ODPPassportConcerns` | `getConcern(passportId, raisedBy)`, `activeConcernCount`, `getConcernRaisersPaged`, `getConcernsByRaiserPaged` |
+| `ODPStatementJournal` | `getStatement`, `getStatementsForPassportPaged`, `getStatementsByAuthorPaged`, `statementOperations` |
+| `ODPAuthorAttestation` | `getAuthorAttestation`, `authorWithdrawalAt`, `authorWithdrawalReason`, `hashAuthorAttestation`, `domainSeparator` |
+| `ODPHosting` | `getLocations`, `getPublishingDelegation` |
+| `ODPProfileDirectory` | `getDomain` |
+| `ODPRegistryRelations` | `getAffiliatedParent`, `getAffiliatedChildrenPaged`, `getAffiliationAudit`, `isAffiliationPending` |
+| `ODPWalletDocumentAnchor` | `getExternalDocumentAttestation` |
+| `ODPEditionUnits` | `getEdition`, `getActivation`, `isActivated`, `commitmentFor`, `editionPassportByNonce`, `unitLeaf`, `labelPayloadHash`, `activationPayloadHash` |
+
+The exact signatures are those of the compiled ABI; this table is a guide, not a replacement for it.
 
 ### Hosting
 
@@ -326,6 +672,8 @@ empty `raisedBy`, not `withdrawnAt == 0` alone. Core has no dependency on concer
 passport. The EIP712 message binds passportId, dataHash, creatorId and authorSigner; domain is name
 `Object Digital Passport`, version`1`, chainId, satellite address. Low-s ECDSA signatures are required.
 A known author key gives an independent signal; an arbitrary freshly declared key proves no human identity.
+The satellite reads `dataHash` and `creatorId` from the core rather than from calldata, so a signature cannot
+be pointed at other bytes. The attestation is optional: its absence is not a negative signal.
 The signature path accepts EOA ECDSA keys; ERC1271 off-chain signature execution is not implemented. The authorSigner can independently call `withdrawAuthorAttestation` once with a nonzero SHA-256 reason, even after passport revocation. `getAuthorAttestation().attested` means historically published; readers MUST additionally check `authorWithdrawalAt` and `authorWithdrawalReason`. Issuer cannot withdraw another signer's consent. Independent author publication, including by contract-wallet transaction callers, uses the journal below.
 `ODPWalletDocumentAnchor` allows any registered profile to anchor nonzero SHA-256 bytes once per
 (wallet, hash), with a <=512-byte URI. It is not a passport-specific institutional proof.
@@ -398,8 +746,15 @@ when both components are <16. It is not a general semantic version and cannot id
 The redesigned core and retired core both report7; their authenticated generation manifests MUST distinguish them.
 New document/satellite versions may coexist when old interpretations and namespaces remain available.
 Changing immutable core semantics requires a new registry. There is no upgrade promise or record migration.
+Derive major as `CONTRACT_VERSION >> 4` and minor as `CONTRACT_VERSION & 0x0f`; the core exposes no separate
+getters for them or for the mint caps of §3. Satellites that record a version byte (§4) MUST report the same
+byte as the core they are pinned to. Every `passport.json` carries `version`; a breaking change to the document
+shape changes it. The stable line will be 1.0, which will define any migration or dual reading explicitly.
+Profile type prefixes change only through a specification update (§3).
 
 ## 15. `.odpass` bundle
+
+### 15.1 Format
 
 An issued `.odpass` MUST be a ZIP container with exactly named root JSON files `passport.json`,
 `generation.json`, `receipt.json`, and `manifest.json`; original referenced files reside in `files/`.
@@ -426,6 +781,8 @@ The manifest MUST reproduce the authenticated fixed deployment identities of §7
 blocks and source/build identity MUST also be retained from that deployment manifest. These are actual deployed
 identities, not unlinked bytecode templates or placeholders. No such addresses are approved by this document.
 
+### 15.2 Verification rules
+
 A receipt MUST contain matching `generationId`, `chainId`, `registry`, assigned `passportId`, the successful nonzero `operationId`, `transactionHash`,
 `blockNumber` and `blockHash`, with `format: "odp-bundle-receipt-0.7"`. Readers MUST reject conflicting identities between receipt, generation manifest, selected
 chain record and any hash-bound satellite references such as `unit_key_set.data.satellite`. They MUST NOT
@@ -441,6 +798,11 @@ metadata are outside dataHash; every field inside passport.json remains subject 
 `manifest.json` uses `format: "odp-bundle-manifest-0.7"` and lists payload paths, SHA-256 hashes and byte
 lengths. Payload path is `files/` followed by its 64 lowercase SHA-256 hex digits. Readers MUST validate
 file bytes and required payload completeness independently of the editable manifest.
+Required payloads follow from `passport.json`, never from a manifest flag: the file of every `photo` and
+`file_hash` anchor, `digital.fileHash` and, for an edition, the address list named by
+`unit_key_set.data.addressListHash`. The address list is public and secret-free; it MUST travel in the
+edition's `.odpass`, because without it no verifier can rebuild the tree and no unit can be activated.
+`addressListUrl` is a mirror, never the source of truth.
 
 Harden archive extraction against traversal, duplicate paths and oversized payloads. Machine-readable
 service-file schemas are supplied in schema/bundle-0.7. `chain/tools/bundle.mjs` implements validation of
@@ -449,6 +811,25 @@ payload hashes/lengths and required originals, full edition address-list tree, a
 with an independently trusted generation manifest. It does not parse ZIP or authenticate chain evidence.
 The safe ZIP importer/exporter and client integration remain required before claiming complete bundle conformance.
 Storage, publication and retrieval follow §22.19; the format does not mandate a hosting service or provider.
+
+### 15.3 Trust model and limitations
+
+A bundle is untrusted input and is treated as data only (CA-13). It does not replace chain state: verification
+rests on the on-chain commitments. Every path ends at a read from one chain, and this is stated here rather
+than left for an implementer to discover.
+
+With no chain access a verifier can still open the bundle and check its structure, recompute the hashes of
+`passport.json`, its anchors and every payload, and check them against each other, that is, confirm that the
+bundle is internally consistent. It can show those hashes for comparison with a value obtained elsewhere, or
+compare them with chain data it authenticated earlier (§19). It cannot establish that the document was
+registered, by whom or when, or whether the passport was later revoked or finalized for print. A forger can
+build an internally consistent bundle. Such a result MUST be shown as unconfirmed, with the time of any cached
+chain data (CA-11.4, CA-17.1), and MUST NOT be worded so that it reads as a positive verdict (CA-16.1).
+
+A verifier MUST NOT depend on a single RPC endpoint. It MUST be able to try more than one and SHOULD let the
+user supply their own; a self-hosted node depends on nobody. "Could not reach the registry" is an ordinary
+event and MUST NOT be shown as "invalid" or as "not an ODP passport". If Polygon PoS itself stopped, records
+would remain in its history but live verification would stop for everyone; this line has no fallback anchor.
 
 ## 16. Limits and external statements
 
@@ -459,6 +840,26 @@ can add assessments. The core has no general issuer-event history API or on-chai
 the journal provides its own history and never changes core content or extends the revocation window.
 Public data is permanent: clients SHOULD avoid personal information that should later be erased.
 
+This specification also does not define: who stores or hosts `.odpass` files and originals (§16.1, §22.19);
+the visual design of clients and labels (§5); pricing, sales or marketplace mechanics; networks other than
+the single deployment of §22.12; human-readable names for profiles; which seal product to use (§6); or C2PA
+integration beyond hash commitments (§9).
+
+### 16.1 Durable hosting (normative SHOULD)
+
+Not choosing a host is not the same as having no view on how. An issuer or holder that publishes
+`passport.json`, the photo copy or an `.odpass` SHOULD use locations that are:
+
+- content-addressed or otherwise integrity-bound, so the bytes at an address cannot silently change (an IPFS
+  CID derived from the committed hash, CA-19.5, or an Arweave transaction);
+- independent of any single operator's goodwill, including the issuer's own domain, which will lapse;
+- retrievable without an account, key or paid plan, through more than one route (CA-19.6, CA-19.7).
+
+A personal file-sharing link meets none of these. When every online copy is gone, the on-chain card (title,
+author name, short description, domain), the classification and the hashes remain readable. What is lost is the
+identification evidence in `anchors[]` and the originals, unless someone holds the `.odpass`. That is a
+degradation, not a revocation, and a client MUST present it as such (CA-9.1, CA-19.7).
+
 ## 17. Wallet and key management
 
 Keep real issuer/master keys outside public documents, logs, tests and the repository. An issuer who has lost their key
@@ -466,12 +867,70 @@ has no administrator recovery path. Separate author keys have only their explici
 passports within the role-specific window unless finalized for print. It cannot edit immutable older records. Permissionless registration enables impersonation
 and Sybil flooding: independent identity and client filtering remain necessary.
 
+The protocol requires only an Ethereum-compatible account that can send transactions; how its key is made
+and kept is the holder's choice and responsibility. A key MUST be generated on the holder's own device or
+hardware and MUST NOT be sent to ODP, a client vendor or any server; release clients hold no keys (CA-20.1).
+An issuer SHOULD use a wallet dedicated to ODP, not one used for balances, trading or daily payments. Common
+arrangements, all compatible: a software wallet backed by a seed phrase kept offline on paper in more than one
+place; a hardware device, also backed by a seed phrase; seed-less hardware, which needs a second device bought
+before registration because losing all devices loses the profile; and, for `B`, `P` and `M`, a multisig
+account (CA-5.6, CA-5.7). No wallet brand is normative.
+
+If an issuer loses its key: its profile ID and every passport it issued stay on chain and remain verifiable;
+it can no longer mint, revoke within a window, finalize for print, open an edition, raise or withdraw its own
+statements, or declare a domain under that profile. A new wallet is a new profile (CA-1.4).
+
 ## 18. Interoperability
 
 Hashes, full IDs, generation context and algorithm versions are required at integration boundaries.
 All original data and historical addresses must remain exportable. Public statements may be independently
 indexed, but an indexer omission is not evidence of absence. The core supports Ethereum-style ABI readers;
 client SDKs, NFC hardware, DID methods and legal attestations require their own conformance work.
+
+ODP is meant as a verifiable registry beside, not instead of, regulatory Digital Product Passports, GS1
+identifiers, IIIF manifests, C2PA content credentials and institutional catalogues.
+
+### 18.0 Position relative to the EU DPP (ESPR)
+
+The regulatory DPP is the one established by Regulation (EU) 2024/1781 (Ecodesign for Sustainable Products
+Regulation, ESPR), Chapter III. An ODP passport is not an ESPR DPP. It is no conformity route, product-group
+delegated acts do not apply to it, it has no unique identifier registered with the Commission, it is not
+connected to the DPP registry (Art. 13) or the web portal (Art. 14), and it makes no claim about the
+sustainability information ESPR requires. Nothing here helps an economic operator meet an ESPR obligation, and
+an implementation MUST NOT present an ODP passport as satisfying one.
+
+Two points of Art. 11 describe properties ODP happens to share, and the overlap stops there:
+
+- Art. 11(e), availability after insolvency, liquidation or cessation of activity: the on-chain record needs
+  no operator (§1, §7). Off-chain copies do not survive on their own (§16.1).
+- Art. 11(g), authentication, reliability and integrity of the data: this is what `dataHash`, `anchorsHash`
+  and the card check provide (§10, §11).
+
+ESPR expects service providers and a registry; ODP deliberately has neither. That is a difference in kind.
+
+### 18.1 Optional `passport.json` content
+
+Issuers MAY add namespaces such as `sustainability`, `compliance`, `identifiers.gtin` (a GS1 GTIN) or
+`iiif.manifest`, or string values in `additionalMetadata`. Everything inside `passport.json` is part of
+`dataHash` (§10) and is an issuer statement: the protocol checks that the bytes are unchanged, not that the
+content is true. A GTIN or other identifier does not prove authenticity and does not replace the passport ID.
+A GS1 Digital Link or other URL is not an ODP label (§22.14). Additional photos are further `photo` anchors.
+
+### 18.2 The `did:odp` naming convention (informative)
+
+`odp` is not a registered DID method. There is no method specification, no resolver and no entry in the W3C
+DID Specification Registries. A `did:odp:…` string is a naming convention for documents produced by this
+project, nothing more. Software that requires a resolvable DID (a Verifiable Credentials issuer or verifier, a
+wallet, a profile that mandates `did:web` or `did:webvh`) cannot consume it, and an implementation MUST NOT
+present ODP as offering DID support. Within that limit, tooling MAY use `did:odp:passport:<Passport ID>` and
+`did:odp:profile:<Profile ID>` and MAY export a DID-document-shaped JSON built from public chain data at any
+time, without a transaction. Such a file asserts nothing the chain record does not. Only the `odp://` scheme
+(§12) carries protocol meaning.
+
+### 18.3 Verifiable Credentials
+
+Institutional proofs and journal statements MAY be mapped to credential-style claims in wallets or catalogues.
+The on-chain records and their lifecycle (§4, §13) remain what a verifier checks.
 
 ## 19. Availability and client policy
 
@@ -500,6 +959,11 @@ and key set. The original edition's count, root, description and original files 
 rewritten. An `open` classification does not authorize appending units to an existing passport. Each issued
 key set is finite and immutable; any later run is independently identified and verified. A new edition MUST
 NOT inherit activation state from an earlier edition. No mutable umbrella-series contract is required.
+
+An edition passport carries exactly one `unit_key_set` anchor and at most one `unit_variant_commit` anchor.
+When `edition.total` is present it MUST equal `unitCount`. Its identification anchors describe the run, not any
+one unit. Only `B` may issue editions because the mechanism needs a controlled key process and secure printing,
+and because a mis-issued edition cannot be corrected unit by unit.
 
 ### 20.2 Prepare before mint
 
@@ -533,6 +997,16 @@ left/right. The canonical proof has ceil(log2(unitCount)) levels. The contract c
 count cap needs at most20 levels. Clients MUST construct/check the canonical count/tree. Root is a commitment,
 not an encrypted address list. An optional published address list is lower-case full addresses in index order,
 one per line with LF including final LF; its SHA256 is addressListHash. It MUST NOT contain codes/private keys.
+It travels in the edition's `.odpass` (§15). The whole set costs one 32-byte root on chain, whatever its size.
+
+Indexes MUST be assigned independently of cartons, regions, distribution batches and release waves, for
+example by shuffling at labelling time. Activations are public, so indexes that follow packing order would let
+anyone read regional sell-through from the chain.
+
+Rebuilding the root from the published list checks the edition: that the list is the one committed at mint,
+including against replacement by the issuer. It says nothing about the unit in front of the reader, because
+every index below `unitCount` is in the tree by construction. A verifier MUST NOT present a successful
+membership check as evidence that a particular object is genuine.
 
 ### 20.4 Optional variant commitment
 
@@ -542,6 +1016,14 @@ Salt remains inside the package, not the public document. No on-chain variant ev
 The variant unitCount MUST agree with the edition total (if present) and its unit_key_set count (if present).
 A reader checks the disclosed variant/proof against its separate hash-bound anchor. Distinct root domains and
 leaf formats MUST NOT be interchanged.
+
+Each `randomSalt32` comes from a CSPRNG and is unique per unit. It MUST NOT be derivable from the unit key,
+the index or anything readable without opening the sealed package: variant vocabularies are small, so whoever
+holds the salt can test every candidate, and a salt derived from the outer code would let a reseller learn the
+contents by scratching the label. The salt MUST be carried inside the sealed package, for example on an
+enclosed card; the issuer MUST NOT publish it before the unit is opened and MAY keep copies as an optional
+recovery path, never as a dependency. The length prefix and fixed salt size make the commitment open to one
+variant only; a substituted salt card fails to verify rather than proving another variant.
 
 ### 20.5 Key derivation v2
 
@@ -562,6 +1044,9 @@ SHA256(ASCII(payload20)). Print five groups of five. Reader uppercases, removes 
 and O→0, checks length/alphabet/checksum, and reconstructs seed13. Checksum is typo detection, not authentication.
 Keep the code under tamper-evident concealment; whoever learns it can sign. Store the master securely and do
 not reuse context/master combinations across distinct production runs.
+The alphabet and checksum are global and MUST NOT be localized. The code length is a security parameter: an
+attacker can test guesses offline against the public list and needs any valid unit, not a particular one, so
+an implementation MUST NOT shorten the code for usability.
 
 ### 20.7 Outer labels
 
@@ -570,6 +1055,14 @@ Optional label signature uses personal_sign over the32-byte keccak256 of
 The expected labelSigner is the one committed before mint and registered at open; zero means plain labels.
 Readers can verify labels offline with an authenticated edition bundle. A genuine signature can be copied.
 It proves only that the specified key signed that label, not that the attached object matches the description.
+Signing prevents fabricated labels, not copied ones. A verifier MUST NOT downgrade an edition with plain labels.
+
+The outer carrier, readable before purchase, MUST make the edition passport ID and the unit index recoverable,
+and MUST also print both as readable text, so a unit stays checkable when a symbol is damaged or its encoding
+changes. It MUST NOT carry the unit code or anything derived from it. The concealed code has its own printed
+form under the concealment layer; its symbol format is being fixed with print tests (`review/qr-07`). The label
+MUST be applied so that removing or moving it is visibly destructive, for example across a package seam; this
+is the only physical binding in the mechanism, and no cryptographic property replaces it.
 
 ### 20.8–20.9 Activation
 
@@ -578,12 +1071,42 @@ Unit key signs personal_sign over keccak256 of
 Any courier may call `activate(id,index,proof,signature)`. Low-s ECDSA and valid-v are required; index must be
 in range, root proof valid, and slot unused. First valid submission stores unitAddress and block timestamp.
 Duplicate attempts revert. This is not replay-proof physical ownership: leaked/cloned keys permit early use.
+Because a duplicate reverts rather than succeeding as a no-op, a courier's dry run rejects it before any fee is
+spent. The signature binds chain, satellite, edition and index, so it is valid for one slot only. A signature
+MAY be produced offline and submitted later from any device, by anyone. An activation carries no verdict: an
+earlier activation can mean a cloned code or a legitimate resale, and the protocol cannot tell which. A
+verifier reports the facts (index, unit address, block time) and MUST NOT rank or label them as counterfeit or
+stolen; no concern is raised automatically (§13).
+
+No ODP-operated service, repository or maintainer may hold a master seed, a share of it or a unit key for any
+edition. The reference tools derive keys offline and store nothing. A `P` or `M` profile MAY witness the key
+process by submitting an ordinary institutional proof (§4) on the edition passport.
 
 ### 20.10–20.13 Lifecycle and removal of unit passports
 
 There is no unit-passport mint or transfer. Edition activation remains possible for an already opened nonrevoked edition. Passport revocation blocks new activations but preserves recorded ones.
 First activation does not close the B issuer 24h revocation window. Only expiry or explicit print finalization closes revocation. Display activation, revocation and print finalization independently.
 Readers must retain the pinned satellite even after client defaults change. No satellite can write to the core.
+A later issuer correction (§13) that points to a new edition is prose about the run. It MUST NOT be turned into
+a machine-readable "superseded" or "invalid" state for the earlier edition: its units keep their committed keys
+and verify as before.
+
+### 20.14 Stated limits
+
+A client and its marketing MUST NOT claim assurances the mechanism does not give. In particular:
+
+1. The issuer knows every unit key when it generates them and can activate units itself; no outside party can
+   verify that the master seed was destroyed.
+2. The print vendor necessarily sees the codes; this is controlled physically, not cryptographically.
+3. Anyone who knows the codes can activate units they do not hold, including an insider before shipping.
+   Every activation has a public time; judging whether it is plausible is left to people, and an issuer can
+   explain a poisoned run with a correction statement (§13).
+4. Before its concealment layer is removed, a sealed counterfeit carrying a copied code looks the same as the
+   real unit; the activation state is the only pre-purchase signal.
+5. A unit key binds the package, not the object inside it; a variant commitment (§20.4) binds only the variant.
+6. The activation log is public commercial data: with the on-chain `unitCount` anyone can reconstruct run size
+   and sell-through over time. An issuer MUST be told this before it opens an edition. Index shuffling (§20.3)
+   limits the leak to totals.
 
 ## 21. Pre-release validation boundaries (ABI 0.7-redesign-8)
 
@@ -808,7 +1331,11 @@ operator decides which domain is the organization's real one.
 Domain publication endpoint: an organization publishes its profile IDs at
 `https://<domain>/.well-known/odp.json` as a JSON object `{"chainId": <number>, "registry": "0x…",
 "profiles": [{"profileId": "…"}]}`; an entry MAY override `chainId`/`registry`. A profile counts as published
-only when `profileId`, `chainId` and `registry` all match the generation being verified.
+only when `profileId`, `chainId` and `registry` all match the generation being verified. The file is served
+over HTTPS as `application/json` from the organization's own domain, not a shared hosting or social-network
+domain; a static file at this reserved path (RFC 8615) is readable without a browser engine and writable only
+by whoever controls the server. The endpoint is advisory: no mint, statement or verification result depends
+on it, and a missing file invalidates nothing; it only leaves the identity unconfirmed.
 
 - CA-10.1. The client MUST show an organization name only from a directory row with status `active`, labelled
   with the directory's operator. Otherwise it shows the profile ID and "self-declared type: museum/expert";
@@ -843,7 +1370,8 @@ receipt are never a trust root.
 
 - CA-12.1. The client MUST embed this single generation (chainId 137, registry and satellite addresses) and
   accept only it. Addresses from a bundle, QR or URL are only compared with it; any other chain or registry
-  MUST be shown as "not an ODP passport / not verified", never as verified.
+  MUST be shown as "not an ODP passport / not verified", never as verified. This includes the superseded
+  lines of §7.
 - CA-12.2. The client MUST show "files intact" and "registration confirmed on the ODP registry" as separate
   results; the first alone MUST NOT be called an authentic passport.
 - CA-12.3. The client MUST check the receipt itself on chain: transaction, block, and that the event was
@@ -1061,3 +1589,8 @@ sending POL from its own wallet to the addresses of the people it supports.
   its public actions, and that the sponsor gets no access to the wallet and can only stop funding it.
 - CA-20.6. The client MUST show the POL balance and an approximate number of operations it covers, and MUST NOT
   make any action depend on sponsorship; the user can always fund the wallet themselves.
+
+---
+
+*Object Digital Passport is open source under the MIT License. Gaps and ambiguities in this specification are
+reported as a [Standard gap issue](https://github.com/object-digital-passport/specifications/issues/new?template=standard_gap.md), in English.*

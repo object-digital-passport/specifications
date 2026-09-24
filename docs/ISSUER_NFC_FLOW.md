@@ -15,14 +15,14 @@ Minting before scanning the chip lets you publish the wrong `nfcPublicKey` or `u
       → ODP Android Companion: Provision new NTAG 424 tag (factory key only)
       → or NXP TagWriter / PC tooling
       → yields 16-byte EV2 application key (nfcPublicKey) + UID
-      → the published key MUST be 01h..04h, never 00h — see SPEC §6 step 1
+      → the published key MUST be 01h..04h, never 00h — see SPEC §6 (`nfc` anchor)
 2. ODP web — passport.html
       → paste EV2 key
       → Android companion issuer scan
       → import chip setup JSON (locks UID + key)
 3. Complete passport form + images/files
 4. Mint on-chain
-5. Write NDEF carrier (odp:// URI, per SPEC §12.2 — no hostname) — after passport ID exists
+5. Write NDEF carrier (odp:// URI, per SPEC §6 and §12 — no hostname) — after passport ID exists
 6. Lock the carrier file: Write and ReadWrite access conditions to Fh
 ```
 
@@ -90,4 +90,4 @@ Web import requires `ev2AuthPassed: true` and, for TagTamper, `tamperState: inta
 
 **Honest limit:** lock requires a second tap with the same EV2 key. SDM-enabled NDEF layouts must be finalized in NXP tools instead. On-chain passport fields remain immutable regardless of tag lock.
 
-See also [ANDROID_NTAG424DNA_TAGTAMPER.md](./ANDROID_NTAG424DNA_TAGTAMPER.md) and SPEC.md §6 / Level 2A.
+See also [ANDROID_NTAG424DNA_TAGTAMPER.md](./ANDROID_NTAG424DNA_TAGTAMPER.md) and SPEC.md §6 (`nfc` anchor).
