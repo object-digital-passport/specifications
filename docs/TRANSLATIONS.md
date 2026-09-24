@@ -111,8 +111,7 @@ Add `--all` to list every soft finding instead of the first few per file.
 | `ODP_ASTRA_REVIEW.md` | — | none: independent review authored in Russian |
 | `ODP_07_IMPLEMENTATION.md` | — | none: implementation report authored in Russian |
 
-The current `docs/ru/SPEC.md` is a migration pointer. Its full old translation is archived;
-full translation of the rewritten normative SPEC is pending. Historical guides do not define the redesigned ABI.
+Historical guides do not define the redesigned ABI.
 
 | `ODP_07_ACTION_PLAN.md` | — | russian only |
 | `ODP_07_APP_CHANGES.md` | — | russian only |

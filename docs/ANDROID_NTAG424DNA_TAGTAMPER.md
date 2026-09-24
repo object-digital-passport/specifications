@@ -158,7 +158,7 @@ odp://ODP-2026-03-004829301
 2. if you want the ODP offline payload on the same carrier, write the exported `.ndef` file instead
 3. add an HTTPS record only if you have decided to accept what it costs — see below
 
-**Do not write a hostname unless you mean it permanently.** `SPEC.md` §12.2 is explicit that no
+**Do not write a hostname unless you mean it permanently.** `SPEC.md` §12 and §22.14 are explicit that no
 hostname is printed: a URL on a tag is a promise about a server, fixed onto an object that will
 outlive it. This documentation used to recommend writing the project's GitHub Pages URL here.
 That was wrong, and any tag written that way keeps pointing wherever that address ends up.
