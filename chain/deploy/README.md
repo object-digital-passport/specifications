@@ -1,4 +1,4 @@
-# ODP 0.7 release and deployment (ABI 0.7-redesign-7)
+# ODP 0.7 release and deployment (ABI 0.7-redesign-8)
 
 **Current restriction: do not connect a wallet, access public networks, deploy or publish.** The future commands below require new explicit authorization, including the read-only RPC preflight. No public generation is approved. Compile/test/packaging do not load keys. A local EVM test deploys all
 ten factories and checks complete runtime, including registry and EIP-712 immutable values.
@@ -69,17 +69,19 @@ independent infrastructure; these remain explicit external RPC trust assumptions
 
 ## Final prelaunch checks
 
-**No release bundle exists for the current sources.** The scripts above require
-`abiGeneration === '0.7-redesign-7'`; the only bundle in the repository, `review/v07-no-stop/release.json`
+**No approved release bundle exists for the current sources.** The scripts above require
+`abiGeneration === '0.7-redesign-8'` (ABI8 adds `previewHash` to the mint tuple and media view). The ABI7
+candidate in `review/v07-abi7-release/` is therefore rejected, and so is `review/v07-no-stop/release.json`
 with canonical hash `sha256:95cb88357a90ce962b1b8b710e9c57eb380fd28e74a34123c1b51365dd56322c`, is
 `0.7-redesign-6` and is rejected. Its core ABI still carries `REVOCATION_WINDOW` and lacks
 `finalizePassportForPrint` and `getPassportReleaseState`. Everything in this section is therefore an
 unexecutable procedure until a bundle is rebuilt from the current sources with `release.mjs` and a new
 `approvedHash` is independently reviewed and approved.
 
-An **unapproved candidate** was built offline on 2026-09-21: [`review/v07-abi7-release/`](../../review/v07-abi7-release/README.md),
-canonical hash `sha256:91c9ee4a9eb27f6b8ada9bf2bbcd394fafbe5d9dbfae539efa4e53ce0d5b76f7`. It is not an
-`approvedHash` until the owner reviews and approves it.
+An **unapproved ABI8 candidate** was built offline on 2026-09-24: [`review/v07-abi8-release/`](../../review/v07-abi8-release/README.md),
+canonical hash `sha256:7392c8214e7f1258e3dc886ce89f5b5df30f65bca6d0ace2d1b7b3006ca414d7`. It is not an
+`approvedHash` until the owner reviews and approves it. The owner-approved ABI7 hash
+(`review/v07-abi7-release/`, `sha256:91c9ee4a…76f7`) no longer describes the current sources.
 
 Sealed `0.7-redesign-6` evidence: [audit handoff](../../review/audit-handoff-abi6/README.md); earlier rehearsal: `review/v07-prelaunch/README.md` at repository root. Code and documentation delta after that package, with the open conflicts: [report](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian).
 

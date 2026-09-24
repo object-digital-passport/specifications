@@ -13,7 +13,7 @@ async function register(c,w,t='C') { await tx(c.connect(w).registerCreator(ether
 async function inputs(type='physical', overrides={}) {
  const b=await ethers.provider.getBlock('latest'),d=new Date(b.timestamp*1000);
  return { core:{year:d.getUTCFullYear(),month:d.getUTCMonth()+1,title:'Object',authorName:'Author',shortDescription:'Description',domain:'art',contentClass:1,lifecycleStatus:3,aiStatus:1,verificationMethod:1,editionModel:1,...overrides.core},
- editionCommitment:(overrides.anchorTypesMask&4096)?hash('test-only-unopened-edition'):Z,dataHash:hash('data'),imageHash:type==='digital'?Z:hash('image'),fileHash:type==='physical'?Z:hash('file'),anchorsHash:hash('anchors'),anchorTypesMask:type==='physical'?15:type==='digital'?32:47,...Object.fromEntries(Object.entries(overrides).filter(([k])=>k!=='core'))};
+ editionCommitment:(overrides.anchorTypesMask&4096)?hash('test-only-unopened-edition'):Z,dataHash:hash('data'),imageHash:type==='digital'?Z:hash('image'),previewHash:Z,fileHash:type==='physical'?Z:hash('file'),anchorsHash:hash('anchors'),anchorTypesMask:type==='physical'?15:type==='digital'?32:47,...Object.fromEntries(Object.entries(overrides).filter(([k])=>k!=='core'))};
 }
 async function mint(c,w,type='physical',args=null,operationId=ethers.hexlify(ethers.randomBytes(32))) {
  const method='mint'+type[0].toUpperCase()+type.slice(1);

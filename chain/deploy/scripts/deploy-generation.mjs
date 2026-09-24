@@ -14,7 +14,7 @@ function atomicWrite(file,value) {
 }
 export async function deployGeneration({provider,verificationProvider,signer,release,approvedHash,chainId,generationId,manifestPath:file,resume=false,recoveryTransactions={},confirmations,expectedDeployer,spendPolicy,finalityOptions,checkpoint=async()=>{}}) {
  if(!file||!generationId||!Number.isSafeInteger(confirmations)||confirmations<1)throw new Error('Manifest, generation and positive confirmation count required');
- if(release.format!=='odp-release-0.7'||release.abiGeneration!=='0.7-redesign-7'||releaseHash(release)!==approvedHash)throw new Error('Unapproved release bundle');
+ if(release.format!=='odp-release-0.7'||release.abiGeneration!=='0.7-redesign-8'||releaseHash(release)!==approvedHash)throw new Error('Unapproved release bundle');
  if(String((await provider.getNetwork()).chainId)!==String(chainId))throw new Error('Chain ID confirmation mismatch');
  const mainnet=String(chainId)==='137';
  if(mainnet){

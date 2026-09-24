@@ -6,7 +6,7 @@ import {releaseHash,roles} from './release.mjs';
 import {validateSpendPolicy,checkRemainingBudget} from './spend-policy.mjs';
 import {parseJSONBytes} from '../../tools/canonical.mjs';
 export async function preflightMainnet({providers,deployer,release,approvedHash,spendPolicy}) {
- if(release.abiGeneration!=='0.7-redesign-7'||releaseHash(release)!==approvedHash)throw Error('Unapproved release');
+ if(release.abiGeneration!=='0.7-redesign-8'||releaseHash(release)!==approvedHash)throw Error('Unapproved release');
  if(providers.length!==2||providers[0]===providers[1])throw Error('Two RPC providers required');
  deployer=getAddress(deployer);const policy=validateSpendPolicy(spendPolicy),observations=[];
  for(const provider of providers){

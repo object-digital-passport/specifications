@@ -433,6 +433,105 @@
         ],
         "description": "SPEC §9 mixed object semantics: the canonical JSON MUST contain both physical and digital blocks."
       }
+    },
+    {
+      "$comment": "ABI 0.7-redesign-8 public preview copy: at most one photo anchor with data.role \"preview\". Its hash is the on-chain previewHash: SHA-256 of a JPEG of at most 1048576 bytes without GPS or other location metadata, stored as an ordinary .odpass payload in files/. The anchor is absent iff previewHash is zero. tools/passport.mjs also requires the preview hash to differ from the primary photo hash.",
+      "properties": {
+        "anchors": {
+          "type": "array",
+          "contains": {
+            "type": "object",
+            "required": [
+              "type",
+              "data"
+            ],
+            "properties": {
+              "type": {
+                "const": "photo"
+              },
+              "data": {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "const": "preview"
+                  }
+                }
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "$comment": "A preview photo requires an explicit primary photo (data.role \"primary\").",
+      "if": {
+        "required": [
+          "anchors"
+        ],
+        "properties": {
+          "anchors": {
+            "type": "array",
+            "contains": {
+              "type": "object",
+              "required": [
+                "type",
+                "data"
+              ],
+              "properties": {
+                "type": {
+                  "const": "photo"
+                },
+                "data": {
+                  "type": "object",
+                  "required": [
+                    "role"
+                  ],
+                  "properties": {
+                    "role": {
+                      "const": "preview"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "anchors": {
+            "type": "array",
+            "contains": {
+              "type": "object",
+              "required": [
+                "type",
+                "data"
+              ],
+              "properties": {
+                "type": {
+                  "const": "photo"
+                },
+                "data": {
+                  "type": "object",
+                  "required": [
+                    "role"
+                  ],
+                  "properties": {
+                    "role": {
+                      "const": "primary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ],
   "$defs": {

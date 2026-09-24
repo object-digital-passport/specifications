@@ -15,8 +15,14 @@ the edition fixture byte-for-byte. `tools/canonical.mjs` is the serializer; do n
 JSON.stringify (integer-like keys reorder). SPEC.md §10 and §20 define all byte formats.
 
 
-`operations-redesign-5.json` is the retained operation-digest fixture and is still current: neither the
-removal of profile stop nor the `0.7-redesign-7` changes altered mint/journal/proof encoding or the
-operation domains. Its filename is provenance, not an ABI selector.
+`operations-redesign-8.json` is the current operation-digest fixture. ABI `0.7-redesign-8` inserted
+`previewHash` after `imageHash` in the mint tuple, so the mint digest changed: `mint` has a zero copy,
+`mintPreview` a nonzero one. Its statement/proof entries are byte-identical to `operations-redesign-5.json`,
+which is retained unchanged as provenance; its mint entry encodes the redesign-7 tuple and no longer matches
+current contracts. Filenames are provenance, not ABI selectors.
+
+`physical-preview.*` (redesign-8) is the physical example plus one public preview copy anchor
+`{"type":"photo","data":{"role":"preview"},"hash":…}`; its `.expected.json` also records `previewHash`.
+The four original sets are unchanged and prepare with `previewHash` zero.
 `chain/tools/operations.mjs` and the tools/EVM tests check the full digests. Never update vectors merely to
 make documentation agree; discrepancies require a separate reviewed protocol/tool decision.

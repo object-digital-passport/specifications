@@ -67,6 +67,7 @@ contract ObjectDigitalPassport {
         uint32  anchorTypesMask; // OR of ODPAnchorBits; mint enforces the hard minimum per objectType
         bytes32 editionCommitment;
         bytes32 imageHash;       // SHA-256 of primary photo; required non-zero for physical/mixed
+        bytes32 previewHash;     // SHA-256 of the public lightweight copy of the primary photo; 0 = none
         bytes32 fileHash;        // SHA-256 of digital original; bytes32(0) for physical
         uint256 timestamp;       // mint block time — proof of the registration moment
         bool revoked;
@@ -104,6 +105,7 @@ contract ObjectDigitalPassport {
     struct PassportMediaView {
         bytes32 dataHash;
         bytes32 imageHash;
+        bytes32 previewHash;
         bytes32 fileHash;
         bytes32 anchorsHash;
         uint32  anchorTypesMask;
@@ -272,6 +274,7 @@ contract ObjectDigitalPassport {
             anchorTypesMask: m.anchorTypesMask,
             editionCommitment: m.editionCommitment,
             imageHash: m.imageHash,
+            previewHash: m.previewHash,
             fileHash: m.fileHash,
             timestamp: block.timestamp,
             revoked: false,
@@ -428,6 +431,7 @@ contract ObjectDigitalPassport {
         out = PassportMediaView({
             dataHash: p.dataHash,
             imageHash: p.imageHash,
+            previewHash: p.previewHash,
             fileHash: p.fileHash,
             anchorsHash: p.anchorsHash,
             anchorTypesMask: p.anchorTypesMask,

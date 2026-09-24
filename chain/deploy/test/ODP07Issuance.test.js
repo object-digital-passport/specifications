@@ -32,7 +32,7 @@ describe('0.7 direct issuance and durable operation identity',()=>{
   await tx(c.mintPhysical(m,op));
   const changes=[];
   for(const [k,v] of Object.entries(m.core))changes.push({...m,core:{...m.core,[k]:typeof v==='string'?v+'x':Number(v)+1}});
-  for(const k of ['dataHash','imageHash','fileHash','anchorsHash','editionCommitment'])changes.push({...m,[k]:hash('changed-'+k)});
+  for(const k of ['dataHash','imageHash','previewHash','fileHash','anchorsHash','editionCommitment'])changes.push({...m,[k]:hash('changed-'+k)});
   changes.push({...m,anchorTypesMask:m.anchorTypesMask+1});
   for(const next of changes)await expect(c.mintPhysical(next,op)).to.be.revertedWithCustomError(c,'MintOperationConflict').withArgs(op);
   for(const kind of ['mintDigital','mintMixed'])await expect(c[kind](m,op)).to.be.revertedWithCustomError(c,'MintOperationConflict').withArgs(op);

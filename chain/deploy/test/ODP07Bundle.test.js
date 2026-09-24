@@ -39,7 +39,7 @@ describe('0.7 canonical bundle to local EVM and back',()=>{
   }
  });
  it('all checked-in examples satisfy schema and semantic validation',()=>{
-  for(const k of ['physical','digital','mixed','edition'])expect(preparePassport(parseJSON(fs.readFileSync(new URL(`../../../schema/examples/0.7/${k}.json`,import.meta.url),'utf8')),{issuer:'0x'+'1'.repeat(40)}).mint.dataHash).match(/^0x[0-9a-f]{64}$/);
+  for(const k of ['physical','digital','mixed','edition','physical-preview'])expect(preparePassport(parseJSON(fs.readFileSync(new URL(`../../../schema/examples/0.7/${k}.json`,import.meta.url),'utf8')),{issuer:'0x'+'1'.repeat(40)}).mint.dataHash).match(/^0x[0-9a-f]{64}$/);
  });
  it('rejects time, byte-length, assigned-ID and cross-anchor inconsistencies',()=>{
   const source=JSON.parse(fs.readFileSync(new URL('../../../schema/examples/0.7/digital.json',import.meta.url)));

@@ -24,7 +24,7 @@ export function buildRelease(info,output,{sourceCommit,compilerHash,dependencyHa
   }
   contracts[name]={abi:c.abi,bytecode:'0x'+b.object,runtime:'0x'+r.object,immutableReferences:refs};
  }
- return {format:'odp-release-0.7',abiGeneration:'0.7-redesign-7',sourceCommit,compilerVersion:info.solcLongVersion,compilerHash,dependencyHash,buildInfoHash:digest(canonicalize({info,output})),input:info.input,output,contracts};
+ return {format:'odp-release-0.7',abiGeneration:'0.7-redesign-8',sourceCommit,compilerVersion:info.solcLongVersion,compilerHash,dependencyHash,buildInfoHash:digest(canonicalize({info,output})),input:info.input,output,contracts};
 }
 export function expectedRuntime(contract,{registry,chainId,address}) {
  let bytes=Buffer.from(contract.runtime.slice(2),'hex');

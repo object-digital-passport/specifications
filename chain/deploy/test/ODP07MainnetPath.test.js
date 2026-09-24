@@ -7,7 +7,7 @@ import {deployGeneration} from '../scripts/deploy-generation.mjs';
 import {preflightMainnet} from '../scripts/preflight-mainnet.mjs';
 import {feeOverrides} from '../scripts/spend-policy.mjs';
 import {releaseHash,roles} from '../scripts/release.mjs';
-const release=JSON.parse(fs.readFileSync(new URL('../../../review/v07-abi7-release/release.json',import.meta.url)));
+const release=JSON.parse(fs.readFileSync(new URL('../../../review/v07-abi8-release/release.json',import.meta.url)));
 
 describe('Polygon137 complete deployment path over two local HTTP RPCs',function(){
  this.timeout(60000);

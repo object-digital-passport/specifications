@@ -9,6 +9,6 @@ export function proofDigest({chainId,registry,satellite,author,passportId,docume
 export function mintDigest({chainId,registry,issuer,objectType,mint}) {
  if(!['physical','digital','mixed'].includes(objectType))throw new Error('Invalid mint kind');
  const core='tuple(uint32 year,uint8 month,string title,string authorName,string shortDescription,string domain,uint8 contentClass,uint8 lifecycleStatus,uint8 aiStatus,uint8 verificationMethod,uint8 editionModel)';
- const tuple=`tuple(${core} core,bytes32 dataHash,bytes32 imageHash,bytes32 fileHash,bytes32 anchorsHash,uint32 anchorTypesMask,bytes32 editionCommitment)`;
+ const tuple=`tuple(${core} core,bytes32 dataHash,bytes32 imageHash,bytes32 previewHash,bytes32 fileHash,bytes32 anchorsHash,uint32 anchorTypesMask,bytes32 editionCommitment)`;
  return encode(['string','uint256','address','address','string',tuple],['ODP-MINT-OPERATION-0.7',chainId,registry,issuer,objectType,mint]);
 }

@@ -16,7 +16,7 @@ and a separately authorized wallet flow. Obtain the assigned passport ID from re
 create a separate receipt.json, and leave passport.json unchanged. No real wallet integration or ZIP parser
 is claimed by these offline modules. See SPEC.md for the client obligations and deployment generation pins.
 
-## Mint operation identity (ABI 0.7-redesign-7)
+## Mint operation identity (ABI 0.7-redesign-8)
 
 The second core mint argument is a nonzero bytes32 operationId, not a principal string. Persist an operation
 ID, exact prepared inputs and chain/registry/issuer before sending. Retry that same operation; query
@@ -68,12 +68,26 @@ within the selected satellite. Lookup occurs before lifecycle/calendar validatio
 original ID through a custom error after withdrawal/supersession/revocation or month rollover and never
 reactivates evidence. Journal has no calendar input. The ID is not part of the digest.
 Full digest types/domains and errors: [SPEC §13 and §21](../../SPEC.md).
-`schema/vectors/operations-redesign-5.json` retains its historical filename because no later generation changed
-these digest domains/encodings; it does not select a redesign-5 decoder or deployed generation.
+`schema/vectors/operations-redesign-8.json` is the current operation-digest fixture: ABI redesign-8 added
+`previewHash` to the mint tuple, so the mint digest changed (`mint` with a zero copy, `mintPreview` with one).
+Statement/proof entries are byte-identical to the retained historical `operations-redesign-5.json`.
 
 Run the already installed local dependencies with `node tools/check-vectors.mjs` and
 `node --test tools/test/*.test.mjs` from `chain/`. Installing dependencies needs network access and is not
 part of the currently authorized offline documentation task.
+
+## Public preview copy (ABI 0.7-redesign-8)
+
+The mint tuple is `core, dataHash, imageHash, previewHash, fileHash, anchorsHash, anchorTypesMask, editionCommitment`.
+`previewHash` is SHA-256 of the exact bytes of the public lightweight copy of the primary photo (JPEG, at most
+1048576 bytes, no GPS or other location metadata), stored as an ordinary `.odpass` payload `files/<sha256hex>`.
+In passport.json it is the anchor `{"type":"photo","data":{"role":"preview"},"hash":"sha256:…"}`: at most one,
+only next to a `photo` with `role: "primary"`, and different from the primary hash. `preparePassport` returns
+`previewHash` (zero without the anchor) and rejects violations; core mirrors them with `EC(142)` (copy without
+`imageHash`) and `EC(143)` (copy equal to `imageHash`). `verifyPassport` compares `previewHash` with
+`getPassportMedia`, so a copy present on only one side fails. The copy uses no extra anchor bit (PHOTO covers it).
+`validateBundleEntries` requires the copy payload and rejects it above 1048576 bytes; it does not decode JPEG
+or inspect metadata. `schema/examples/0.7/physical-preview.json` and `schema/vectors/physical-preview.*` are the reference case.
 
 ## ABI7 issuance roles and print finalization
 

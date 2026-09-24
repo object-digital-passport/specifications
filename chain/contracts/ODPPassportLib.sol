@@ -70,17 +70,26 @@ library ODPPassportLib {
         if (!((mask & required) == required)) revert EC(105);
     }
 
+    /// @dev Optional public copy of the primary photo: it needs a primary photo and must be a different file.
+    function validatePreviewHash(PassportMintInputs memory m) internal pure {
+        if (m.previewHash == bytes32(0)) return;
+        if (m.imageHash == bytes32(0)) revert EC(142);
+        if (m.previewHash == m.imageHash) revert EC(143);
+    }
+
     function validatePhysicalMintInputs(PassportMintInputs memory m) internal pure {
         validateCommonMintInputs(m);
         if (!(m.fileHash == bytes32(0))) revert EC(106);
         if (!(m.imageHash != bytes32(0))) revert EC(107);
         requireAnchorBits(m.anchorTypesMask, ODPAnchorBits.PHYSICAL_REQUIRED);
+        validatePreviewHash(m);
     }
 
     function validateDigitalMintInputs(PassportMintInputs memory m) internal pure {
         validateCommonMintInputs(m);
         if (!(m.fileHash != bytes32(0))) revert EC(29);
         requireAnchorBits(m.anchorTypesMask, ODPAnchorBits.DIGITAL_REQUIRED);
+        validatePreviewHash(m);
     }
 
     function validateMixedMintInputs(PassportMintInputs memory m) internal pure {
@@ -88,6 +97,7 @@ library ODPPassportLib {
         if (!(m.fileHash != bytes32(0))) revert EC(29);
         if (!(m.imageHash != bytes32(0))) revert EC(107);
         requireAnchorBits(m.anchorTypesMask, ODPAnchorBits.PHYSICAL_REQUIRED | ODPAnchorBits.DIGITAL_REQUIRED);
+        validatePreviewHash(m);
     }
 
     // ─── UTC calendar (ODP-ID / PRF-ID must match mint/proof block month in UTC) ─

@@ -22,6 +22,7 @@ struct PassportMintInputs {
     PassportCoreMintInputs core;
     bytes32 dataHash;        // SHA-256 of canonical minified passport.json
     bytes32 imageHash;       // SHA-256 of the primary photo; required for physical/mixed
+    bytes32 previewHash;     // SHA-256 of the public lightweight JPEG copy of the primary photo; 0 = none
     bytes32 fileHash;        // SHA-256 of the digital original
     bytes32 anchorsHash;     // SHA-256 of the canonical minified `anchors` array
     uint32 anchorTypesMask;  // OR of anchor type bits (see ODPAnchorBits)

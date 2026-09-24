@@ -55,12 +55,16 @@ test('statement validator rejects independently changed subject, journal, author
 });
 
 test('pinned operation vectors preserve encoding and separate caller, chain and satellite',async()=>{
- const methods=await import('../operations.mjs');const v=JSON.parse(fs.readFileSync(new URL('../../../schema/vectors/operations-redesign-5.json',import.meta.url)));
- for(const kind of ['statement','proof','mint']) {
-  const f=methods[kind+'Digest'],{input,digest}=v[kind];assert.equal(f(input),digest);
+ const methods=await import('../operations.mjs');const v=JSON.parse(fs.readFileSync(new URL('../../../schema/vectors/operations-redesign-8.json',import.meta.url)));
+ // Statement/proof encodings are unchanged since redesign-5; the redesign-8 mint tuple adds previewHash.
+ const old=JSON.parse(fs.readFileSync(new URL('../../../schema/vectors/operations-redesign-5.json',import.meta.url)));
+ for(const kind of ['statement','proof'])assert.deepEqual(v[kind],old[kind]);
+ assert.notEqual(v.mint.digest,old.mint.digest);assert.notEqual(v.mintPreview.digest,v.mint.digest);
+ for(const kind of ['statement','proof','mint','mintPreview']) {
+  const f=methods[kind.replace('Preview','')+'Digest'],{input,digest}=v[kind];assert.equal(f(input),digest);
   assert.notEqual(f({...input,chainId:80002}),digest);
   assert.notEqual(f({...input,registry:'0x'+'4'.repeat(40)}),digest);
-  if(kind!=='mint')assert.notEqual(f({...input,satellite:'0x'+'5'.repeat(40)}),digest);
+  if(!kind.startsWith('mint'))assert.notEqual(f({...input,satellite:'0x'+'5'.repeat(40)}),digest);
  }
 });
 

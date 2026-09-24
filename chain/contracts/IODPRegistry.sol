@@ -39,6 +39,7 @@ interface IODPRegistry {
     struct PassportMediaView {
         bytes32 dataHash;
         bytes32 imageHash;
+        bytes32 previewHash;
         bytes32 fileHash;
         bytes32 anchorsHash;
         uint32  anchorTypesMask;

@@ -232,6 +232,11 @@
           },
           {
             "internalType": "bytes32",
+            "name": "previewHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
             "name": "fileHash",
             "type": "bytes32"
           },

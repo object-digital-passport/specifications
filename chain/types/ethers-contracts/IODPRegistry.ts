@@ -21,9 +21,9 @@ export declare namespace IODPRegistry {
     export type PassportHeaderViewStructOutput = [passportId: string, contractVersion: bigint, creator: string, creatorId: string, year: bigint, month: bigint, title: string, authorName: string, shortDescription: string, domain: string, objectType: string] & {passportId: string, contractVersion: bigint, creator: string, creatorId: string, year: bigint, month: bigint, title: string, authorName: string, shortDescription: string, domain: string, objectType: string }
   
 
-    export type PassportMediaViewStruct = {dataHash: BytesLike, imageHash: BytesLike, fileHash: BytesLike, anchorsHash: BytesLike, anchorTypesMask: BigNumberish, editionCommitment: BytesLike}
+    export type PassportMediaViewStruct = {dataHash: BytesLike, imageHash: BytesLike, previewHash: BytesLike, fileHash: BytesLike, anchorsHash: BytesLike, anchorTypesMask: BigNumberish, editionCommitment: BytesLike}
 
-    export type PassportMediaViewStructOutput = [dataHash: string, imageHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string] & {dataHash: string, imageHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string }
+    export type PassportMediaViewStructOutput = [dataHash: string, imageHash: string, previewHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string] & {dataHash: string, imageHash: string, previewHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string }
   
 
     export type PassportReleaseViewStruct = {revocationDeadline: BigNumberish, printFinalizedAt: BigNumberish}

@@ -9,9 +9,9 @@ import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, Typed
     export type PassportCoreMintInputsStructOutput = [year: bigint, month: bigint, title: string, authorName: string, shortDescription: string, domain: string, contentClass: bigint, lifecycleStatus: bigint, aiStatus: bigint, verificationMethod: bigint, editionModel: bigint] & {year: bigint, month: bigint, title: string, authorName: string, shortDescription: string, domain: string, contentClass: bigint, lifecycleStatus: bigint, aiStatus: bigint, verificationMethod: bigint, editionModel: bigint }
   
 
-    export type PassportMintInputsStruct = {core: PassportCoreMintInputsStruct, dataHash: BytesLike, imageHash: BytesLike, fileHash: BytesLike, anchorsHash: BytesLike, anchorTypesMask: BigNumberish, editionCommitment: BytesLike}
+    export type PassportMintInputsStruct = {core: PassportCoreMintInputsStruct, dataHash: BytesLike, imageHash: BytesLike, previewHash: BytesLike, fileHash: BytesLike, anchorsHash: BytesLike, anchorTypesMask: BigNumberish, editionCommitment: BytesLike}
 
-    export type PassportMintInputsStructOutput = [core: PassportCoreMintInputsStructOutput, dataHash: string, imageHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string] & {core: PassportCoreMintInputsStructOutput, dataHash: string, imageHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string }
+    export type PassportMintInputsStructOutput = [core: PassportCoreMintInputsStructOutput, dataHash: string, imageHash: string, previewHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string] & {core: PassportCoreMintInputsStructOutput, dataHash: string, imageHash: string, previewHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string }
   
 
 export declare namespace ObjectDigitalPassport {
@@ -31,9 +31,9 @@ export declare namespace ObjectDigitalPassport {
     export type PassportHeaderViewStructOutput = [passportId: string, contractVersion: bigint, creator: string, creatorId: string, year: bigint, month: bigint, title: string, authorName: string, shortDescription: string, domain: string, objectType: string] & {passportId: string, contractVersion: bigint, creator: string, creatorId: string, year: bigint, month: bigint, title: string, authorName: string, shortDescription: string, domain: string, objectType: string }
   
 
-    export type PassportMediaViewStruct = {dataHash: BytesLike, imageHash: BytesLike, fileHash: BytesLike, anchorsHash: BytesLike, anchorTypesMask: BigNumberish, editionCommitment: BytesLike}
+    export type PassportMediaViewStruct = {dataHash: BytesLike, imageHash: BytesLike, previewHash: BytesLike, fileHash: BytesLike, anchorsHash: BytesLike, anchorTypesMask: BigNumberish, editionCommitment: BytesLike}
 
-    export type PassportMediaViewStructOutput = [dataHash: string, imageHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string] & {dataHash: string, imageHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string }
+    export type PassportMediaViewStructOutput = [dataHash: string, imageHash: string, previewHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string] & {dataHash: string, imageHash: string, previewHash: string, fileHash: string, anchorsHash: string, anchorTypesMask: bigint, editionCommitment: string }
   
 
     export type PassportReleaseViewStruct = {revocationDeadline: BigNumberish, printFinalizedAt: BigNumberish}

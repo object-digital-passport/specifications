@@ -20,11 +20,18 @@ export function preparePassport(document, {issuer, issuerType} = {}) {
  const dt=new Date(d.registeredAt*1000),iso=dt.toISOString().replace('.000Z','Z');
  if(d.registration.utcIso8601!==iso || d.registration.localIso8601!==iso.replace('Z','+00:00') || d.year!==dt.getUTCFullYear() || d.month!==dt.getUTCMonth()+1)throw new Error('Inconsistent preparation time');
  if(d.edition.number && d.edition.total && d.edition.number>d.edition.total)throw new Error('Edition number exceeds total');
- const photos=d.anchors.filter(a=>a.type==='photo'),primary=photos.filter(a=>a.data?.role==='primary');
+ // A `role: "preview"` photo is the public lightweight copy (ABI 0.7-redesign-8 previewHash), never the primary photo.
+ const allPhotos=d.anchors.filter(a=>a.type==='photo'),previews=allPhotos.filter(a=>a.data?.role==='preview'),photos=allPhotos.filter(a=>a.data?.role!=='preview'),primary=photos.filter(a=>a.data?.role==='primary');
  if(primary.length>1 || (photos.length>1 && primary.length!==1))throw new Error('Ambiguous primary photo');
+ if(previews.length>1)throw new Error('Multiple preview photos');
+ if(previews.length && primary.length!==1)throw new Error('Preview photo requires a primary photo');
  const photo=primary[0]??photos[0],files=d.anchors.filter(a=>a.type==='file_hash');
  let imageHash=photo?fromHash(photo.hash):zero,fileHash=d.objectType==='physical'?zero:fromHash(d.digital.fileHash);
+ const previewHash=previews.length?fromHash(previews[0].hash):zero;
  if((d.objectType!=='digital' && imageHash===zero) || (d.objectType!=='physical' && fileHash===zero))throw new Error('Required nonzero file/image hash');
+ // Mirrors core EC(142)/EC(143).
+ if(previewHash!==zero && imageHash===zero)throw new Error('Preview photo requires a primary photo');
+ if(previewHash!==zero && previewHash===imageHash)throw new Error('Preview photo must differ from the primary photo');
  if(fileHash!==zero && (files.length!==1 || fromHash(files[0].hash)!==fileHash))throw new Error('File hash mismatch or ambiguous file anchor');
  if(d.objectType==='physical' && files.length)throw new Error('Physical object must not declare digital file anchor');
  const unitSets=d.anchors.filter(a=>a.type==='unit_key_set');if(unitSets.length>1)throw new Error('Multiple unit key sets');
@@ -36,12 +43,12 @@ export function preparePassport(document, {issuer, issuerType} = {}) {
  const core={year:d.year,month:d.month,title:d.title,authorName:d.authorName,shortDescription:d.shortDescription,domain:d.domain??'',contentClass:codes.contentClass.indexOf(d.contentClass)+1,lifecycleStatus:codes.status.indexOf(d.status)+1,aiStatus:codes.aiStatus.indexOf(d.aiStatus)+1,verificationMethod:codes.verificationMethod.indexOf(d.verificationMethod)+1,editionModel:codes.edition.indexOf(d.edition.model)+1};
  let commitment=zero;
  if(unitSets.length){if(!issuer)throw new Error('Issuer address required for edition commitment');const a=unitSets[0].data;commitment=editionCommitment({...a,issuer,labelSigner:a.labelSignerKey});}
- return {document:d,canonical,mint:{core,dataHash:canonicalHash(d),imageHash,fileHash,anchorsHash:canonicalHash(d.anchors),anchorTypesMask:mask,editionCommitment:commitment}};
+ return {document:d,canonical,mint:{core,dataHash:canonicalHash(d),imageHash,previewHash,fileHash,anchorsHash:canonicalHash(d.anchors),anchorTypesMask:mask,editionCommitment:commitment}};
 }
 /** Checks integrity/card. Caller must separately pin generation and assess identity/status. */
 export function verifyPassport(document,header,media,classification) {
  const p=preparePassport(document,{issuer:header.creator}),m=p.mint;
- for(const k of ['dataHash','imageHash','fileHash','anchorsHash','editionCommitment'])if(m[k].toLowerCase()!==media[k].toLowerCase())throw new Error('Hash mismatch: '+k);
+ for(const k of ['dataHash','imageHash','previewHash','fileHash','anchorsHash','editionCommitment'])if(m[k].toLowerCase()!==media[k].toLowerCase())throw new Error('Hash mismatch: '+k);
  if(BigInt(m.anchorTypesMask)!==BigInt(media.anchorTypesMask))throw new Error('Anchor mask mismatch');
  for(const k of ['title','authorName','shortDescription','domain'])if(m.core[k]!==header[k])throw new Error('Card mismatch: '+k);
  if(header.objectType!==p.document.objectType || BigInt(header.year)!==BigInt(m.core.year) || BigInt(header.month)!==BigInt(m.core.month))throw new Error('Object/calendar mismatch');

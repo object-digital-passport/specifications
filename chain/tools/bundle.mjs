@@ -10,6 +10,7 @@ const schemas = Object.fromEntries(['generation', 'receipt', 'manifest'].map(nam
   return [name, new Ajv2020({ strict: false, allErrors: true }).compile(schema)];
 }));
 const roles = ['concerns', 'hosting', 'profile-directory', 'institutional-proofs', 'author-attestation', 'wallet-document-anchor', 'relations', 'edition-units', 'statement-journal'];
+export const MAX_PREVIEW_BYTES = 1048576;
 const fail = message => { throw new Error(`Bundle: ${message}`); };
 
 /** Validates already decoded entries. ZIP envelope validation must run before this API.
@@ -68,6 +69,9 @@ export function validateBundleEntries(entries, { trustedGeneration } = {}) {
   }
   if (passport.digital) required.add(passport.digital.fileHash);
   for (const hash of required) if (!listed.has('files/' + hash.slice(7))) fail('required original missing');
+  // The public lightweight copy (photo role "preview") is a regular payload with a size ceiling.
+  for (const anchor of passport.anchors.filter(a => a.type === 'photo' && a.data?.role === 'preview'))
+    if (files.get('files/' + anchor.hash.slice(7)).length > MAX_PREVIEW_BYTES) fail('preview copy exceeds 1048576 bytes');
   for (const anchor of passport.anchors.filter(a=>a.type==='unit_key_set'))
     verifyAddressList(files.get('files/'+anchor.data.addressListHash.slice(7)), anchor.data);
   let deployment = 'unverified';
