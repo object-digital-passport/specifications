@@ -13,7 +13,7 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
-**The 0.7 line, redesigned before its first deployment, and still not deployed.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the current ABI generation is `0.7-redesign-8`. There is no mainnet deployment and no contract address. No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation. The `0.7-redesign-8` release bundle is a candidate that the project owner has not approved. This version will be dated on the day of its Polygon mainnet deployment.
+**The 0.7 line, redesigned before its first deployment, and still not deployed.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the current ABI generation is `0.7-redesign-8`. There is no mainnet deployment and no contract address. No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation. The project owner approved the `0.7-redesign-8` release bundle on 2026-09-24 (`sha256:7392c821…a414d7`). This version will be dated on the day of its Polygon mainnet deployment.
 
 ### Added
 
@@ -83,7 +83,7 @@ its own history; what is recorded here from now on is the protocol.
 - **The 0.7 registry was audited before it could ship, and every finding is backed by a test.** The audit made 36 findings, 4 of them critical: `tx.origin` substitution behind the extension router; a unit-key signature that did not cover the card; a governance-named `editionUnits` address that could mint under any profile and remove any passport's revocation remedy; and a relations satellite that, by simply lying, granted mint-agent and publishing rights. Each finding has an executable proof of concept. All four critical findings were closed by removing the code that contained them, and the rest were answered by satellite, specification and client work. Reports and evidence are under `review/`.
 - **A usage-safety review of how people will actually hold keys, print labels and hand objects over.** Each of its 19 items has a decision recorded in `review/usage-safety-abi6/CLOSURE.md`, including the 2026-09-24 revision, and the decisions are normative in SPEC §22. None of this is implemented or accepted in a client application yet.
 - **A logic recheck of `0.7-redesign-7` (2026-09-24) found no defect in the contracts** and matched them against SPEC §2–§8, §13 and §20. Its main operational finding, the UTC month boundary for multisignature proposals, is now a client rule (CA-5.8–5.10). Two lower findings remain notes for client work: pending affiliation requests never expire, and self-declared `P`/`M` profiles have no issuance limit. Slither was not run on the redesigned contracts.
-- **What is not covered yet:** no independent audit of `0.7-redesign-8`; the sealed audit package describes `0.7-redesign-6` only; the `0.7-redesign-8` release bundle has not been approved by the owner; and nothing has been deployed.
+- **What is not covered yet:** no independent audit of `0.7-redesign-8`; the sealed audit package describes `0.7-redesign-6` only; the `0.7-redesign-8` release bundle is approved, but nothing has been deployed.
 
 ## [0.7] - 2026-08-22 — pre-release
 

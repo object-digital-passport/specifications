@@ -1242,7 +1242,7 @@ valid. Rationale and acceptance scenarios:
   does not enforce it, so a reader MUST NOT infer anything from a C profile's wallet type.
 - CA-5.8. Mint and `submitProof` succeed only in the UTC month named in their inputs (§2, `EC(68)`). For a Safe
   proposal of either, the client MUST show the execution deadline (00:00 UTC on the first day of the next
-  month, also in local time) and MUST warn when the proposal is created close to that deadline, because the
+  month, also in local time) and MUST warn when the proposal is created less than 24 hours before that deadline, because the
   last co-signer may sign too late.
 - CA-5.9. A pending mint or `submitProof` proposal whose UTC month has passed MUST be shown as unexecutable,
   not as pending (this narrows CA-5.6). With `safeTxGas = 0` and `gasPrice = 0`, Safe v1.4.1 reverts the whole

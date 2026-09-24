@@ -11,7 +11,8 @@ version is [`CHANGELOG.md`](../../CHANGELOG.md).
 
 | Version | | |
 |---|---|---|
-| [**v0.7**](v0.7.md) | passports for things made in thousands | **pre-release** — not deployed anywhere |
+| [**v0.7**](v0.7.md) | a registry nobody can override | **prepared** — not deployed yet; new passports still go to v0.6 |
+| [v0.7 preview](v0.7-preview.md) | passports for things made in thousands | pre-release of 22 Aug 2026, never deployed, replaced by v0.7 |
 | [v0.6](v0.6.md) | what a passport stores, redesigned | current deployed line, live since 24 Jul 2026 |
 | [v0.5](v0.5.md) | deployed, never released | superseded — the note explains why |
 | [v0.4.1](v0.4.1.md) | website and tooling only | no blockchain change |

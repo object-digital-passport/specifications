@@ -1,4 +1,4 @@
-> Текущая ABI — `0.7-redesign-8`: [дельта после аудиторского пакета](ODP_07_ABI6_DOCUMENTATION_DELTA.md), [индекс](docs/ru/README-docs.md), [глоссарий](docs/ru/GLOSSARY.md). Запечатанный пакет описывает прежнюю `0.7-redesign-6`, утверждённый release-бандл — `0.7-redesign-7`; ни один из них эту ABI не подтверждает. Цель — Polygon mainnet (137), Amoy не используется, ничего не развёрнуто. Сейчас запрещены подключение кошелька, внешняя сеть, deployment и публикация.
+> Текущая ABI — `0.7-redesign-8`: [дельта после аудиторского пакета](ODP_07_ABI6_DOCUMENTATION_DELTA.md), [индекс](docs/ru/README-docs.md), [глоссарий](docs/ru/GLOSSARY.md). Запечатанный пакет описывает прежнюю `0.7-redesign-6` и эту ABI не подтверждает; [release-бандл](review/v07-abi8-release/README.md) `0.7-redesign-8` владелец утвердил 2026-09-24. Цель — Polygon mainnet (137), Amoy не используется, ничего не развёрнуто. Сейчас запрещены подключение кошелька, внешняя сеть, deployment и публикация.
 
 # Object Digital Passport
 

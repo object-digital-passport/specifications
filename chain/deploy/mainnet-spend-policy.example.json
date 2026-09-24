@@ -1,7 +1,7 @@
 {
   "warning": "LOCAL EVM measurement; not a live Polygon fee quote. Limits include 25 percent rounded margin. Fill all fee fields before use. Each creation is estimated again before sending.",
   "gasLimits": {
-    "ObjectDigitalPassport": "3220000",
+    "ObjectDigitalPassport": "3500000",
     "ODPEditionUnits": "1780000",
     "ODPAuthorAttestation": "1330000",
     "ODPPassportConcerns": "1280000",
@@ -10,7 +10,7 @@
     "ODPRegistryRelations": "1960000",
     "ODPPassportProofRegistry": "1880000",
     "ODPWalletDocumentAnchor": "680000",
-    "ODPStatementJournal": "1770000"
+    "ODPStatementJournal": "1780000"
   },
   "maxFeePerGas": "FILL_WEI_PER_GAS",
   "maxPriorityFeePerGas": "FILL_WEI_PER_GAS",
