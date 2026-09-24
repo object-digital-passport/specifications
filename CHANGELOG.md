@@ -13,9 +13,13 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
+## [0.7] - 2026-09-24 — pre-release
+
 **The 0.7 line, redesigned before its first deployment, and still not deployed.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the current ABI generation is `0.7-redesign-8`. There is no mainnet deployment and no contract address. No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation. The project owner approved the `0.7-redesign-8` release bundle on 2026-09-24 (`sha256:7392c821…a414d7`). This version will be dated on the day of its Polygon mainnet deployment.
 
 ### Added
+
+- **The specification is fully translated into Russian.** [`docs/ru/SPEC.md`](docs/ru/SPEC.md) was a pointer to the English text; it is now a section-by-section translation of `SPEC.md`, with the same section numbers, CA identifiers, tables and error codes, and a key that maps MUST/SHOULD/MAY to their Russian equivalents. The English text stays normative. Four other Russian guides caught up with their originals.
 
 - **`finalizePassportForPrint(id)`: an irreversible mark that closes the revocation window before a label is printed.** Only the original issuer can set it. It refuses missing and revoked passports, a repeat call is a no-op that keeps the first time, and it emits `PassportFinalizedForPrint`. `getPassportReleaseState(id)` returns `(revocationDeadline, printFinalizedAt)`. A client must withhold the final print export until finalization is confirmed on chain (CA-2), so that a printed label never points at a passport its issuer can still revoke. The mark does not observe printers and cannot stop anyone printing elsewhere. It does not protect against key theft either, because the same key can finalize and so close its own window.
 - **A lighter public copy of the primary photo, committed on chain (`previewHash`, ABI `0.7-redesign-8`).** `previewHash` is the SHA-256 of a JPEG of at most 1 MiB with no GPS or other location metadata, made from the primary photo. The copy travels in the `.odpass` next to the untouched original and is described by one `photo` anchor with `data.role: "preview"`, whose hash must equal `previewHash`. Zero means there is no copy. A client creates one only when the user chooses to publish the photo, and that choice is fixed at mint. A nonzero value requires a nonzero `imageHash` (`EC(142)`) and must differ from it (`EC(143)`); the contract cannot check size, format, metadata or that both files show the same picture, so the client checks those. The original can be large and can reveal where it was taken, which makes it a poor thing to publish. With its own commitment, the copy can be published and still checked byte for byte against the chain, while `imageHash` keeps referring to the original (SPEC §8, §9, §22.19).
@@ -32,6 +36,8 @@ its own history; what is recorded here from now on is the protocol.
 - [`docs/ORG_NAMING_AND_SITE.md`](docs/ORG_NAMING_AND_SITE.md) — a proposal, applied nowhere: repository names in the c2pa-org style, what each rename would break, and why `odp.github.io` cannot be obtained.
 
 ### Changed
+
+- **Every issuer must publish its profile ID, and the multisig month warning has a number.** Publishing the profile ID and the full wallet address on a channel the issuer controls was a recommendation; it is now required of every issuer, and organizations (`B`, `P`, `M`) must also serve `/.well-known/odp.json` ([`SPEC.md` §3](SPEC.md)). The registry cannot enforce it, so an unpublished profile is simply unidentified. A client warns when a Safe mint or proof proposal is created less than 24 hours before the end of the UTC month (CA-5.8). The example deployment spend policy again carries a 25 % margin over the measured `0.7-redesign-8` deployment gas: 3 500 000 for the core and 1 780 000 for the statement journal.
 
 - **Contract-wallet issuers can prove their wallet, and the identity file names its format and wallet.** The off-chain creator wallet proof now accepts ERC-1271 `isValidSignature` for issuers registered to a Safe or another contract wallet, with the block of the check recorded ([`SPEC.md` §11](SPEC.md)). `/.well-known/odp.json` carries `"odp": 1` and an optional full `wallet` per profile, matching the [ODP Profile Directory format](https://github.com/object-digital-passport/odp-profile-directory); a listed wallet that differs from the registry does not count. Edition master seeds MAY also be backed up on paper as SLIP-39 shares next to the `.odpsecret` file (CA-7.7), and large print runs SHOULD use an ISO 14298 printer (CA-7.8). The ESPR article references in §18.0 were checked against the Official Journal text.
 
@@ -85,7 +91,7 @@ its own history; what is recorded here from now on is the protocol.
 - **A logic recheck of `0.7-redesign-7` (2026-09-24) found no defect in the contracts** and matched them against SPEC §2–§8, §13 and §20. Its main operational finding, the UTC month boundary for multisignature proposals, is now a client rule (CA-5.8–5.10). Two lower findings remain notes for client work: pending affiliation requests never expire, and self-declared `P`/`M` profiles have no issuance limit. Slither was not run on the redesigned contracts.
 - **What is not covered yet:** no independent audit of `0.7-redesign-8`; the sealed audit package describes `0.7-redesign-6` only; the `0.7-redesign-8` release bundle is approved, but nothing has been deployed.
 
-## [0.7] - 2026-08-22 — pre-release
+## [0.7-preview] - 2026-08-22 — pre-release
 
 **Not deployed.** No v0.7 registry exists on any network, so nothing can be registered against this line yet; the date is the pre-release tag, not a deployment. Edition passports and per-unit activation keys: one passport for a production run, with a key under a scratch layer on each item. Contracts and tests are done, no issuer tooling or activation page exists. Rationale in [`docs/EDITION_UNIT_KEYS.md`](docs/EDITION_UNIT_KEYS.md) and eleven records under [`docs/adr/`](docs/adr/).
 
@@ -267,6 +273,7 @@ First tagged release of the reference implementation: specification, Solidity co
 
 [Unreleased]: https://github.com/object-digital-passport/specifications/compare/v0.7...HEAD
 [0.7]: https://github.com/object-digital-passport/specifications/compare/v0.6...v0.7
+[0.7-preview]: https://github.com/object-digital-passport/specifications/releases/tag/v.0.7.0
 [0.6]: https://github.com/object-digital-passport/specifications/compare/v0.5...v0.6
 [0.5]: https://github.com/object-digital-passport/specifications/compare/v0.4.1...v0.5
 [0.4.1]: https://github.com/object-digital-passport/specifications/compare/v0.4...v0.4.1
