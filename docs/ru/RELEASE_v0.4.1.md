@@ -19,7 +19,7 @@
 ## Сообщество и GitHub
 
 - Шаблон issue **Standard gap** — предложения по пробелам в **`SPEC.md`**.
-- **[`CONTRIBUTING.md`](../../docs/CONTRIBUTING.md):** общение в issues/PR на **английском**; нормативный текст — **[`SPEC.md`](../../SPEC.md)** (EN).
+- **[`CONTRIBUTING.md`](../../docs/CONTRIBUTING.md):** общение в issues/PR на **английском**; нормативный текст — **[`SPEC.md`](../../SPEC.md)** (EN). Русские копии в **[`web/frontend/localization/`](https://github.com/object-digital-passport/object-digital-passport.github.io/tree/main/frontend/localization)** справочные.
 - Напоминание в шаблоне PR: заголовок и описание на **английском**.
 - Ветки / **rulesets:** см. **[`.github/BRANCH_PROTECTION.md`](../../.github/BRANCH_PROTECTION.md)** (локальная папка `rulesets/` в `.gitignore` — только шаблоны для импорта).
 

@@ -4,12 +4,11 @@ pragma solidity ^0.8.20;
 import "./ODPErrors.sol";
 import {
     ODPAnchorBits,
-    ODPEventKinds,
     PassportCoreMintInputs,
     PassportMintInputs
 } from "./ODPPassportTypes.sol";
 
-/// @dev Linked library: validation + decode + URL resolution for ObjectDigitalPassport (EIP-170 size).
+/// @dev Internal-only validation and formatting: no linked deployment or external calls.
 library ODPPassportLib {
     uint8 private constant CONTENT_CLASS_STATIC = 1;
     uint8 private constant CONTENT_CLASS_EXECUTABLE = 6;
@@ -22,28 +21,28 @@ library ODPPassportLib {
     uint8 private constant EDITION_UNIQUE = 1;
     uint8 private constant EDITION_DYNAMIC = 4;
 
-    function validateContentClass(uint8 contentClass) public pure {
+    function validateContentClass(uint8 contentClass) internal pure {
         if (!(contentClass >= CONTENT_CLASS_STATIC && contentClass <= CONTENT_CLASS_EXECUTABLE)) revert EC(84);
     }
 
-    function validateLifecycleStatus(uint8 lifecycleStatus) public pure {
+    function validateLifecycleStatus(uint8 lifecycleStatus) internal pure {
         if (!(lifecycleStatus >= STATUS_CONCEPT && lifecycleStatus <= STATUS_ARCHIVED)) revert EC(85);
     }
 
-    function validateAiStatus(uint8 aiStatus) public pure {
+    function validateAiStatus(uint8 aiStatus) internal pure {
         if (!(aiStatus >= AI_STATUS_NONE && aiStatus <= AI_STATUS_GENERATED)) revert EC(86);
     }
 
-    function validateVerificationMethod(uint8 verificationMethod) public pure {
+    function validateVerificationMethod(uint8 verificationMethod) internal pure {
         if (!(verificationMethod >= VERIFY_SELF && verificationMethod <= VERIFY_HYBRID)) revert EC(87);
     }
 
-    function validateEditionModel(uint8 editionModel) public pure {
+    function validateEditionModel(uint8 editionModel) internal pure {
         if (!(editionModel >= EDITION_UNIQUE && editionModel <= EDITION_DYNAMIC)) revert EC(88);
     }
 
     /// @dev Immutable on-chain card: no edit path exists after mint (typo = revoke + re-mint).
-    function validatePassportCore(PassportCoreMintInputs memory core) public pure {
+    function validatePassportCore(PassportCoreMintInputs memory core) internal pure {
         if (!(core.year > 0)) revert EC(9);
         if (!(core.month >= 1 && core.month <= 12)) revert EC(8);
         if (!(bytes(core.title).length > 0)) revert EC(91);
@@ -60,114 +59,45 @@ library ODPPassportLib {
         validateEditionModel(core.editionModel);
     }
 
-    function validateCommonMintInputs(PassportMintInputs memory m) public pure {
+    function validateCommonMintInputs(PassportMintInputs memory m) internal pure {
         validatePassportCore(m.core);
         if (!(m.dataHash != bytes32(0))) revert EC(30);
-        if (!(bytes(m.dataUrl).length <= 512)) revert EC(24);
-        if (!(bytes(m.imageUrl).length <= 512)) revert EC(23);
-        if (m.imageHash == bytes32(0)) {
-            if (!(bytes(m.imageUrl).length == 0)) revert EC(28);
-        }
         if (!(m.anchorsHash != bytes32(0))) revert EC(103);
         if (!(m.anchorTypesMask != 0)) revert EC(104);
     }
 
-    function requireAnchorBits(uint32 mask, uint32 required) public pure {
+    function requireAnchorBits(uint32 mask, uint32 required) internal pure {
         if (!((mask & required) == required)) revert EC(105);
     }
 
-    function validatePhysicalMintInputs(PassportMintInputs memory m) public pure {
+    /// @dev Optional public copy of the primary photo: it needs a primary photo and must be a different file.
+    function validatePreviewHash(PassportMintInputs memory m) internal pure {
+        if (m.previewHash == bytes32(0)) return;
+        if (m.imageHash == bytes32(0)) revert EC(142);
+        if (m.previewHash == m.imageHash) revert EC(143);
+    }
+
+    function validatePhysicalMintInputs(PassportMintInputs memory m) internal pure {
         validateCommonMintInputs(m);
         if (!(m.fileHash == bytes32(0))) revert EC(106);
         if (!(m.imageHash != bytes32(0))) revert EC(107);
         requireAnchorBits(m.anchorTypesMask, ODPAnchorBits.PHYSICAL_REQUIRED);
+        validatePreviewHash(m);
     }
 
-    function validateDigitalMintInputs(PassportMintInputs memory m) public pure {
+    function validateDigitalMintInputs(PassportMintInputs memory m) internal pure {
         validateCommonMintInputs(m);
         if (!(m.fileHash != bytes32(0))) revert EC(29);
         requireAnchorBits(m.anchorTypesMask, ODPAnchorBits.DIGITAL_REQUIRED);
+        validatePreviewHash(m);
     }
 
-    function validateMixedMintInputs(PassportMintInputs memory m) public pure {
+    function validateMixedMintInputs(PassportMintInputs memory m) internal pure {
         validateCommonMintInputs(m);
         if (!(m.fileHash != bytes32(0))) revert EC(29);
         if (!(m.imageHash != bytes32(0))) revert EC(107);
         requireAnchorBits(m.anchorTypesMask, ODPAnchorBits.PHYSICAL_REQUIRED | ODPAnchorBits.DIGITAL_REQUIRED);
-    }
-
-    /// @dev Append-only event inputs. `value` carries the new lifecycleStatus for STATUS events only.
-    function validatePassportEventInputs(
-        uint8 kind,
-        uint8 value,
-        string memory note,
-        bytes32 attachmentHash,
-        string memory attachmentUrl
-    ) public pure {
-        if (!(kind >= ODPEventKinds.STATUS && kind <= ODPEventKinds.EDITION_NOTICE)) revert EC(108);
-        if (kind == ODPEventKinds.STATUS) {
-            validateLifecycleStatus(value);
-        } else {
-            if (!(value == 0)) revert EC(109);
-        }
-        if (!(bytes(note).length <= 256)) revert EC(96);
-        if (attachmentHash == bytes32(0)) {
-            if (!(bytes(attachmentUrl).length == 0)) revert EC(89);
-        } else {
-            if (!(bytes(attachmentUrl).length <= 512)) revert EC(90);
-        }
-    }
-
-    function decodeMintNorm(bytes memory norm) public pure returns (PassportMintInputs memory m) {
-        m = abi.decode(norm, (PassportMintInputs));
-    }
-
-    function decodeAndValidateDigitalExtensionNorm(bytes memory norm) public pure returns (PassportMintInputs memory m) {
-        m = decodeMintNorm(norm);
-        validateDigitalMintInputs(m);
-    }
-
-    function decodeAndValidatePhysicalExtensionNorm(bytes memory norm) public pure returns (PassportMintInputs memory m) {
-        m = decodeMintNorm(norm);
-        validatePhysicalMintInputs(m);
-    }
-
-    function trimTrailingSlashBytes(bytes memory b) internal pure returns (bytes memory) {
-        uint256 end = b.length;
-        while (end > 0 && b[end - 1] == 0x2f) {
-            unchecked {
-                end--;
-            }
-        }
-        if (end == b.length) {
-            return b;
-        }
-        bytes memory out = new bytes(end);
-        for (uint256 i = 0; i < end; i++) {
-            out[i] = b[i];
-        }
-        return out;
-    }
-
-    function stripTrailingSlashMemory(string memory s) public pure returns (string memory) {
-        return string(trimTrailingSlashBytes(bytes(s)));
-    }
-
-    /// @param dataUrl When `dataUrlIsFolderBase` is true, folder root only; stored URL becomes `folderBase/passportId.odpass` (§15 ZIP bundle, not raw JSON).
-    function resolveMintDataUrlMemory(
-        string memory dataUrl,
-        bool dataUrlIsFolderBase,
-        string memory passportId
-    ) public pure returns (string memory) {
-        if (bytes(dataUrl).length == 0) {
-            if (!(!dataUrlIsFolderBase)) revert EC(31);
-            return "";
-        }
-        if (!dataUrlIsFolderBase) {
-            return dataUrl;
-        }
-        string memory base = stripTrailingSlashMemory(dataUrl);
-        return string(abi.encodePacked(base, "/", passportId, ".odpass"));
+        validatePreviewHash(m);
     }
 
     // ─── UTC calendar (ODP-ID / PRF-ID must match mint/proof block month in UTC) ─
@@ -188,7 +118,7 @@ library ODPPassportLib {
 
     /// @dev Gregorian UTC: Unix `ts` seconds since 1970-01-01 00:00:00 UTC.
     /// @notice Reverts EC(83) if `ts` is outside a supported range (internal calendar loop bound).
-    function utcYearMonthFromTimestamp(uint256 ts) public pure returns (uint32 year, uint8 month) {
+    function utcYearMonthFromTimestamp(uint256 ts) internal pure returns (uint32 year, uint8 month) {
         uint256 dayCount = ts / 86400;
         uint256 y = 1970;
         for (uint256 i = 0; i < 600; i++) {
@@ -203,7 +133,7 @@ library ODPPassportLib {
 
         uint256 m = 1;
         uint256 rem = dayCount;
-        bool found;
+        bool found = false;
         for (uint256 mi = 1; mi <= 12; mi++) {
             uint256 dim = _daysInMonth(mi, y);
             if (rem < dim) {
@@ -219,9 +149,9 @@ library ODPPassportLib {
         month = uint8(m);
     }
 
-    // ─── String formatters (ID building; linked to shrink main contract EIP-170 size) ─
+    // ─── Internal string formatters ─
 
-    function yearToString(uint32 v) public pure returns (string memory) {
+    function yearToString(uint32 v) internal pure returns (string memory) {
         if (v == 0) return "0";
         uint32 temp = v;
         uint256 len = 0;
@@ -237,14 +167,14 @@ library ODPPassportLib {
         return string(b);
     }
 
-    function monthToString(uint8 v) public pure returns (string memory) {
+    function monthToString(uint8 v) internal pure returns (string memory) {
         bytes memory b = new bytes(2);
         b[1] = bytes1(uint8(48 + v % 10));
         b[0] = bytes1(uint8(48 + (v / 10) % 10));
         return string(b);
     }
 
-    function pad8(uint32 v) public pure returns (string memory) {
+    function pad8(uint32 v) internal pure returns (string memory) {
         bytes memory b = new bytes(8);
         for (uint256 i = 8; i > 0; i--) {
             b[i - 1] = bytes1(uint8(48 + v % 10));
@@ -253,15 +183,15 @@ library ODPPassportLib {
         return string(b);
     }
 
-    function formatOdpPassportId(uint32 year, uint8 month, uint32 n) public pure returns (string memory) {
+    function formatOdpPassportId(uint32 year, uint8 month, uint32 n) internal pure returns (string memory) {
         return string(abi.encodePacked("ODP-", yearToString(year), "-", monthToString(month), "-", pad9(n)));
     }
 
-    function formatPrfId(uint32 year, uint8 month, uint32 n) public pure returns (string memory) {
+    function formatPrfId(uint32 year, uint8 month, uint32 n) internal pure returns (string memory) {
         return string(abi.encodePacked("PRF-", yearToString(year), "-", monthToString(month), "-", pad8(n)));
     }
 
-    function pad9(uint32 v) public pure returns (string memory) {
+    function pad9(uint32 v) internal pure returns (string memory) {
         bytes memory b = new bytes(9);
         for (uint256 i = 9; i > 0; i--) {
             b[i - 1] = bytes1(uint8(48 + v % 10));
@@ -270,7 +200,7 @@ library ODPPassportLib {
         return string(b);
     }
 
-    function pad3(uint32 v) public pure returns (string memory) {
+    function pad3(uint32 v) internal pure returns (string memory) {
         bytes memory b = new bytes(3);
         b[2] = bytes1(uint8(48 + v % 10));
         b[1] = bytes1(uint8(48 + (v / 10) % 10));
@@ -279,7 +209,7 @@ library ODPPassportLib {
     }
 
     /// @dev "C-482-930-174-005" style creator id body from type prefix and number.
-    function buildCreatorId(bytes1 typePrefix, uint64 number) public pure returns (string memory) {
+    function buildCreatorId(bytes1 typePrefix, uint64 number) internal pure returns (string memory) {
         return string(
             abi.encodePacked(
                 string(abi.encodePacked(typePrefix)),

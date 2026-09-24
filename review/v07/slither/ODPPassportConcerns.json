@@ -1,0 +1,120 @@
+{
+  "success": true,
+  "error": null,
+  "results": {
+    "detectors": [
+      {
+        "elements": [
+          {
+            "type": "pragma",
+            "name": "^0.8.20",
+            "source_mapping": {
+              "start": 32,
+              "length": 24,
+              "filename_relative": "IODPRegistry.sol",
+              "filename_absolute": "/Users/Andrei/\u041f\u0440\u043e\u0435\u043a\u0442\u044b/GitHub/Object Digital Passport/specifications/chain/contracts/IODPRegistry.sol",
+              "filename_short": "IODPRegistry.sol",
+              "is_dependency": false,
+              "lines": [
+                2
+              ],
+              "starting_column": 1,
+              "ending_column": 25
+            },
+            "type_specific_fields": {
+              "directive": [
+                "solidity",
+                "^",
+                "0.8",
+                ".20"
+              ]
+            }
+          },
+          {
+            "type": "pragma",
+            "name": "^0.8.20",
+            "source_mapping": {
+              "start": 32,
+              "length": 24,
+              "filename_relative": "ODPErrors.sol",
+              "filename_absolute": "/Users/Andrei/\u041f\u0440\u043e\u0435\u043a\u0442\u044b/GitHub/Object Digital Passport/specifications/chain/contracts/ODPErrors.sol",
+              "filename_short": "ODPErrors.sol",
+              "is_dependency": false,
+              "lines": [
+                2
+              ],
+              "starting_column": 1,
+              "ending_column": 25
+            },
+            "type_specific_fields": {
+              "directive": [
+                "solidity",
+                "^",
+                "0.8",
+                ".20"
+              ]
+            }
+          },
+          {
+            "type": "pragma",
+            "name": "^0.8.20",
+            "source_mapping": {
+              "start": 32,
+              "length": 24,
+              "filename_relative": "ODPPassportConcerns.sol",
+              "filename_absolute": "/Users/Andrei/\u041f\u0440\u043e\u0435\u043a\u0442\u044b/GitHub/Object Digital Passport/specifications/chain/contracts/ODPPassportConcerns.sol",
+              "filename_short": "ODPPassportConcerns.sol",
+              "is_dependency": false,
+              "lines": [
+                2
+              ],
+              "starting_column": 1,
+              "ending_column": 25
+            },
+            "type_specific_fields": {
+              "directive": [
+                "solidity",
+                "^",
+                "0.8",
+                ".20"
+              ]
+            }
+          },
+          {
+            "type": "pragma",
+            "name": "^0.8.20",
+            "source_mapping": {
+              "start": 32,
+              "length": 24,
+              "filename_relative": "ODPSatellite.sol",
+              "filename_absolute": "/Users/Andrei/\u041f\u0440\u043e\u0435\u043a\u0442\u044b/GitHub/Object Digital Passport/specifications/chain/contracts/ODPSatellite.sol",
+              "filename_short": "ODPSatellite.sol",
+              "is_dependency": false,
+              "lines": [
+                2
+              ],
+              "starting_column": 1,
+              "ending_column": 25
+            },
+            "type_specific_fields": {
+              "directive": [
+                "solidity",
+                "^",
+                "0.8",
+                ".20"
+              ]
+            }
+          }
+        ],
+        "description": "Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)\n\t- VerbatimInvalidDeduplication\n\t- FullInlinerNonExpressionSplitArgumentEvaluationOrder\n\t- MissingSideEffectsOnSelectorAccess.\nIt is used by:\n\t- ^0.8.20 (IODPRegistry.sol#2)\n\t- ^0.8.20 (ODPErrors.sol#2)\n\t- ^0.8.20 (ODPPassportConcerns.sol#2)\n\t- ^0.8.20 (ODPSatellite.sol#2)\n",
+        "markdown": "Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)\n\t- VerbatimInvalidDeduplication\n\t- FullInlinerNonExpressionSplitArgumentEvaluationOrder\n\t- MissingSideEffectsOnSelectorAccess.\nIt is used by:\n\t- [^0.8.20](IODPRegistry.sol#L2)\n\t- [^0.8.20](ODPErrors.sol#L2)\n\t- [^0.8.20](ODPPassportConcerns.sol#L2)\n\t- [^0.8.20](ODPSatellite.sol#L2)\n",
+        "first_markdown_element": "IODPRegistry.sol#L2",
+        "id": "725993b221c6c11bf84b6e44abc8299834cf452c036ffd7cac3fce3b918f266a",
+        "check": "solc-version",
+        "impact": "Informational",
+        "confidence": "High",
+        "reference": "https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity"
+      }
+    ]
+  }
+}

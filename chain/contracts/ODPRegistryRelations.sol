@@ -1,33 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
+import "./ODPSatellite.sol";
 
 import "./ODPErrors.sol";
 
-/**
- * Satellite: affiliation, mint-agent delegation, and creator publishing delegation.
- * Deploy after `ObjectDigitalPassport`; constructor takes the registry address.
- * The main registry may consult this contract for mint-agent and publishing-agent reads.
- *
- * Affiliation links one organisation profile to a parent organisation profile through a
- * two-step handshake (child proposes, parent confirms). Eligible types are `B`, `M` and `P`
- * in any combination; `C` is excluded — an individual has no divisions, and `C -> C` would
- * only be a way to attach oneself to somebody else's name. The link is display-only: it
- * grants no rights, no mint allowance and no inherited trust (see SPEC.md section 4).
- */
-interface IODPRegistryForRelations {
-    struct CreatorRecord {
-        string creatorId;
-        address wallet;
-        bytes1 typePrefix;
-        uint256 timestamp;
-    }
-
-    function getCreatorByWallet(address wallet) external view returns (string memory);
-    function getCreator(string calldata creatorId) external view returns (CreatorRecord memory);
-}
-
-contract ODPRegistryRelations {
-    IODPRegistryForRelations public immutable odpRegistry;
+contract ODPRegistryRelations is ODPSatellite {
 
     bytes1 private constant TYPE_B = "B";
     bytes1 private constant TYPE_M = "M";
@@ -36,13 +13,6 @@ contract ODPRegistryRelations {
     uint16 private constant MAX_ACTIVE_CHILDREN_PER_PARENT = 100;
     uint16 private constant MAX_PENDING_PARENTS_PER_CHILD = 100;
 
-    /**
-     * Hops the cycle check walks upward from a proposed parent before giving up.
-     * Affiliation is multi-level on purpose (a school under a university under a
-     * consortium), so depth cannot be forbidden outright — but an unbounded walk is an
-     * unbounded gas cost, so a chain whose ancestors do not terminate within this many
-     * hops is rejected instead of traversed.
-     */
     uint256 private constant MAX_AFFILIATION_WALK = 8;
 
     mapping(bytes32 => bool) private _pendingAffiliation;
@@ -54,28 +24,15 @@ contract ODPRegistryRelations {
     mapping(string => uint256) private _affiliationDetachedAt;
     mapping(string => string) private _lastDetachedParent;
 
-    struct DelegationInfo {
-        address agent;
-        uint256 expiresAt;
-    }
+    event AffiliationProposed(string parentId, string childId, uint256 timestamp);
+    event AffiliationConfirmed(string parentId, string childId, uint256 timestamp);
+    event AffiliationDetached(string parentId, string childId, uint256 timestamp);
 
-    mapping(address => DelegationInfo) private _creatorPublishDelegation;
-    mapping(string => address) private _mintAgentForCreator;
-    mapping(bytes32 => bool) private _mintAgentDelegationPending;
-
-    event MintAgentUpdate(string indexed principalCreatorId, address indexed agent, uint8 kind, uint256 timestamp);
-    event AffiliationProposed(string indexed parentId, string indexed childId, uint256 timestamp);
-    event AffiliationConfirmed(string indexed parentId, string indexed childId, uint256 timestamp);
-    event AffiliationDetached(string indexed parentId, string indexed childId, uint256 timestamp);
-    event CreatorPublishingDelegated(address indexed creator, address indexed agent, uint256 expiresAt);
-    event CreatorPublishingDelegationRevoked(address indexed creator, uint256 timestamp);
-
-    constructor(address registry_) {
-        odpRegistry = IODPRegistryForRelations(registry_);
+    constructor(address registry_) ODPSatellite(registry_) {
     }
 
     function proposeAffiliation(string calldata parentId) external {
-        string memory childId = _requireRegistered();
+        string memory childId = _registered();
         _requireAffiliationType(childId);
         if (!(bytes(parentId).length > 0)) revert EC(49);
         if (!(keccak256(bytes(parentId)) != keccak256(bytes(childId)))) revert EC(46);
@@ -86,11 +43,7 @@ contract ODPRegistryRelations {
         // authoritative cycle check is the one in confirmAffiliation.
         _requireNoCycle(parentId, childId);
 
-        // Triaged encodePacked collision: both IDs are validated registered profiles with
-        // the fixed contract-generated format T-NNN-NNN-NNN-NNN (17 chars) — fixed-length
-        // concatenation is unambiguous. Next contract generation should use abi.encode.
-        // slither-disable-next-line encode-packed-collision
-        bytes32 k = keccak256(abi.encodePacked(parentId, childId));
+        bytes32 k = keccak256(abi.encode(parentId, childId));
         if (!(!_pendingAffiliation[k])) revert EC(47);
         _pendingAffiliation[k] = true;
         _pendingParentsCountByChild[childId] = _pendingParentsCountByChild[childId] + 1;
@@ -99,15 +52,13 @@ contract ODPRegistryRelations {
     }
 
     function confirmAffiliation(string calldata childId) external {
-        string memory parentId = _requireRegistered();
+        string memory parentId = _registered();
         _requireAffiliationType(parentId);
         _requireAffiliationType(childId);
         if (!(keccak256(bytes(parentId)) != keccak256(bytes(childId)))) revert EC(46);
         if (!(bytes(_parentOf[childId]).length == 0)) revert EC(45);
 
-        // Triaged: fixed-format registered IDs — see proposeAffiliation note.
-        // slither-disable-next-line encode-packed-collision
-        bytes32 k = keccak256(abi.encodePacked(parentId, childId));
+        bytes32 k = keccak256(abi.encode(parentId, childId));
         if (!(_pendingAffiliation[k])) revert EC(42);
         delete _pendingAffiliation[k];
         _pendingParentsCountByChild[childId] = _pendingParentsCountByChild[childId] - 1;
@@ -161,9 +112,7 @@ contract ODPRegistryRelations {
     function cancelAffiliationRequest(string calldata parentId) external {
         string memory childId = _requireRegistered();
         _requireAffiliationType(childId);
-        // Triaged: fixed-format registered IDs — see proposeAffiliation note.
-        // slither-disable-next-line encode-packed-collision
-        bytes32 k = keccak256(abi.encodePacked(parentId, childId));
+        bytes32 k = keccak256(abi.encode(parentId, childId));
         if (!(_pendingAffiliation[k])) revert EC(42);
         delete _pendingAffiliation[k];
         _pendingParentsCountByChild[childId] = _pendingParentsCountByChild[childId] - 1;
@@ -174,9 +123,7 @@ contract ODPRegistryRelations {
         view
         returns (bool)
     {
-        // Triaged: view over the same fixed-format key space — see proposeAffiliation note.
-        // slither-disable-next-line encode-packed-collision
-        return _pendingAffiliation[keccak256(abi.encodePacked(parentId, childId))];
+        return _pendingAffiliation[keccak256(abi.encode(parentId, childId))];
     }
 
     function getAffiliatedParent(string calldata childId) external view returns (string memory) {
@@ -192,89 +139,7 @@ contract ODPRegistryRelations {
         view
         returns (string[] memory result, uint256 total)
     {
-        return _stringArraySlice(_childrenOf[parentId], offset, limit);
-    }
-
-    function requestMintAgentRole(string calldata principalCreatorId) external {
-        if (!(bytes(principalCreatorId).length > 0)) revert EC(76);
-        IODPRegistryForRelations.CreatorRecord memory cr = odpRegistry.getCreator(principalCreatorId);
-        if (!(msg.sender != cr.wallet)) revert EC(75);
-        if (_mintAgentForCreator[principalCreatorId] == msg.sender) {
-            return;
-        }
-        bytes32 k = keccak256(abi.encodePacked(principalCreatorId, msg.sender));
-        if (!(!_mintAgentDelegationPending[k])) revert EC(74);
-        _mintAgentDelegationPending[k] = true;
-        emit MintAgentUpdate(principalCreatorId, msg.sender, 0, block.timestamp);
-    }
-
-    function confirmMintAgentRole(address agent) external {
-        if (!(agent != address(0))) revert EC(21);
-        string memory creatorId = _requireRegistered();
-        bytes32 k = keccak256(abi.encodePacked(creatorId, agent));
-        if (!(_mintAgentDelegationPending[k])) revert EC(73);
-        delete _mintAgentDelegationPending[k];
-        address prev = _mintAgentForCreator[creatorId];
-        _mintAgentForCreator[creatorId] = agent;
-        if (prev != address(0) && prev != agent) {
-            emit MintAgentUpdate(creatorId, prev, 3, block.timestamp);
-        }
-        emit MintAgentUpdate(creatorId, agent, 2, block.timestamp);
-    }
-
-    function revokeMintAgentRole() external {
-        string memory creatorId = _requireRegistered();
-        address prev = _mintAgentForCreator[creatorId];
-        if (!(prev != address(0))) revert EC(79);
-        delete _mintAgentForCreator[creatorId];
-        emit MintAgentUpdate(creatorId, prev, 3, block.timestamp);
-    }
-
-    function renounceMintAgentRole(string calldata principalCreatorId) external {
-        if (!(bytes(principalCreatorId).length > 0)) revert EC(76);
-        odpRegistry.getCreator(principalCreatorId);
-        if (!(_mintAgentForCreator[principalCreatorId] == msg.sender)) revert EC(72);
-        delete _mintAgentForCreator[principalCreatorId];
-        emit MintAgentUpdate(principalCreatorId, msg.sender, 3, block.timestamp);
-    }
-
-    function cancelMintAgentRequest(string calldata principalCreatorId) external {
-        if (!(bytes(principalCreatorId).length > 0)) revert EC(76);
-        bytes32 k = keccak256(abi.encodePacked(principalCreatorId, msg.sender));
-        if (!(_mintAgentDelegationPending[k])) revert EC(73);
-        delete _mintAgentDelegationPending[k];
-        emit MintAgentUpdate(principalCreatorId, msg.sender, 1, block.timestamp);
-    }
-
-    function mintAgentForCreator(string calldata creatorId) external view returns (address) {
-        return _mintAgentForCreator[creatorId];
-    }
-
-    function mintAgentDelegationPending(bytes32 key) external view returns (bool) {
-        return _mintAgentDelegationPending[key];
-    }
-
-    function delegateCreatorPublishing(address agent, uint256 expiresAt) external {
-        if (!(agent != address(0))) revert EC(21);
-        _requireRegistered();
-        if (!(expiresAt > block.timestamp)) revert EC(20);
-        _creatorPublishDelegation[msg.sender] = DelegationInfo({agent: agent, expiresAt: expiresAt});
-        emit CreatorPublishingDelegated(msg.sender, agent, expiresAt);
-    }
-
-    function revokeCreatorPublishing() external {
-        _requireRegistered();
-        delete _creatorPublishDelegation[msg.sender];
-        emit CreatorPublishingDelegationRevoked(msg.sender, block.timestamp);
-    }
-
-    function getCreatorPublishingDelegation(address creatorWallet)
-        external
-        view
-        returns (address agent, uint256 expiresAt)
-    {
-        DelegationInfo storage d = _creatorPublishDelegation[creatorWallet];
-        return (d.agent, d.expiresAt);
+        return _page(_childrenOf[parentId], offset, limit);
     }
 
     function _requireRegistered() internal view returns (string memory creatorId) {
@@ -283,17 +148,11 @@ contract ODPRegistryRelations {
     }
 
     function _requireAffiliationType(string memory creatorId) internal view {
-        IODPRegistryForRelations.CreatorRecord memory c = odpRegistry.getCreator(creatorId);
+        IODPRegistry.CreatorRecord memory c = odpRegistry.getCreator(creatorId);
         bytes1 t = c.typePrefix;
         if (!(t == TYPE_B || t == TYPE_M || t == TYPE_P)) revert EC(71);
     }
 
-    /**
-     * Rejects a link that would close a loop: `A` under `B` under `A` leaves every client
-     * that walks the chain spinning forever. Walks upward from the proposed parent and
-     * reverts if the child is already an ancestor. The walk is capped so gas stays bounded;
-     * a chain that does not reach a root within the cap is rejected rather than traversed.
-     */
     function _requireNoCycle(string memory parentId, string memory childId) internal view {
         bytes32 childKey = keccak256(bytes(childId));
         string memory cursor = parentId;
@@ -319,23 +178,15 @@ contract ODPRegistryRelations {
         revert EC(63);
     }
 
-    function _stringArraySlice(string[] storage arr, uint256 offset, uint256 limit)
-        internal
-        view
-        returns (string[] memory result, uint256 total)
-    {
-        total = arr.length;
-        if (offset >= total) {
-            return (new string[](0), total);
-        }
-        uint256 end = offset + limit;
-        if (end > total) {
-            end = total;
-        }
-        uint256 n = end - offset;
-        result = new string[](n);
-        for (uint256 i = 0; i < n; i++) {
-            result[i] = arr[offset + i];
-        }
+    function leaveAffiliation() external {
+        string memory childId = _registered();
+        string memory parentId = _parentOf[childId];
+        if (bytes(parentId).length == 0) revert EC(43);
+        _removeChildFromParentList(parentId, childId);
+        delete _parentOf[childId];
+        _activeChildrenCountByParent[parentId]--;
+        _affiliationDetachedAt[childId] = block.timestamp;
+        _lastDetachedParent[childId] = parentId;
+        emit AffiliationDetached(parentId, childId, block.timestamp);
     }
 }

@@ -1,0 +1,14 @@
+{
+  "scope": "read-only targeted observation, not full app audit",
+  "head": "61913a04cc7febcbc8510e0c246cd8f45b34ac5b",
+  "files": {
+    "Backend/Shared/Chain/CreatorRegistryPolicy.swift": "0a483987f05e3a68cb9bc1ec083cddb541d62d38e3a91e785abd219eabd92339",
+    "Backend/Shared/Minting/RegistryMintCall.swift": "7eda5e47cc60a1bbb11ca4a2fe1ddd0f4d9318ff6330f8b1b01b22910202e63e"
+  },
+  "observations": [
+    "approvedDeployment remains nil",
+    "Deployment ABI identity is only UInt8 version 7, lacks redesign generation and runtime pin",
+    "v7 mint encoder still includes principal address, URL fields and bool/string arguments; incompatible with redesign-5 core tuple plus bytes32 operationId"
+  ],
+  "changesMade": false
+}

@@ -56,3 +56,12 @@ web/.certs/
 # vendor datasheets, prices, competitor analysis — and the decisions they support
 # are recorded in commit messages and in the documents those decisions changed.
 docs/research/
+
+# Local deployment operator settings
+chain/deploy/mainnet-spend-policy.local.json
+chain/deploy-preflight.local.json
+
+# Sealed ABI6 audit package: kept locally, too large for git. Integrity is recorded in
+# review/ODP-0.7-ABI6-AUDIT.zip.sha256 and review/audit-handoff-verification.json.
+review/ODP-0.7-ABI6-AUDIT.zip
+review/audit-handoff-abi6/

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ODP 0.7 bundle receipt",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "odp-bundle-receipt-0.7"
+    },
+    "generationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "chainId": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "registry": {
+      "type": "string",
+      "pattern": "^0x(?!0{40}$)[0-9a-f]{40}$"
+    },
+    "passportId": {
+      "type": "string",
+      "pattern": "^ODP-[0-9]{4}-(0[1-9]|1[0-2])-[0-9]{9}$"
+    },
+    "transactionHash": {
+      "type": "string",
+      "pattern": "^0x[0-9a-f]{64}$"
+    },
+    "blockNumber": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "blockHash": {
+      "type": "string",
+      "pattern": "^0x[0-9a-f]{64}$"
+    },
+    "operationId": {
+      "type": "string",
+      "pattern": "^0x(?!0{64}$)[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "format",
+    "generationId",
+    "chainId",
+    "registry",
+    "passportId",
+    "transactionHash",
+    "blockNumber",
+    "blockHash",
+    "operationId"
+  ],
+  "additionalProperties": false
+}

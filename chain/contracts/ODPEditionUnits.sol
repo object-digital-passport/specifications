@@ -1,73 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
+import "./ODPSatellite.sol";
 
 import "./ODPErrors.sol";
-import { PassportMintInputs } from "./ODPPassportTypes.sol";
 
-/**
- * Satellite: edition unit keys and activation — SPEC 0.7 §20.
- *
- * An edition passport registers one Merkle root covering every unit key of a production
- * run, so 100 000 units cost 32 bytes on-chain. Each physical unit carries a keypair whose
- * seed is printed under a tamper-evident layer; presenting a signature from that key
- * records a one-time, public, timestamped activation.
- *
- * Deployed after `ObjectDigitalPassport`; the constructor pins one registry. Governance
- * must then point the registry at this satellite via `setEditionUnits`, which is what lets
- * the first activation close that edition's revocation window (§20.13).
- *
- * Deliberately NOT here: any judgement. A duplicate activation reverts, competing records
- * are surfaced rather than ranked, and nothing in this contract marks a unit as fake.
- */
-interface IODPRegistryForUnits {
-    /// @dev ABI must match `CreatorRecord` field order on `ObjectDigitalPassport.getCreator`.
-    struct CreatorRecord {
-        string creatorId;
-        address wallet;
-        bytes1 typePrefix;
-        uint256 timestamp;
-    }
-
-    /// @dev ABI must match `PassportHeaderView` field order on `ObjectDigitalPassport`.
-    struct PassportHeaderView {
-        string passportId;
-        uint8 contractVersion;
-        address creator;
-        address owner;
-        string creatorId;
-        uint32 year;
-        uint8 month;
-        string title;
-        string authorName;
-        string shortDescription;
-        string domain;
-        string objectType;
-    }
-
-    function getPassportHeader(string calldata passportId) external view returns (PassportHeaderView memory);
-    function getCreator(string calldata creatorId) external view returns (CreatorRecord memory);
-    function lockEditionRevocation(string calldata passportId) external;
-    function mintUnitPassport(
-        PassportMintInputs calldata m,
-        string calldata editionPassportId,
-        address unitOwner,
-        bool dataUrlIsFolderBase
-    ) external returns (string memory passportId);
-}
-
-contract ODPEditionUnits {
+contract ODPEditionUnits is ODPSatellite {
     bytes1 private constant TYPE_B = "B";
 
-    /// Bounds a proof to a tree of 2^32 leaves — the `unitCount` ceiling.
+    /// Absolute proof-length bound; canonical trees under the count cap need at most 20 levels.
     uint256 private constant MAX_PROOF = 32;
-
-    IODPRegistryForUnits public immutable odpRegistry;
 
     struct Edition {
         bytes32 merkleRoot;
         uint32 unitCount;
         bool open;
-        bool windowClosed; // revocation window already locked on the registry
+        bytes32 editionNonce;
         // SPEC §20.7 — the key an offline reader checks a signed outer label against.
         // address(0) = this edition prints plain labels. Immutable with the edition.
         address labelSigner;
@@ -79,84 +26,80 @@ contract ODPEditionUnits {
     }
 
     mapping(string => Edition) private _editions;
+    mapping(address => mapping(bytes32 => string)) private _editionPassportByNonce;
+    error EditionCommitmentMismatch();
+    error EditionNonceAlreadyUsed(string passportId);
     mapping(bytes32 => Activation) private _activations;
-
-    /// keccak(edition, unitIndex, owner) — one unit passport per owner, not one per unit.
-    mapping(bytes32 => bool) private _mintedForOwner;
-    /// keccak(edition, unitIndex) — every unit passport minted for that unit, in mint order.
-    mapping(bytes32 => string[]) private _unitPassports;
 
     event EditionOpened(
         string editionPassportId,
         bytes32 merkleRoot,
         uint32 unitCount,
         address labelSigner,
+        bytes32 editionNonce,
         address indexed issuer
     );
     event UnitActivated(string editionPassportId, uint32 indexed unitIndex, address indexed unitAddress, uint256 timestamp);
-    event UnitPassportMinted(
-        string editionPassportId,
-        uint32 indexed unitIndex,
-        address indexed unitOwner,
-        string passportId
-    );
 
-    constructor(address registry_) {
-        odpRegistry = IODPRegistryForUnits(registry_);
+    constructor(address registry_) ODPSatellite(registry_) {
     }
 
     // ─── Issuer surface ───────────────────────────────────────────────────────
 
-    /**
-     * SPEC §20.3 — register the unit-key set of an edition.
-     *
-     * The root has to exist on-chain as a plain value: `anchorsHash` commits the whole
-     * anchors array as one hash, which no contract can verify a proof against. Off-chain
-     * verifiers compare this root with the `unit_key_set` anchor; a mismatch is a tampered
-     * or misconfigured edition.
-     *
-     * `B` profiles only (§20.1), and only the edition's own creator. Write-once: a second
-     * production run is a second edition passport with its own key set.
-     */
     function openEdition(
         string calldata editionPassportId,
         bytes32 merkleRoot,
         uint32 unitCount,
-        address labelSigner
+        address labelSigner,
+        bytes32 editionNonce
     ) external {
         if (_editions[editionPassportId].open) revert EC(119);
         if (!(merkleRoot != bytes32(0))) revert EC(118);
-        if (!(unitCount > 0)) revert EC(122);
+        if (!(unitCount > 0 && unitCount <= 1_048_576)) revert EC(122);
 
-        IODPRegistryForUnits.PassportHeaderView memory h = odpRegistry.getPassportHeader(editionPassportId);
+        IODPRegistry.PassportHeaderView memory h = odpRegistry.getPassportHeader(editionPassportId);
         if (!(msg.sender == h.creator)) revert EC(120);
         if (!(odpRegistry.getCreator(h.creatorId).typePrefix == TYPE_B)) revert EC(121);
 
+        _registered();
+        IODPRegistry.PassportClassificationView memory c = odpRegistry.getPassportClassification(editionPassportId);
+        if (c.revoked) revert EC(11);
+        if (c.editionModel != 2 && c.editionModel != 3) revert EC(122);
+        if ((odpRegistry.getPassportMedia(editionPassportId).anchorTypesMask & 4096) == 0) revert EC(105);
+        if (editionNonce == bytes32(0)) revert EC(141);
+        if (odpRegistry.getPassportMedia(editionPassportId).editionCommitment !=
+            commitmentFor(h.creator, merkleRoot, unitCount, labelSigner, editionNonce)) {
+            revert EditionCommitmentMismatch();
+        }
+        string storage prior = _editionPassportByNonce[h.creator][editionNonce];
+        if (bytes(prior).length != 0) revert EditionNonceAlreadyUsed(prior);
+        _editionPassportByNonce[h.creator][editionNonce] = editionPassportId;
         _editions[editionPassportId] = Edition({
             merkleRoot: merkleRoot,
             unitCount: unitCount,
             open: true,
-            windowClosed: false,
+            editionNonce: editionNonce,
             labelSigner: labelSigner
         });
 
-        emit EditionOpened(editionPassportId, merkleRoot, unitCount, labelSigner, msg.sender);
+        emit EditionOpened(editionPassportId, merkleRoot, unitCount, labelSigner, editionNonce, msg.sender);
+    }
+
+    /// @notice Exact typed commitment to prepare before mint. No passportId circular dependency.
+    /// @dev Domain fixes unit derivation v2, SHA256/indexed-address leaves and duplicate-odd tree rules.
+    function commitmentFor(address issuer, bytes32 root, uint32 count, address labelSigner, bytes32 nonce)
+        public view returns (bytes32)
+    {
+        return keccak256(abi.encode("ODP-EDITION-COMMITMENT-0.7", block.chainid,
+            address(odpRegistry), issuer, address(this), nonce, root, count, labelSigner));
+    }
+
+    function editionPassportByNonce(address issuer, bytes32 nonce) external view returns (string memory) {
+        return _editionPassportByNonce[issuer][nonce];
     }
 
     // ─── Activation ───────────────────────────────────────────────────────────
 
-    /**
-     * SPEC §20.9 — record the first use of a unit key.
-     *
-     * Permissionless: the signature is authenticated, `msg.sender` is not. Whoever submits
-     * is a courier and gains nothing, so any relayer — an issuer's paymaster, a marketplace,
-     * any ODP-aware app, or the holder's own wallet — can carry it, and a signature may be
-     * produced offline and published years later.
-     *
-     * A duplicate reverts rather than succeeding as a no-op. That is a spam defence: a no-op
-     * would let anyone replay one valid signature indefinitely and drain whoever pays the
-     * fee, while a revert fails in simulation before any money moves.
-     */
     function activate(
         string calldata editionPassportId,
         uint32 unitIndex,
@@ -165,6 +108,7 @@ contract ODPEditionUnits {
     ) external {
         Edition storage ed = _editions[editionPassportId];
         if (!ed.open) revert EC(118);
+        if (odpRegistry.getPassportClassification(editionPassportId).revoked) revert EC(11);
         if (!(unitIndex < ed.unitCount)) revert EC(122);
 
         bytes32 slot = _slot(editionPassportId, unitIndex);
@@ -175,81 +119,18 @@ contract ODPEditionUnits {
 
         _activations[slot] = Activation({ timestamp: uint64(block.timestamp), unitAddress: unitAddress });
 
-        // §20.13 — the first activation of any unit closes the edition's revocation window.
-        if (!ed.windowClosed) {
-            ed.windowClosed = true;
-            odpRegistry.lockEditionRevocation(editionPassportId);
-        }
-
         emit UnitActivated(editionPassportId, unitIndex, unitAddress, block.timestamp);
-    }
-
-    // ─── Unit passports (§20.10) ──────────────────────────────────────────────
-
-    /**
-     * SPEC §20.10 — lazily mint a passport for one unit, owned by whoever the unit key names.
-     *
-     * The key names the owner and anyone may pay: the owner address is inside the signed
-     * message, so a buyer with a wallet mints to themselves, an issuer's service mints to the
-     * buyer rather than to itself, and a holder with no wallet names the unit address and
-     * keeps the bearer model. `msg.sender` confers nothing.
-     *
-     * Uniqueness is per `(unit, owner)`, never per unit. A rule of one-passport-per-unit
-     * would hand whoever mints first — including the holder of a cloned code — the power to
-     * lock the genuine holder out permanently, so competing passports are allowed and
-     * surfaced instead (§20.11). What is blocked is only re-minting for the same owner.
-     */
-    function mintUnitPassport(
-        string calldata editionPassportId,
-        uint32 unitIndex,
-        address unitOwner,
-        bytes32[] calldata proof,
-        bytes calldata signature,
-        PassportMintInputs calldata m,
-        bool dataUrlIsFolderBase
-    ) external returns (string memory passportId) {
-        Edition storage ed = _editions[editionPassportId];
-        if (!ed.open) revert EC(118);
-        if (!(unitIndex < ed.unitCount)) revert EC(122);
-        if (!(unitOwner != address(0))) revert EC(130);
-
-        // §20.10 — a unit passport presupposes a first use; there is no minting an unopened unit.
-        if (_activations[_slot(editionPassportId, unitIndex)].timestamp == 0) revert EC(128);
-
-        bytes32 ownerSlot = keccak256(abi.encodePacked(editionPassportId, unitIndex, unitOwner));
-        if (_mintedForOwner[ownerSlot]) revert EC(129);
-
-        address unitAddress = _recoverSigner(
-            mintPayloadHash(editionPassportId, unitIndex, unitOwner),
-            signature
-        );
-        if (!_proves(ed.merkleRoot, proof, unitIndex, unitAddress)) revert EC(123);
-
-        passportId = odpRegistry.mintUnitPassport(m, editionPassportId, unitOwner, dataUrlIsFolderBase);
-
-        _mintedForOwner[ownerSlot] = true;
-        _unitPassports[_slot(editionPassportId, unitIndex)].push(passportId);
-
-        emit UnitPassportMinted(editionPassportId, unitIndex, unitOwner, passportId);
     }
 
     // ─── Reads ────────────────────────────────────────────────────────────────
 
     function getEdition(string calldata editionPassportId)
-        external view returns (bytes32 merkleRoot, uint32 unitCount, bool open, bool windowClosed, address labelSigner)
+        external view returns (bytes32 merkleRoot, uint32 unitCount, bool open, bytes32 editionNonce, address labelSigner)
     {
         Edition storage ed = _editions[editionPassportId];
-        return (ed.merkleRoot, ed.unitCount, ed.open, ed.windowClosed, ed.labelSigner);
+        return (ed.merkleRoot, ed.unitCount, ed.open, ed.editionNonce, ed.labelSigner);
     }
 
-    /**
-     * SPEC §20.7 — the message a signed outer label carries.
-     *
-     * Verified **off-chain and offline**: a reader with the edition's `.odpass` bundle can
-     * check a label in a shop with no network at all. The contract publishes the key and
-     * never verifies a label itself — signing stops labels being *fabricated*, and nothing
-     * stops a genuine label being *photocopied*. Duplication is what activation catches.
-     */
     function labelPayloadHash(string calldata editionPassportId, uint32 unitIndex)
         public view returns (bytes32)
     {
@@ -278,23 +159,6 @@ contract ODPEditionUnits {
         return _activations[_slot(editionPassportId, unitIndex)].timestamp != 0;
     }
 
-    /**
-     * Every unit passport minted for this unit, in mint order. More than one is not an error
-     * (§20.11): a verifier reports them all, unranked and without a verdict, and mint order
-     * is explicitly not a ranking.
-     */
-    function getUnitPassports(string calldata editionPassportId, uint32 unitIndex)
-        external view returns (string[] memory)
-    {
-        return _unitPassports[_slot(editionPassportId, unitIndex)];
-    }
-
-    function hasUnitPassportFor(string calldata editionPassportId, uint32 unitIndex, address unitOwner)
-        external view returns (bool)
-    {
-        return _mintedForOwner[keccak256(abi.encodePacked(editionPassportId, unitIndex, unitOwner))];
-    }
-
     /// The message a unit key signs (§20.9), exposed so wallets and tools agree byte-for-byte.
     function activationPayloadHash(string calldata editionPassportId, uint32 unitIndex)
         public view returns (bytes32)
@@ -310,23 +174,6 @@ contract ODPEditionUnits {
         );
     }
 
-    /// The message a unit key signs to authorize a mint (§20.10); `unitOwner` is inside it,
-    /// which is what lets the payer and the owner be different parties.
-    function mintPayloadHash(string calldata editionPassportId, uint32 unitIndex, address unitOwner)
-        public view returns (bytes32)
-    {
-        return keccak256(
-            abi.encodePacked(
-                "ODP-UNIT-MINT-v1",
-                uint256(block.chainid),
-                address(this),
-                editionPassportId,
-                unitIndex,
-                unitOwner
-            )
-        );
-    }
-
     /// SPEC §20.3 leaf: `SHA-256( uint32be(index) || address20 )`.
     function unitLeaf(uint32 unitIndex, address unitAddress) public pure returns (bytes32) {
         return sha256(abi.encodePacked(unitIndex, unitAddress));
@@ -335,7 +182,7 @@ contract ODPEditionUnits {
     // ─── Internals ────────────────────────────────────────────────────────────
 
     function _slot(string calldata editionPassportId, uint32 unitIndex) private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(editionPassportId, unitIndex));
+        return keccak256(abi.encode(editionPassportId, unitIndex));
     }
 
     function _recoverSigner(bytes32 payloadHash, bytes calldata signature) private pure returns (address) {
@@ -359,11 +206,6 @@ contract ODPEditionUnits {
         return signer;
     }
 
-    /**
-     * SPEC §20.3 tree: interior node = `SHA-256(left || right)`, last node duplicated on an
-     * odd level. Direction is taken from the index rather than from flags in the proof, so a
-     * proof carries only siblings and cannot claim a position it does not have.
-     */
     function _proves(
         bytes32 root,
         bytes32[] calldata proof,

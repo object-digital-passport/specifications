@@ -1,0 +1,80 @@
+
+Detector: weak-prng
+ObjectDigitalPassport._currentMonth() (ObjectDigitalPassport.sol#490-497) uses a weak PRNG: "secsInYear = block.timestamp % 31_556_952 (ObjectDigitalPassport.sol#493)" 
+ObjectDigitalPassport._generateCreatorNumber() (ObjectDigitalPassport.sol#501-521) uses a weak PRNG: "n = uint64(uint256(keccak256(bytes)(abi.encodePacked(block.timestamp,block.prevrandao,msg.sender,baseNonce + i,gasleft()()))) % 1_000_000_000_000) (ObjectDigitalPassport.sol#508-514)" 
+ObjectDigitalPassport._generatePassportId(uint32,uint8) (ObjectDigitalPassport.sol#523-546) uses a weak PRNG: "n = uint32(uint256(keccak256(bytes)(abi.encodePacked(block.timestamp,block.prevrandao,msg.sender,baseNonce + i,key,gasleft()()))) % 1_000_000_000) (ObjectDigitalPassport.sol#531-538)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+Detector: incorrect-equality
+ObjectDigitalPassport._activeProfile() (ObjectDigitalPassport.sol#553-557) uses a dangerous strict equality:
+	- bytes(id).length == 0 (ObjectDigitalPassport.sol#555)
+ObjectDigitalPassport._beginMint(string) (ObjectDigitalPassport.sol#448-456) uses a dangerous strict equality:
+	- ! (_creators[creatorId].revokedAt == 0) (ObjectDigitalPassport.sol#454)
+ObjectDigitalPassport._checkAndIncrementMintLimit(string,address) (ObjectDigitalPassport.sol#468-478) uses a dangerous strict equality:
+	- t == TYPE_P || t == TYPE_M (ObjectDigitalPassport.sol#470)
+ObjectDigitalPassport._checkAndIncrementMintLimit(string,address) (ObjectDigitalPassport.sol#468-478) uses a dangerous strict equality:
+	- (t == TYPE_B) (ObjectDigitalPassport.sol#473)
+ObjectDigitalPassport._requireUtcYearMonth(uint32,uint8) (ObjectDigitalPassport.sol#459-462) uses a dangerous strict equality:
+	- ! (year == cy && month == cm) (ObjectDigitalPassport.sol#461)
+ObjectDigitalPassport._resolveMintPrincipal(string) (ObjectDigitalPassport.sol#429-446) uses a dangerous strict equality:
+	- bytes(creatorId).length == 0 (ObjectDigitalPassport.sol#436)
+ObjectDigitalPassport.revokeMintAgentRole() (ObjectDigitalPassport.sol#588-595) uses a dangerous strict equality:
+	- bytes(id).length == 0 (ObjectDigitalPassport.sol#590)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Detector: timestamp
+ObjectDigitalPassport.revokeCreator() (ObjectDigitalPassport.sol#213-220) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (bytes(creatorId).length > 0) (ObjectDigitalPassport.sol#215)
+ObjectDigitalPassport.getCreator(string) (ObjectDigitalPassport.sol#222-227) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (bytes(_creators[creatorId].creatorId).length > 0) (ObjectDigitalPassport.sol#225)
+ObjectDigitalPassport.revokePassport(string,bytes32) (ObjectDigitalPassport.sol#349-361) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _creators[p.creatorId].revokedAt != 0 (ObjectDigitalPassport.sol#354)
+	- block.timestamp > p.timestamp + REVOCATION_WINDOW (ObjectDigitalPassport.sol#355)
+ObjectDigitalPassport._resolveMintPrincipal(string) (ObjectDigitalPassport.sol#429-446) uses timestamp for comparisons
+	Dangerous comparisons:
+	- bytes(creatorId).length == 0 (ObjectDigitalPassport.sol#436)
+ObjectDigitalPassport._beginMint(string) (ObjectDigitalPassport.sol#448-456) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (_creators[creatorId].revokedAt == 0) (ObjectDigitalPassport.sol#454)
+ObjectDigitalPassport._requireUtcYearMonth(uint32,uint8) (ObjectDigitalPassport.sol#459-462) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! (year == cy && month == cm) (ObjectDigitalPassport.sol#461)
+ObjectDigitalPassport._checkAndIncrementMintLimit(string,address) (ObjectDigitalPassport.sol#468-478) uses timestamp for comparisons
+	Dangerous comparisons:
+	- t == TYPE_P || t == TYPE_M (ObjectDigitalPassport.sol#470)
+	- (t == TYPE_B) (ObjectDigitalPassport.sol#473)
+ObjectDigitalPassport._currentMonth() (ObjectDigitalPassport.sol#490-497) uses timestamp for comparisons
+	Dangerous comparisons:
+	- m > 12 (ObjectDigitalPassport.sol#495)
+ObjectDigitalPassport.passportExists(string) (ObjectDigitalPassport.sol#550-552) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _passports[id].creator != address(0) (ObjectDigitalPassport.sol#551)
+ObjectDigitalPassport._activeProfile() (ObjectDigitalPassport.sol#553-557) uses timestamp for comparisons
+	Dangerous comparisons:
+	- bytes(id).length == 0 (ObjectDigitalPassport.sol#555)
+	- _creators[id].revokedAt != 0 (ObjectDigitalPassport.sol#556)
+ObjectDigitalPassport._validateEditionBits(string,PassportMintInputs) (ObjectDigitalPassport.sol#558-561) uses timestamp for comparisons
+	Dangerous comparisons:
+	- (m.anchorTypesMask & (ODPAnchorBits.UNIT_KEY_SET | ODPAnchorBits.UNIT_VARIANT_COMMIT)) != 0 && _creators[id].typePrefix != TYPE_B (ObjectDigitalPassport.sol#559-560)
+ObjectDigitalPassport.revokeMintAgentRole() (ObjectDigitalPassport.sol#588-595) uses timestamp for comparisons
+	Dangerous comparisons:
+	- bytes(id).length == 0 (ObjectDigitalPassport.sol#590)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (ODPErrors.sol#2)
+	- ^0.8.20 (ODPPassportLib.sol#2)
+	- ^0.8.20 (ODPPassportTypes.sol#2)
+	- ^0.8.20 (ObjectDigitalPassport.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+ObjectDigitalPassport.sol analyzed (3 contracts with 102 detectors), 23 result(s) found
+'/private/tmp/odp-astra-cache/compilers-v3/macosx-amd64/solc-macosx-amd64-v0.8.20+commit.a1b79de6 --version' running
+'/private/tmp/odp-astra-cache/compilers-v3/macosx-amd64/solc-macosx-amd64-v0.8.20+commit.a1b79de6 ObjectDigitalPassport.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --optimize-runs 1 --evm-version shanghai --allow-paths .,/Users/Andrei/Проекты/GitHub/Object Digital Passport/specifications/chain/contracts' running

@@ -1,3 +1,5 @@
+> **Historical / superseded for ABI `0.7-redesign-8`.** The glossary, bundle layout, mutable status/owner model and web commands below belong to v0.6; they do not establish current website or app readiness. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+
 # Object Digital Passport — detailed guide (English)
 
 *This is the long-form project overview (formerly the root `README.md`). For a short entry point, see the [root README](../README.md). Friendly explainers live on the [project Wiki](https://github.com/object-digital-passport/specifications/wiki). Normative protocol: [SPEC.md](../SPEC.md). Documentation index: [README.md](README.md).*
@@ -274,7 +276,9 @@ Deployed at `chainId` 137 on 2026-07-24 (deployer `0xefB9f9Fa39965Ab1df3D244ecAE
 
 **Release notes:** [docs/V0.6.md](V0.6.md) (narrative) · [docs/RELEASE_v0.6.md](RELEASE_v0.6.md) (addresses, bytecode, changelog-style) · historical [docs/V0.5.md](V0.5.md) / [docs/V0.4.md](V0.4.md) / [docs/RELEASE_v0.4.1.md](RELEASE_v0.4.1.md) · **Earlier line (v0.3 vs v0.2):** [ru/RELEASE_v0.3.md](ru/RELEASE_v0.3.md).
 
-## Terms You Need
+## Terms You Need (historical v0.6)
+
+For terms of the current generation, use the [current glossary](GLOSSARY.md).
 
 
 | Term            | Meaning in ODP                                                                  |

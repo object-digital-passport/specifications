@@ -1,0 +1,99 @@
+{
+  "version": "0.7",
+  "passportId": null,
+  "title": "Object Community #1",
+  "authorName": "Example Holder",
+  "shortDescription": "Mixed-media painting, canvas/oil, 2025",
+  "description": "Signed mixed-media object with NFC-backed seal anchor.",
+  "creationDate": "2025-11",
+  "domain": "contemporary_art",
+  "objectType": "physical",
+  "status": "produced_object",
+  "contentClass": "static",
+  "aiStatus": "assisted",
+  "verificationMethod": "nfc",
+  "edition": {
+    "model": "unique"
+  },
+  "idGranularity": "item",
+  "authorship": {
+    "author": {
+      "name": "Example Holder",
+      "wallet": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      "creatorId": "C-482-930-174-005"
+    },
+    "team": "Studio North"
+  },
+  "anchors": [
+    {
+      "type": "photo",
+      "data": {
+        "role": "primary"
+      },
+      "hash": "sha256:a3f1c2d4e5b6978810aabbccddeeff00112233445566778899aabbccddeeff00"
+    },
+    {
+      "type": "photo",
+      "data": {
+        "role": "preview"
+      },
+      "hash": "sha256:9fc41c9a458391b364df2f5ef80f6f16f093c5b8336e6b9972123a5d7cf18cdd"
+    },
+    {
+      "type": "dimensions",
+      "data": {
+        "width": 60,
+        "height": 40,
+        "unit": "CMT",
+        "depth": 2
+      }
+    },
+    {
+      "type": "materials",
+      "data": {
+        "list": [
+          "canvas",
+          "oil paint"
+        ]
+      }
+    },
+    {
+      "type": "distinguishing_features",
+      "data": {
+        "text": "Craquelure lower-left quadrant; retouched 2 cm scratch near frame edge"
+      }
+    },
+    {
+      "type": "marks",
+      "data": {
+        "text": "Signed on reverse, studio stamp on stretcher"
+      }
+    },
+    {
+      "type": "nfc",
+      "data": {
+        "uid": "04a3f912cc8b4e",
+        "publicKey": "0f1e2d3c4b5a69788796a5b4c3d2e1f0",
+        "model": "NTAG424DNA_TAGTAMPER",
+        "installedAt": "2026-03-15"
+      }
+    }
+  ],
+  "year": 2026,
+  "month": 3,
+  "registeredAt": 1774204245,
+  "registration": {
+    "ianaTimeZone": "UTC",
+    "localIso8601": "2026-03-22T18:30:45+00:00",
+    "utcIso8601": "2026-03-22T18:30:45Z"
+  },
+  "refinementTags": [
+    "artwork",
+    "mixed_media",
+    "signed"
+  ],
+  "physical": {
+    "category": "artwork",
+    "medium": "mixed media"
+  }
+}

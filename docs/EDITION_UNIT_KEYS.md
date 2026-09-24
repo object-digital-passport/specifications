@@ -1,6 +1,8 @@
+> **Historical / superseded for ABI `0.7-redesign-8`.** The old diagrams, unit-passport/owner hooks, first-activation revocation lock, passportId-based key derivation and ready-reader claims below are superseded. ABI6 uses nonce-based v2, typed commitment and no unit passports; copied signatures/activation are not clone detection or ownership proof. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+
 # Edition passports and unit activation keys
 
-*Design note for the **v0.7** line. **Non-normative** — this document records the decisions and their rationale. The binding rules are **[`SPEC.md` §20](../SPEC.md#20-edition-passports-and-unit-activation-keys-v07-line-b-profile-only)**; where the two disagree, the spec wins.*
+*Design note for the **v0.7** line. **Non-normative** — this document records the decisions and their rationale. The binding rules are **[`SPEC.md` §20](../SPEC.md#20-edition-keys-and-activation)**; where the two disagree, the spec wins.*
 
 *Status: draft · Author: Andrei Chernikov · RU mirror: [`ru/EDITION_UNIT_KEYS.md`](ru/EDITION_UNIT_KEYS.md)*
 
@@ -345,7 +347,7 @@ One detail worth knowing early: the Merkle root has to be registered on-chain as
 | 1 | What does the secret prove? | Both one-time first use **and** repeatable possession — via a keypair, not a hash commitment. The secret never appears on-chain, so it cannot be front-run |
 | 2 | Passport granularity | One passport per **edition** + Merkle root of unit keys; per-unit passports **lazily minted** on demand |
 | 3 | Does the code identify a box or an object? | Both layers: box for everyone, object for those who lazily mint a unit passport |
-| 4 | Outer QR format | GS1 Digital Link **and** ODP identifiers in one symbol |
+| 4 | Outer QR format | ~~GS1 Digital Link and ODP identifiers in one symbol~~ Superseded 2026-09-21: `odp:` identifiers only, no web URL (SPEC §22.14) |
 | 5 | Who may publish activations? | Anyone — the contract checks the signature, not the sender |
 | 6 | Who owns a lazily minted unit passport? | The unit key (bearer), transferable to a real wallet later by signing with that key |
 | 7 | Behaviour on an already-activated code | Show the fact and the date. No verdict |

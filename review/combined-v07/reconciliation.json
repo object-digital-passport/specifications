@@ -1,0 +1,10 @@
+{
+  "comparedImplementationFiles": 73,
+  "changedSinceCodexSnapshot": [],
+  "cleanCoreRuntimeKeccak256": "0x4d915a931254b3b4e01fc4657278a875a03ef50ca9200ab30714f0322f79901c",
+  "sameAsOpusReportedRuntime": true,
+  "opusCompleteSnapshotAvailable": false,
+  "opusAdditionalTestsRerun": false,
+  "independentlyReproducedOpusFinding": "F-08",
+  "planSha256": "8ee69281f4729ae4cadd0436928928a14a14f64403aa692080c50835dcc20652"
+}

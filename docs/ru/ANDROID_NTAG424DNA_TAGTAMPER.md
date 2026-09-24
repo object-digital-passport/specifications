@@ -1,3 +1,5 @@
+> **Исторический материал, заменён для ABI `0.7-redesign-8`.** NFC hardware/transport отложен; старое руководство не подтверждает реализованную или физически проверенную поддержку. Нормативна [английская SPEC](../../SPEC.md); см. [app handoff](../../ODP_07_APP_HANDOFF.md), [глоссарий](GLOSSARY.md), [дельту](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md). Эта страница не разрешает кошелёк или внешнюю сеть.
+
 # Android-гайд: NTAG 424 DNA TagTamper с ODP
 
 Этот гайд описывает практический стек `ODP + NTAG 424 DNA TagTamper`, когда одного браузера уже недостаточно.
@@ -6,13 +8,14 @@
 
 - `ODP web` нужен для выпуска паспорта, публикации `nfcPublicKey`, сборки `.odpass`, сборки `odpOffline` и якорения `ndppCommitmentHash`.
 - `NXP TagWriter` нужен для записи tap carrier.
-- `Tag TrustLink Android` (или другое совместимое приложение для NTAG 424 DNA) нужен для аутентификации чипа и чтения статуса TagTamper.
+- В текущем пилоте на Pixel APK `ODP Android Companion` импортирует Android handoff, выполняет живое сканирование, пробует EV2/аутентифицированное чтение и сравнивает байты защищённого файла с on-chain `nfcPublicKey`.
+- `Tag TrustLink Android` (или другое совместимое приложение для NTAG 424 DNA) оставьте как полезную перекрёстную проверку или запасной ориентир, когда нужно внешнее второе мнение об аутентификации чипа или состоянии TagTamper.
 
 Это разные шаги доверия:
 
 1. открытие carrier не равно аутентификации чипа,
 2. аутентификация чипа ещё не означает привязку chip-to-passport,
-3. привязка chip-to-passport делается сравнением результата чипа с on-chain `nfcPublicKey`,
+3. привязка chip-to-passport делается сравнением задокументированного живого результата mirror-profile с on-chain `nfcPublicKey`,
 4. проверка ODP `.odpass` / `dataHash` снова отдельна.
 
 ODP остаётся слоем реестра и проверки хэшей. Android-приложение — это NFC runtime.
@@ -67,17 +70,37 @@ Tag TrustLink — это шаг аутентификации чипа. Сам п
 
 Для первого практического прототипа Android сейчас оптимален. iPhone может быть полезен через native app, но не через один только браузер.
 
+## Протокол пилота на Pixel
+
+Короткий практический путь проверки для текущего пилота с **пошаговым** Android companion:
+
+1. Выпустите паспорт в ODP web с `nfcModel = NTAG424DNA_TAGTAMPER`, запишите `physical.seal.nfc.uid` в `passport.json` и опубликуйте 16-байтовый ключ приложения EV2 как on-chain `nfcPublicKey`.
+2. Экспортируйте Android handoff из `Verify` (после загрузки `passport.json` / `.odpass`, чтобы в него попал `nfcUid`) или из `Manage passport`; пилот заранее выбирает `odp-ntag424-ev2-symmetric-cr-v1`, когда `nfcPublicKey` занимает 16 байт.
+3. Установите debug-APK Android companion на Pixel с включённым NFC.
+4. Откройте handoff и пройдите пошаговые экраны (`Get setup` → `Review values` → необязательный файл → `Tap NFC now`).
+5. При желании импортируйте на шаге необязательного файла локальный `.odpass` или `passport.json`, чтобы канонический `dataHash` тоже проверился на устройстве.
+6. Если метке нужна аутентификация EV2, откройте `Operator tools`, введите локальные данные сессионной аутентификации, затем вернитесь в пошаговое сканирование или сканируйте из режима оператора.
+7. Приложите Pixel к объекту. Сначала прочитайте результат простыми словами, затем при необходимости `Technical details`. Для паспортов с TagTamper ищите **`highAssuranceSeal = pass`**: ключ EV2 совпал + аутентифицированный TagTamper INTACT + UID чипа совпал, когда он ожидается.
+8. Tag TrustLink используйте только как дополнительный ориентир, если нужен второй путь проверки; основным путём пилота он больше не является.
+
 ## Рекомендуемый issuer flow
 
 ### 1. Подготовьте чип
 
-Сначала провижньте физическую метку в своей NFC toolchain.
+Подготовьте (провижньте) физическую метку на телефоне или в инструментах NXP.
+
+**ODP Android Companion (рекомендуется на Pixel):** Issue workflow → **Prepare to provision** → подтвердите → приложите метку → скопируйте JSON `odp-chip-provision`. Подготовка оставляет NDEF **доступным для записи** (ключ EV2 0) до шага **Write NFC carrier** после минта, который затем переводит CC/NDEF в режим только для чтения.
+
+**NXP TagWriter / ПК:** тот же результат, если метка уже персонализирована в другом месте.
 
 Минимально вам нужны:
 
 - реальный чип
-- публичный ключ или другой публичный verification material, который вы хотите опубликовать через ODP
+- **16-байтовый ключ приложения EV2** из подготовки (он становится on-chain `nfcPublicKey`)
+- успешное сканирование **issuer-chip-setup** в Android companion **до** минта (см. [ISSUER_NFC_FLOW.md](./ISSUER_NFC_FLOW.md))
 - tamper-aware установка чипа на объект
+
+Библиотека: подготовка использует вендоренный код из [AndroidCrypto/Ntag424SdmFeature](https://github.com/AndroidCrypto/Ntag424SdmFeature) (`net.bplearning.ntag424`, MIT). См. [odp-android-companion/ntag424-dna/NOTICE.md](https://github.com/object-digital-passport/odp-android-companion/blob/main/ntag424-dna/NOTICE.md).
 
 ### 2. Выпустите ODP-паспорт
 
@@ -106,7 +129,7 @@ Tag TrustLink — это шаг аутентификации чипа. Сам п
 
 Если вы используете NDPP-совместимый carrier mode:
 
-- **первая** NDEF-запись — это Verify link
+- **первая** NDEF-запись — это ODP Verify link
 - **вторая** запись несёт детерминированный `odp:off` payload
 - `ndppCommitmentHash` всё равно хэширует только raw-байты второй записи
 - `ndppCommitmentUri` должен указывать на размещённую копию этих же raw public payload bytes, а не на страницу Verify
@@ -126,14 +149,22 @@ ODP web также показывает Android helper block с:
 
 Рекомендуемый паттерн:
 
-1. держите стандартную URL / URI запись первой
-2. ведите её на ODP Verify URL, например:
+1. запишите URI `odp://` первой записью — он называет паспорт и ничего больше:
 
 ```text
-https://your-site.example/verify.html?id=ODP-...
+odp://ODP-2026-03-004829301
 ```
 
-3. если нужен ODP offline payload на том же carrier, запишите экспортированный ODP `.ndef` файл
+2. если нужен ODP offline payload на том же carrier, вместо этого запишите экспортированный файл `.ndef`
+3. добавляйте HTTPS-запись, только если вы решили принять её цену — см. ниже
+
+**Не записывайте имя хоста, если не готовы к тому, что это навсегда.** `SPEC.md` §12 и §22.14 прямо говорят, что
+имя хоста не печатается: URL на метке — это обещание о сервере, закреплённое на объекте, который
+переживёт этот сервер. Раньше эта документация советовала записывать сюда адрес GitHub Pages проекта.
+Это было ошибкой, и любая записанная так метка продолжает указывать туда, куда в итоге будет вести этот адрес.
+
+HTTPS-запись — настоящее удобство: телефон без обработчика ODP хоть что-то откроет, —
+поэтому она остаётся доступной. Это выбор с последствиями, а не вариант по умолчанию.
 
 Практический смысл:
 
@@ -150,7 +181,7 @@ https://your-site.example/verify.html?id=ODP-...
 1. приложите Android к объекту
 2. в Tag TrustLink выполните chip-side validation / secure-message flow
 3. прочитайте там же TagTamper state
-4. сравните public key чипа из Android-результата с on-chain `nfcPublicKey` в ODP
+4. сравните задокументированные живые байты mirror-profile из Android-результата с on-chain `nfcPublicKey` в ODP
 5. затем используйте ODP Verify, чтобы сравнить:
    - Passport ID
    - issuer / creator
@@ -193,7 +224,7 @@ https://your-site.example/verify.html?id=ODP-...
 
 Браузер **не** умеет:
 
-- низкоуровневый NTAG 424 DNA challenge-response
+- низкоуровневый EV2/аутентифицированный read flow для NTAG 424 DNA
 - чтение TagTamper status
 - прямую secure-аутентификацию чипа
 
@@ -202,16 +233,19 @@ https://your-site.example/verify.html?id=ODP-...
 - `web` для ODP registry и payload tooling
 - `Android app` для аутентификации чипа и статуса tamper
 
-## Рекомендуемый MVP
+Низкоуровневая работа с NTAG 424 DNA может опираться на источники вроде `AndroidCrypto/Ntag424SdmFeature`, но это должно оставаться техническим материалом, а не архитектурой самого ODP-верификатора.
+
+## Рекомендуемый текущий пилот
 
 Если нужен реалистичный первый деплой:
 
 1. используйте ODP web для выпуска
 2. используйте URL-first NFC carrier для tap entry
-3. используйте Tag TrustLink Android для аутентификации чипа / статуса tamper
+3. используйте APK ODP Android Companion на Pixel для импорта handoff, EV2/аутентифицированного чтения и пилотного `chipKeyMatch`
 4. используйте ODP Verify для реестра и целостности файлов
-5. сравнивайте Android-результат чипа с on-chain `nfcPublicKey`
+5. сравнивайте результат Android companion с on-chain `nfcPublicKey`
+6. Tag TrustLink используйте только как необязательную перекрёстную проверку, а не как основной путь пилота
 
-Так вы уже сейчас получаете рабочую связку ODP + TagTamper, не дожидаясь отдельного custom native ODP verifier app.
+Так вы уже получаете рабочую связку ODP + TagTamper для текущего пилота, не заявляя полностью универсального верификатора по максимуму спецификации и полностью заданного нативного пути произвольного challenge-response.
 
 Для объёма dedicated-app смотрите `docs/ANDROID_VERIFIER_MVP.md`.

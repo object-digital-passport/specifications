@@ -1,0 +1,18 @@
+
+> object-digital-passport@0.7.0 compile
+> hardhat compile && node deploy/scripts/eip170-report.mjs && node deploy/scripts/export-abi.mjs && node deploy/scripts/normalize-typechain.mjs
+
+
+Compiled 16 Solidity files with solc 0.8.20 (evm target: shanghai)
+ObjectDigitalPassport: 12129/24576 runtime bytes
+ODPEditionUnits: 6482/24576 runtime bytes
+ODPAuthorAttestation: 4966/24576 runtime bytes
+ODPPassportConcerns: 4529/24576 runtime bytes
+ODPHosting: 3821/24576 runtime bytes
+ODPProfileDirectory: 2495/24576 runtime bytes
+ODPRegistryRelations: 7255/24576 runtime bytes
+ODPPassportProofRegistry: 6205/24576 runtime bytes
+ODPWalletDocumentAnchor: 2507/24576 runtime bytes
+ODPStatementJournal: 5903/24576 runtime bytes
+Exported 0.7-redesign-4 ABI: 11 interfaces
+Normalized deterministic TypeChain export/overload ordering

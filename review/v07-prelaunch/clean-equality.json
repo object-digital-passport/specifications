@@ -1,0 +1,19 @@
+{
+  "compilerInputExact": true,
+  "compilerOutputExact": true,
+  "lockfileExact": true,
+  "generatedFileCount": 43,
+  "generatedFilesExact": true,
+  "contracts": [
+    "ObjectDigitalPassport",
+    "ODPEditionUnits",
+    "ODPAuthorAttestation",
+    "ODPPassportConcerns",
+    "ODPHosting",
+    "ODPProfileDirectory",
+    "ODPRegistryRelations",
+    "ODPPassportProofRegistry",
+    "ODPWalletDocumentAnchor",
+    "ODPStatementJournal"
+  ]
+}

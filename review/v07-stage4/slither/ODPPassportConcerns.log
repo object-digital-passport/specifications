@@ -1,0 +1,63 @@
+Traceback (most recent call last):
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/platform/solc.py", line 424, in get_version
+    with subprocess.Popen(
+         ~~~~~~~~~~~~~~~~^
+        cmd,
+        ^^^^
+    ...<3 lines>...
+        executable=shutil.which(cmd[0]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as process:
+    ^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1990, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+OSError: [Errno 86] Bad CPU type in executable: '/Users/Andrei/Library/Caches/hardhat-nodejs/compilers-v3/macosx-amd64/solc-macosx-amd64-v0.8.20+commit.a1b79de6'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/private/tmp/odp-v07-static/bin/slither", line 6, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/slither/__main__.py", line 815, in main
+    main_impl(all_detector_classes=detectors, all_printer_classes=printers)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/slither/__main__.py", line 936, in main_impl
+    ) = process_all(filename, args, detector_classes, printer_classes)
+        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/slither/__main__.py", line 100, in process_all
+    compilations = compile_all(target, **vars(args))
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/crytic_compile.py", line 870, in compile_all
+    compilations.append(CryticCompile(target, **kwargs))
+                        ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/crytic_compile.py", line 279, in __init__
+    self._compile(**kwargs)
+    ~~~~~~~~~~~~~^^^^^^^^^^
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/crytic_compile.py", line 725, in _compile
+    self._platform.compile(self, **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/platform/solc.py", line 195, in compile
+    targets_json = _get_targets_json(compilation_unit, self._target, **kwargs)
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/platform/solc.py", line 324, in _get_targets_json
+    return _run_solc(
+        compilation_unit,
+    ...<6 lines>...
+        force_legacy_json=force_legacy_json,
+    )
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/platform/solc.py", line 553, in _run_solc
+    version=get_version(solc, env),
+            ~~~~~~~~~~~^^^^^^^^^^^
+  File "/private/tmp/odp-v07-static/lib/python3.14/site-packages/crytic_compile/platform/solc.py", line 443, in get_version
+    raise InvalidCompilation(error)
+crytic_compile.platform.exceptions.InvalidCompilation: [Errno 86] Bad CPU type in executable: '/Users/Andrei/Library/Caches/hardhat-nodejs/compilers-v3/macosx-amd64/solc-macosx-amd64-v0.8.20+commit.a1b79de6'
+'/Users/Andrei/Library/Caches/hardhat-nodejs/compilers-v3/macosx-amd64/solc-macosx-amd64-v0.8.20+commit.a1b79de6 --version' running

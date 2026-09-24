@@ -1,0 +1,51 @@
+{
+  "version": "0.7",
+  "passportId": "ODP-2026-03-000193847",
+  "title": "Untitled #7",
+  "authorName": "Example Holder",
+  "shortDescription": "Generative image, TIFF original, 2026",
+  "description": "Single-edition digital work with optional C2PA manifest.",
+  "creationDate": "2026-02-18",
+  "domain": "digital_art",
+  "objectType": "digital",
+  "status": "produced_object",
+  "contentClass": "static",
+  "aiStatus": "generated",
+  "verificationMethod": "c2pa",
+  "edition": { "model": "unique" },
+  "idGranularity": "item",
+  "anchors": [
+    {
+      "type": "file_hash",
+      "hash": "sha256:c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4"
+    },
+    {
+      "type": "perceptual_hash",
+      "data": { "algorithm": "pdq", "value": "f8f8091a2b3c4d5e" }
+    },
+    {
+      "type": "c2pa",
+      "hash": "sha256:d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5",
+      "data": { "activeManifest": "Adobe Content Credentials" }
+    }
+  ],
+  "year": 2026,
+  "month": 3,
+  "registeredAt": 1748000000,
+  "registration": {
+    "ianaTimeZone": "UTC",
+    "localIso8601": "2026-03-22T18:30:45+00:00",
+    "utcIso8601": "2026-03-22T18:30:45Z"
+  },
+  "refinementTags": ["image", "generative"],
+  "digital": {
+    "subtype": "image",
+    "format": "TIFF",
+    "fileHash": "sha256:c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4",
+    "fileSize": 48392810,
+    "c2pa": {
+      "manifestHash": "sha256:d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5",
+      "activeManifest": "Adobe Content Credentials"
+    }
+  }
+}

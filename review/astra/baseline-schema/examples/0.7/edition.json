@@ -1,0 +1,118 @@
+{
+  "version": "0.7",
+  "passportId": "ODP-2026-08-004829415",
+  "title": "Little Wanderers — Series One",
+  "authorName": "Example Holder",
+  "shortDescription": "Blind-box vinyl figure series, edition of 100000.",
+  "description": "Signed mixed-media object with NFC-backed seal anchor.",
+  "creationDate": "2025-11",
+  "domain": "contemporary_art",
+  "objectType": "physical",
+  "status": "produced_object",
+  "contentClass": "static",
+  "aiStatus": "assisted",
+  "verificationMethod": "nfc",
+  "edition": {
+    "model": "limited",
+    "total": 100000
+  },
+  "idGranularity": "batch",
+  "authorship": {
+    "author": {
+      "name": "Example Holder",
+      "wallet": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      "creatorId": "C-482-930-174-005"
+    },
+    "team": "Studio North"
+  },
+  "anchors": [
+    {
+      "type": "photo",
+      "data": {
+        "role": "primary"
+      },
+      "hash": "sha256:a3f1c2d4e5b6978810aabbccddeeff00112233445566778899aabbccddeeff00"
+    },
+    {
+      "type": "dimensions",
+      "data": {
+        "width": 60,
+        "height": 40,
+        "unit": "CMT",
+        "depth": 2,
+        "upperTolerance": 0.3,
+        "lowerTolerance": 0.3
+      }
+    },
+    {
+      "type": "materials",
+      "data": {
+        "list": [
+          "canvas",
+          "oil paint"
+        ]
+      }
+    },
+    {
+      "type": "distinguishing_features",
+      "data": {
+        "text": "Craquelure lower-left quadrant; retouched 2 cm scratch near frame edge"
+      }
+    },
+    {
+      "type": "marks",
+      "data": {
+        "text": "Signed on reverse, studio stamp on stretcher"
+      }
+    },
+    {
+      "type": "nfc",
+      "data": {
+        "uid": "04a3f912cc8b4e",
+        "publicKey": "0f1e2d3c4b5a69788796a5b4c3d2e1f0",
+        "model": "NTAG424DNA_TAGTAMPER",
+        "installedAt": "2026-03-15"
+      }
+    },
+    {
+      "type": "unit_key_set",
+      "data": {
+        "merkleRoot": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "unitCount": 100000,
+        "hashAlg": "sha256",
+        "leafFormat": "sha256(uint32be(index) || address20)",
+        "addressListUrl": "https://example.com/editions/series-one/units.bin",
+        "addressListHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "labelSignerKey": "0x1111111111111111111111111111111111111111"
+      },
+      "verification": "Rebuild the tree from the published address list and compare with the root registered in ODPEditionUnits."
+    },
+    {
+      "type": "unit_variant_commit",
+      "data": {
+        "merkleRoot": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "unitCount": 100000,
+        "hashAlg": "sha256",
+        "leafFormat": "sha256(uint32be(index) || uint16be(len(variant)) || utf8(variant) || salt32)"
+      },
+      "verification": "Open the box, take the salt from the card inside, recompute the commitment (SPEC 20.4)."
+    }
+  ],
+  "year": 2026,
+  "month": 3,
+  "registeredAt": 1748000000,
+  "registration": {
+    "ianaTimeZone": "UTC",
+    "localIso8601": "2026-03-22T18:30:45+00:00",
+    "utcIso8601": "2026-03-22T18:30:45Z"
+  },
+  "refinementTags": [
+    "artwork",
+    "mixed_media",
+    "signed"
+  ],
+  "physical": {
+    "category": "artwork",
+    "medium": "mixed media"
+  }
+}

@@ -1,0 +1,216 @@
+
+> object-digital-passport@0.1.0 test
+> hardhat test
+
+◇ injected env (0) from deploy/.env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from deploy/user-setup/private.local.env // tip: ⌘ override existing { override: true }
+WARNING: PRIVATE_KEY not set — copy chain/deploy/user-setup/private.local.env.example to chain/deploy/user-setup/private.local.env and fill PRIVATE_KEY (see chain/deploy/user-setup/README.md).
+No contracts to compile
+
+Running Solidity tests
+
+
+Running Mocha tests
+
+
+  ODP 0.7 audit PoC
+    A. extension router + tx.origin
+      ✔ A1: a contract the victim calls mints a passport under the VICTIM's profile with attacker content (68ms)
+      ✔ A2: the card has no edit path, so the victim's only remedy is revoke + a permanent revoked record
+    B. edition unit keys
+      ✔ B1: a unit-key holder writes ARBITRARY card content into a passport attributed to the brand (60ms)
+      ✔ B2: ONE unit key mints an unbounded number of passports under the brand, bypassing monthly caps (90ms)
+      ✔ B3: a REVOKED issuer profile still issues unit passports (mintUnitPassport skips _beginMint) (49ms)
+      ✔ B4: any holder of any one unit key permanently destroys the issuer's revocation remedy for the whole edition
+    C. creator vs owner after transfer
+      ✔ C1: after a sale the ORIGINAL creator can still revoke, re-point URLs and rewrite lifecycle status
+      ✔ C2: revokeCreator() does NOT stop a stolen key from revoking every passport that profile ever issued
+      ✔ C3: a buyer permanently squats the one-shot author attestation slot (39ms)
+    D. open institutional registration
+      ✔ D1: anyone self-registers as P and permanently flags a stranger's passport; only they can clear it
+      ✔ D2: satellites cannot see profile revocation — a stopped P profile keeps flagging
+      ✔ D3: the stale 4-field CreatorRecord copy decodes without reverting (silent, not loud)
+    E. events and client recovery
+      ✔ E1: passportId is NOT recoverable from the receipt — the topic holds only keccak256 of the id
+      ✔ E2: an initialOwner recipient cannot find their passport from logs or from the creator index
+      ✔ E3: the deploy script's own smoke-test mint tuple no longer matches the 0.7 ABI
+    F. freeze and governance
+      ✔ F1: handing governance to a multisig does not take freeze() away from the deployer
+      ✔ F2: freeze locks owners out of transfer and revocation, permanently
+      ✔ F3: satellites keep accepting writes after the registry is frozen
+      ✔ F4: satellite rebinding is silent — no event records a change of governance or of any satellite
+    G. what the anchors prove
+      ✔ G1: anchorTypesMask is self-declared — a mint may claim anchors it does not have
+      ✔ G2: two different profiles register the very same file — no global uniqueness
+
+  ODP 0.7 audit PoC (part 2)
+    ✔ H1: a watcher copies the unit signature from the mempool and locks the buyer out of their own unit forever (38ms)
+    ✔ I1: whatever address governance names as editionUnits can mint under ANY profile — a plain C artist included
+    ✔ I2: the same address permanently strips ANY passport of its revocation remedy
+    ✔ I3: governance rewiring and satellite writes survive freeze(), while every user path is shut
+    ✔ J1: a unit passport carries no on-chain link to the edition it came from
+    ✔ J2: PassportUrlsUpdated does not say who changed the URL
+    ✔ J3: the owner cannot revoke a publishing delegation the creator granted
+
+  ODP 0.7 audit PoC (part 3)
+    ✔ K1: a relations satellite that simply lies lets an attacker mint under any profile
+    ✔ K2: the same lying satellite re-points the URLs of a passport it has nothing to do with
+    ✔ L1: the passport ID is not a function of the transaction — a re-broadcast yields a different ID
+    ✔ L2: re-sending the same mint creates a second passport — there is no idempotency key
+    ✔ L3: crossing the UTC month boundary invalidates the prepared document, not just the arguments
+    ✔ L4: a folder-base dataUrl cannot be uploaded before the mint — the path contains the unknown ID
+    ✔ L5: nothing validates the URL scheme — a passport may carry javascript: in a field clients render
+    ✔ L6: the same passport ID string can exist in two different registries
+
+  signed outer labels — payload pinned against Solidity (§20.7)
+    ✔ the specified payload hash equals the contract's
+    ✔ accepts the issuer's signature and rejects a forger's
+    ✔ a label cannot be moved to another unit
+    ✔ garbage in the signature slot is invalid, never a crash
+
+  ODPEditionUnits — SPEC 0.7 §20
+    opening an edition (§20.1, §20.3)
+      ✔ a B profile opens its own edition and the root is readable
+      ✔ rejects a C profile — B only (EC 121)
+      ✔ rejects anyone but the edition's own creator (EC 120) (52ms)
+      ✔ is write-once — a second run needs its own edition passport (EC 119)
+    signed outer labels (§20.7)
+      ✔ publishes the label signer with the edition
+      ✔ a label signature verifies offline against the published key
+      ✔ a fabricated label fails — a forger has no signer key
+      ✔ a label cannot be moved to another unit — the index is signed
+      ✔ an edition may print plain labels — signer is optional
+    activation (§20.9)
+      ✔ records once, from any sender, and reports the timestamp
+      ✔ the submitter gains nothing — a sponsor is a courier
+      ✔ a duplicate reverts rather than costing a sponsor a second fee (EC 124)
+      ✔ a key outside the run fails the proof (EC 123)
+      ✔ a genuine key cannot be replayed at another index (EC 123)
+      ✔ rejects an out-of-range index (EC 122) and an unknown edition (EC 118)
+      ✔ rejects a malformed signature (EC 125)
+      ✔ a signature made offline verifies later from any sender
+    the revocation window (§20.13)
+      ✔ the issuer may revoke before any activation
+      ✔ the first activation closes the window permanently (EC 116)
+      ✔ governance cannot revoke either once the window has closed
+      ✔ only the paired satellite may set the lock (EC 117)
+      ✔ only governance may pair the satellite (EC 56)
+    core hooks (§20.10, §20.13)
+      ✔ initialOwner names the owner; zero still means the minting principal
+      ✔ edition notice (kind 8) is accepted and appends
+      ✔ CONTRACT_VERSION is the 0.7 line
+    unit passports (§20.10)
+      ✔ the key names the owner and anyone may pay (38ms)
+      ✔ a holder with no wallet can name the unit address itself (bearer path)
+      ✔ rejects a unit that was never activated (EC 128)
+      ✔ blocks a repeat for the same owner (EC 129) but allows a competing one (45ms)
+      ✔ a signature for one owner cannot mint to another (EC 123)
+      ✔ rejects a key outside the run (EC 123) and a zero owner (EC 130)
+      ✔ only the paired satellite may reach the core mint (EC 117)
+      ✔ the unit passport carries the minter's own anchors, not the edition's
+    the tree itself
+      ✔ the contract's leaf matches the off-chain construction
+      ✔ verifies every unit of an odd-sized run (44ms)
+
+  SPEC 0.7 §20 known-answer vectors
+    ✔ the printed code round-trips to the vector's unit address
+    ✔ a corrupted code is caught by the check characters
+    ✔ Solidity computes the same leaves
+    ✔ the vector proofs verify against the vector root, in Solidity (41ms)
+    ✔ the vector root matches the tree rebuilt from the leaves
+
+  ODPPassportLib.utcYearMonthFromTimestamp
+    ✔ 1970-01-01 00:00:00 UTC → 1970-01
+    ✔ 1970-01-01 23:59:59 UTC → 1970-01
+    ✔ 1970-01-02 00:00:00 UTC → 1970-01 day 2 (still January)
+    ✔ 1971-01-01 00:00:00 UTC → 1971-01
+    ✔ 2000-02-29 UTC → 2000-02 (leap day)
+    ✔ 2001-02-28 UTC → 2001-02 (non-leap)
+    ✔ 2026-03-15 UTC → 2026-03
+    ✔ last second of year → December
+
+  ObjectDigitalPassport
+    ✔ CONTRACT_VERSION matches major*16+minor (internal SPEC_* constants)
+    UTC year/month (mint & submitProof)
+      ✔ reverts EC(68) when mint year/month do not match block UTC calendar
+      ✔ reverts EC(68) when submitProof month does not match block UTC
+    0.6 on-chain card
+      ✔ stores title/authorName/shortDescription/domain and anchors summary
+      ✔ PassportMinted carries card and anchors fields
+      ✔ card validation: empty/oversized title, authorName, shortDescription (40ms)
+    0.6 anchors hard minimum
+      ✔ reverts EC(103) when anchorsHash is zero
+      ✔ reverts EC(105) when physical mask lacks the identification minimum
+      ✔ reverts EC(106) when physical mint carries a fileHash
+      ✔ reverts EC(107) when physical mint has no primary imageHash
+      ✔ reverts EC(29) when digital mint has no fileHash and EC(105) without FILE_HASH bit
+      ✔ mintMixed requires both physical minimum and file anchor
+    0.6 append-only passport events
+      ✔ STATUS event updates lifecycleStatus and the summary counters (38ms)
+      ✔ DAMAGE event with attachment; history only appends
+      ✔ owner (after transfer) and governance may record; strangers get EC(98)
+      ✔ validates kind, value, and attachment pair
+      ✔ revoked passport accepts no further events
+    getRemainingMints by tier
+      ✔ C: after one mint, remaining is MONTHLY_LIMIT_C - 1
+      ✔ B: after one mint, remaining is MONTHLY_LIMIT_B - 1
+      ✔ P: getRemainingMints stays at uint32 max (unlimited)
+      ✔ M: getRemainingMints stays at uint32 max (unlimited)
+      ✔ M: can submitProof like P; documentHash is stored (38ms)
+    _resolveMintDataUrl (via mintDigital + getPassport)
+      ✔ stores folderBase/passportId.odpass and strips trailing slashes
+      ✔ does not normalize // in the middle of the path (only trailing slashes)
+      ✔ updatePassportUrls sets literal URLs (no folder resolution)
+    ownership and lifecycle
+      ✔ owner starts as creator; transferPassport moves owner
+      ✔ governance or creator can revokePassport; submitProof fails when revoked (39ms)
+      ✔ detachAffiliation sets audit timestamps and clears active parent (43ms)
+    affiliation (B / M / P, display-only)
+      ✔ links across types: a B sub-brand may sit under an M collection (39ms)
+      ✔ rejects C on either side of the link with EC(71)
+      ✔ a parent may itself gain a parent later: school -> university -> consortium (47ms)
+      ✔ refuses a direct cycle: a child cannot become its own parent's parent — EC(67) (39ms)
+      ✔ refuses a cycle through three profiles — EC(67) (45ms)
+      ✔ caps the ancestor walk: an 8-deep chain links, the 9th link reverts EC(69) (93ms)
+    freeze (v0.x safety hatch)
+      ✔ only the deployer may freeze; non-deployer reverts EC(57)
+      ✔ after freeze, writes revert EC(58) but reads still work (39ms)
+    extension mints (IODPExtension)
+      ✔ mintDigitalViaExtension mints after governance setMintExtension (52ms)
+      ✔ mintPhysicalViaExtension mints physical and emits ExtensionMintUsed kind=1 (53ms)
+      ✔ reverts EC(64) when extension not registered
+      ✔ reverts EC(65) when setMintExtension uses reserved profile byte
+      ✔ reverts EC(66) when extension address has no code
+      ✔ non-governance cannot setMintExtension
+    mint agent delegation
+      ✔ handshake: agent mints on behalf; principal is creator/owner; mintAgent set (44ms)
+      ✔ non-agent cannot mint on behalf (EC 72)
+      ✔ principal monthly limit applies when agent mints
+      ✔ revokeMintAgentRole blocks further agent mints
+    ODPCounterfeitConcern satellite
+      ✔ P raises and clears concern; getCounterfeitConcern matches
+      ✔ reject raise from C profile (EC 6)
+    ODPAuthorAttestation satellite
+      ✔ binds a separate author key; digest matches ethers signTypedData
+      ✔ returns empty tuple when no attestation exists
+      ✔ rejects a signature over a different passport's dataHash (EC 115)
+      ✔ rejects a signature from a key other than authorSigner (EC 115)
+      ✔ rejects a non-creator/owner submitter — no slot squatting (EC 112)
+      ✔ is one-shot — a second attestation reverts (EC 111)
+      ✔ rejects attestation on a revoked passport (EC 11)
+      ✔ rejects zero authorSigner (EC 110) and malformed signature (EC 113)
+      ✔ owner (after transfer) may also submit the attestation
+    0.7 creator revocation
+      ✔ marks the profile and emits CreatorRevoked
+      ✔ stops every mint path from the revoked profile (EC 131)
+      ✔ is one-shot (EC 59) and needs a registered wallet (EC 3)
+      ✔ leaves passports minted before the revocation untouched (38ms)
+      ✔ does not free the wallet to register a second profile (EC 53)
+
+
+  150 passing (5s)
+
+
+150 passing (150 mocha)
+
+WARNING: hre.network.connect() is deprecated and will be removed in a future version. Use hre.network.create() or hre.network.getOrCreate() instead.

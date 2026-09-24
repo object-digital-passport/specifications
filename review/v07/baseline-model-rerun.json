@@ -1,0 +1,101 @@
+{
+  "canonicalVectors": true,
+  "registration": {
+    "unix": 1748000000,
+    "actualISO": "2025-05-23T11:33:20.000Z",
+    "claimedISO": "2026-03-22T18:30:45Z"
+  },
+  "jsonCounterexamples": {
+    "positiveExponent": "1e+21",
+    "numericKeys": "{\"2\":\"b\",\"10\":\"a\"}",
+    "literalUtf16": "{\"10\":\"a\",\"2\":\"b\"}",
+    "loneSurrogate": "\"\\ud800\""
+  },
+  "revocationBoundary": "inclusive at exactly 259200 seconds",
+  "concernModel": {
+    "seed": "0x41535452",
+    "steps": 100000,
+    "accepted": 49206,
+    "rejected": 50743,
+    "invariant": true
+  },
+  "entropy": [
+    {
+      "units": 5000,
+      "required": 93,
+      "effectiveBits": 87.71228762045055,
+      "fits100": true
+    },
+    {
+      "units": 100000,
+      "required": 97,
+      "effectiveBits": 83.39035952556318,
+      "fits100": true
+    },
+    {
+      "units": 1048576,
+      "required": 100,
+      "effectiveBits": 80,
+      "fits100": true
+    },
+    {
+      "units": 1048577,
+      "required": 101,
+      "effectiveBits": 79.99999862413945,
+      "fits100": false
+    },
+    {
+      "units": 4294967295,
+      "required": 112,
+      "effectiveBits": 68.0000000003359,
+      "fits100": false
+    }
+  ],
+  "cost": {
+    "one": 0.0011350499999999999,
+    "units5000": 5.675249999999999,
+    "units5000Busy": 24.214400000000005
+  },
+  "calendar": {
+    "from": 1767225600,
+    "to": 2082758400,
+    "mismatchPercent": 2.206119934282585,
+    "longestSeconds": 146556,
+    "longestDays": 1.69625,
+    "monthsWithTwoResets": 16
+  },
+  "failure": [
+    {
+      "occupied": 5000,
+      "failureAfter25": 2.980232238769537e-133
+    },
+    {
+      "occupied": 100000,
+      "failureAfter25": 1.0000000000000012e-100
+    },
+    {
+      "occupied": 1000000,
+      "failureAfter25": 1.0000000000000006e-75
+    },
+    {
+      "occupied": 10000000,
+      "failureAfter25": 1.0000000000000005e-50
+    },
+    {
+      "occupied": 100000000,
+      "failureAfter25": 1.0000000000000014e-25
+    },
+    {
+      "occupied": 500000000,
+      "failureAfter25": 2.9802322387695312e-8
+    },
+    {
+      "occupied": 900000000,
+      "failureAfter25": 0.0717897987691853
+    },
+    {
+      "occupied": 990000000,
+      "failureAfter25": 0.7778213593991465
+    }
+  ]
+}

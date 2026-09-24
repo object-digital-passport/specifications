@@ -1,0 +1,5 @@
+
+> object-digital-passport@0.7.0 vectors
+> node tools/check-vectors.mjs
+
+All four bundle vectors and edition v2 generator match.

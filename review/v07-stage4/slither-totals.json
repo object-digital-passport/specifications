@@ -1,0 +1,37 @@
+[
+  {
+    "impact": "High",
+    "detector": "weak-prng",
+    "count": 4
+  },
+  {
+    "impact": "Medium",
+    "detector": "incorrect-equality",
+    "count": 5
+  },
+  {
+    "impact": "Low",
+    "detector": "timestamp",
+    "count": 18
+  },
+  {
+    "impact": "Informational",
+    "detector": "assembly",
+    "count": 2
+  },
+  {
+    "impact": "Informational",
+    "detector": "cyclomatic-complexity",
+    "count": 1
+  },
+  {
+    "impact": "Informational",
+    "detector": "solc-version",
+    "count": 1
+  },
+  {
+    "impact": "Informational",
+    "detector": "missing-inheritance",
+    "count": 1
+  }
+]

@@ -1,0 +1,4 @@
+spec: schema/passport-0.7.schema.json
+spec: SPEC.md -> index.html
+spec: docs/OBJECTID_PROFILE.md -> objectid-profile.html
+spec: docs/SECURITY.md -> security.html

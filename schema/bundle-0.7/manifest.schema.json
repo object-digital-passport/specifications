@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ODP 0.7 bundle manifest",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "odp-bundle-manifest-0.7"
+    },
+    "passportFile": {
+      "const": "passport.json"
+    },
+    "generationFile": {
+      "const": "generation.json"
+    },
+    "receiptFile": {
+      "const": "receipt.json"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^files/[0-9a-f]{64}$"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "byteLength": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "byteLength"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "format",
+    "passportFile",
+    "generationFile",
+    "receiptFile",
+    "files"
+  ],
+  "additionalProperties": false
+}

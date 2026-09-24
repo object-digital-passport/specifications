@@ -1,176 +1,117 @@
-# Деплой Object Digital Passport (Hardhat)
+# ODP 0.7 release and deployment (ABI 0.7-redesign-8)
 
-Краткая инструкция «с нуля» для Polygon **mainnet** (`polygon` в конфиге). Англоязычные комментарии в скриптах можно не трогать — ниже всё по шагам.
+**Current restriction: do not connect a wallet, access public networks, deploy or publish.** The future commands below require new explicit authorization, including the read-only RPC preflight. No public generation is approved. Compile/test/packaging do not load keys. A local EVM test deploys all
+ten factories and checks complete runtime, including registry and EIP-712 immutable values.
 
-## Важно перед mainnet
+## Offline release preparation
 
-1. **Лимит EIP-170 (24 576 байт на контракт при создании):** реестр **`ObjectDigitalPassport`** линкуется с библиотекой **`ODPPassportLib`** — сначала деплой библиотеки, затем реестра (так делает **`chain/deploy/scripts/deploy.js`**). После **`npm run compile`** из **корня репозитория** смотрите строку **`[ODP] EIP-170:`**: размер **основного** контракта должен быть **≤ 24 576** байт; у библиотеки свой лимит (она тоже должна укладываться — в референсной сборке оба укладываются). Подробности: **[`docs/EIP170_STRATEGY.md`](../../docs/EIP170_STRATEGY.md)**.
-2. **Приватный ключ:** используйте **отдельный** кошелёк только под деплой/операции ODP, храните ключ только в `.env`, **никогда** не коммитьте `.env`.
-3. **POL:** на кошельке деплоя должно быть достаточно **MATIC/POL** на gas (запас на **два** деплоя: библиотека + реестр, плюс опционально спутник `ODPWalletDocumentAnchor`).
+From `chain/`, run `npm ci`, `npx hardhat compile --force`, `npm run compile`, `npm run vectors`,
+`npm run test:tools`, `npx hardhat test --no-compile`. Preserve full build-info input and output.
 
-В **`deployments/<сеть>.json`** сохраняется **`passportLibAddress`** (адрес **`ODPPassportLib`**) и **`contractAddress`** (реестр). Для верификации на Polygonscan нужны **оба** контракта и корректная линковка.
+Run `node deploy/scripts/release.mjs BUILD_INFO SOLJSON NEW_RELEASE_FILE`. The packager requires the exact
+current recursive Solidity source roster/content, recompiles the standard-json input twice with the supplied
+compiler, and requires exact equality to recorded build output. The release includes source content,
+settings, full output, compiler-file hash, lockfile hash, build-info hash, all ten ABI/creation/runtime
+artifacts and named immutable offsets. It prints the SHA256 of the canonical release bundle.
+The source commit is provenance only: dirty source content is embedded, so HEAD is not the release identity.
+Review and preserve the bundle and its hash independently; the packager does not approve a compiler or release.
 
----
+## Future separately authorized deployment
 
-## Подготовка (один раз на машине)
+The user selected direct Polygon mainnet deployment, conditional on successful release verification. No Amoy deployment is required. A configured deployment signer and these inputs remain mandatory:
 
-Установите **Node.js** LTS (например с [nodejs.org](https://nodejs.org/)).
+- `ODP_ENABLE_DEPLOY=1`, explicit `--network`, and matching `ODP_DEPLOY_CHAIN_ID`.
+- `ODP_RELEASE_BUNDLE` and independently approved `ODP_RELEASE_HASH` from offline preparation.
+- `ODP_GENERATION_ID` and `ODP_DEPLOY_MANIFEST` for that generation.
+- `ODP_DEPLOY_CONFIRMATIONS`, a positive integer selected for the network finality policy.
+- From `chain/`, use `npm run deploy:mainnet` only after authorization; it disables compilation. `deploy:testnet` remains an optional separately authorized Amoy path, not a prerequisite.
 
-В терминале (из **корня** репозитория: `npm install` + `npm run compile`, либо из каталога **`chain/`**):
+Factories use only pinned bundle bytes, never ambient Hardhat artifacts. The manifest writes predicted
+address, nonce, constructor arguments and complete creation transaction data before broadcast, then tx hash
+and status. File writes are flushed before rename. A lock refuses concurrent runs against the same path.
+For each receipt, the script verifies sender, nonce, chain, zero value, contract creation, exact data,
+contract address, canonical receipt block and exact runtime. Immutable bytes are computed and compared,
+not masked. Any mismatch interrupts the run. Public finality policy and independent RPC/source verification
+are still required before approving a generation.
 
-```bash
-cd /path/to/object-digital-passport
-npm install
+## Interrupted runs
+
+`ODP_RESUME=1` permits an existing manifest with the same release, chain, deployer and generation ID.
+Every existing transaction is reverified before any new broadcast. Unknown/pending or missing transaction
+hash stops the run. A crash before saving the hash requires read-only nonce/transaction reconciliation. Supply a JSON contract-name → transaction-hash map via
+`ODP_RECOVERY_TRANSACTIONS`; every supplied transaction is verified against the planned sender, nonce,
+constructor, release bytes and runtime before any further broadcast. This map cannot replace an already
+recorded hash. If no transaction was broadcast, the unresolved plan stays blocked;
+do not delete the planned entry or choose a new manifest to bypass it. A stale `.lock` after process death
+requires confirming the original process is gone before manually removing the lock. This is deliberately
+fail-closed; automatic block-history transaction discovery is not implemented.
+
+A complete run writes `MANIFEST.generation.json`, with all nine satellite roles, runtime hashes, deployment
+blocks, source/build/compiler provenance and ABI generation. It is a candidate, not automatic publication
+or client approval. `chain/generations.json` remains empty. No smoke mints, freeze, links or user operations
+are performed. Repeated successful resume compares the existing candidate and does not deploy again. A later chain reorg
+must be reconciled before the candidate is accepted by clients. Checkpoint tests cover failure at planned,
+broadcast, pending and verified stages, along with changed release/identity and tampered output.
+
+
+## Mainnet finality
+
+On chain137 a separate `ODP_VERIFY_RPC_URL` is mandatory. Both RPCs must report chain137 and support
+`finalized` before sending. Each deployment is checked independently through both RPCs: exact transaction,
+receipt canonical block and runtime. Completion additionally requires the receipt block to be finalized
+on both. Finality polling waits at most120 seconds; lag or disagreement leaves a recoverable interrupted
+manifest, never a completed generation. `ODP_DEPLOY_CONFIRMATIONS=1` may be used with this mandatory
+finality gate; it does not bypass it. Local EVM tests still use confirmation counting without public RPCs.
+
+Historical read-only endpoint preflight evidence (not refreshed during documentation alignment): `review/v07-no-stop/polygon-rpc-readonly.json` at repository root.
+The two selected public services are PublicNode and dRPC. A separate URL is not cryptographic proof of
+independent infrastructure; these remain explicit external RPC trust assumptions.
+
+## Final prelaunch checks
+
+**No approved release bundle exists for the current sources.** The scripts above require
+`abiGeneration === '0.7-redesign-8'` (ABI8 adds `previewHash` to the mint tuple and media view). The ABI7
+candidate in `review/v07-abi7-release/` is therefore rejected, and so is `review/v07-no-stop/release.json`
+with canonical hash `sha256:95cb88357a90ce962b1b8b710e9c57eb380fd28e74a34123c1b51365dd56322c`, is
+`0.7-redesign-6` and is rejected. Its core ABI still carries `REVOCATION_WINDOW` and lacks
+`finalizePassportForPrint` and `getPassportReleaseState`. Everything in this section is therefore an
+unexecutable procedure until a bundle is rebuilt from the current sources with `release.mjs` and a new
+`approvedHash` is independently reviewed and approved.
+
+An **unapproved ABI8 candidate** was built offline on 2026-09-24: [`review/v07-abi8-release/`](../../review/v07-abi8-release/README.md),
+canonical hash `sha256:7392c8214e7f1258e3dc886ce89f5b5df30f65bca6d0ace2d1b7b3006ca414d7`. It is not an
+`approvedHash` until the owner reviews and approves it. The owner-approved ABI7 hash
+(`review/v07-abi7-release/`, `sha256:91c9ee4a…76f7`) no longer describes the current sources.
+
+Sealed `0.7-redesign-6` evidence: [audit handoff](../../review/audit-handoff-abi6/README.md); earlier rehearsal: `review/v07-prelaunch/README.md` at repository root. Code and documentation delta after that package, with the open conflicts: [report](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian).
+
+Polygon now requires `ODP_DEPLOYER_ADDRESS` to match the signer and `ODP_SPEND_POLICY` to identify a JSON
+file containing exactly ten `gasLimits`, `maxFeePerGas`, `maxPriorityFeePerGas`, and `maxTotalFeeWei`.
+Amounts use decimal integer strings in gas/wei units. `mainnet-spend-policy.example.json` contains local
+measurements plus a rounded 25% gas margin; its fee placeholders intentionally fail validation.
+Set fee caps from fresh RPC observations and an acceptable total POL budget (1 POL = 10^18 wei).
+The sum of gas limits times maxFeePerGas must fit the total budget. No synthetic test fee is a production approval.
+
+After exporting the non-secret settings from the filled env example, from `chain/` run:
+
+```sh
+node deploy/scripts/preflight-mainnet.mjs > deploy-preflight.local.json
 ```
 
----
+This command needs only the public address. It reads both RPCs, checks chain/finality/nonce/balance,
+compares their common finalized block, reads base fee and priority fee directly from each RPC, and reports
+all predicted addresses. It never loads signing keys. It estimates no satellites before the registry exists:
+their constructors require deployed registry code. On Polygon, every creation is estimated immediately before sending.
+Rerun immediately before `npm run deploy:mainnet` with `ODP_ENABLE_DEPLOY=1` and the authorized signer configured.
+Use an account exclusively reserved for this deployment; no other program/device should send its transactions.
 
-## Настройка секретов
+The manifest fixes the initial nonce and fee policy. Pending/latest nonce disagreement or outside nonce
+consumption stops new creations. Every transaction explicitly sets chainId and EIP1559 fee/gas caps. Balance
+and remaining worst-case cost are checked before each creation. Resume must preserve the same limits and
+nonce plan. Estimate failures before broadcast create no unresolved planned entry. A write-ahead plan created
+immediately before broadcast remains deliberately ambiguous after a crash until reconciled by transaction hash.
 
-Рекомендуемый вариант — отдельная папка (файл не попадает в git): см. **[`user-setup/README.md`](user-setup/README.md)** (`private.local.env`).
-
-Классический вариант:
-
-```bash
-cd deploy
-cp .env.example .env
-```
-
-Откройте **`chain/deploy/.env`** в редакторе и заполните (либо используйте **`chain/deploy/user-setup/private.local.env`** — он перекрывает значения из `.env`):
-
-- **`PRIVATE_KEY`** — приватный ключ кошелька деплоя **без** префикса `0x` (64 hex-символа).
-- **`POLYGONSCAN_API_KEY`** — по желанию, для верификации контракта на Polygonscan (можно оставить заглушку, деплой без неё работает).
-
-Сохраните файл. Проверьте, что `.env` **не** попал в git (`git status` не должен показывать `.env` как новый файл для коммита — он в `.gitignore`).
-
----
-
-## Компиляция и проверка размера (обязательно перед mainnet)
-
-```bash
-npm run compile
-```
-
-В выводе смотрите строку **`[ODP] EIP-170:`** (размер реестра и библиотеки). Если реестр **> 24 576** байт — mainnet-деплой реестра отклонят; вернитесь к [`docs/EIP170_STRATEGY.md`](../../docs/EIP170_STRATEGY.md).
-
-Локальная сеть EDR в **`hardhat.config.ts`** (сеть `default`) использует `allowUnlimitedContractSize: true` — это **только для тестов**; на Polygon лимит соблюдается.
-
----
-
-## Деплой на Polygon mainnet
-
-Убедитесь, что на кошельке есть POL. Затем:
-
-```bash
-npm run deploy:mainnet
-```
-
-Скрипт:
-
-1. Задеплоит **`ODPPassportLib`** и связанный основной реестр **`ObjectDigitalPassport`**.
-2. Попытается задеплоить **`ODPWalletDocumentAnchor`** (спутник для якорей файлов); при ошибке выведет предупреждение.
-3. Попытается задеплоить **`ODPCounterfeitConcern`** (спутник: флаг «institutional concern» для **P/M**); при ошибке — предупреждение.
-4. Попытается задеплоить **`ODPRegistryRelations`**, **`ODPPassportProofRegistry`** и **`ODPExtensionMintRouter`**; для relations/router также выполнит wiring вызовами `setRelationsSatellite(...)` и `setExtensionRouter(...)`.
-5. Запишет **`deployments/polygon.json`** и **`deployments/abi.json`**.
-
-После деплоя пропишите адреса в **`frontend/creator.html`**, **`frontend/passport.html`**, **`frontend/verify.html`** (в репозитории сайта): как минимум **`NET.contract`**, а также **`NET.docAnchor`**, **`NET.counterfeitConcern`**, **`NET.relations`** и **`NET.proofRegistry`** (если соответствующие спутники задеплоены), и **`NET.contractGenerationFallback: 6`**. Перед mainnet-раскаткой сверьтесь с отчётом **EIP-170** из `npm run compile` (линия v0.6: реестр ≈ 13 309 байт из 24 576). Текущая линия: **[`docs/V0.6.md`](../../docs/V0.6.md)**; исторические указатели: **[`docs/V0.5.md`](../../docs/V0.5.md)**, **[`docs/V0.4.md`](../../docs/V0.4.md)**, **[`docs/V0.3.md`](../../docs/V0.3.md)**.
-
----
-
-## Продолжить после успешного `ODPPassportLib`
-
-Если полный **`deploy.js`** успешно задеплоил **`ODPPassportLib`**, а **`ObjectDigitalPassport`** не ушёл (например, не хватило POL на газ), **не** запускайте **`deploy.js`** снова — задеплоится вторая библиотека. Передайте адрес **уже существующей** библиотеки из лога:
-
-```bash
-ODP_PASSPORT_LIB_ADDRESS=0xYourLibFromLog npx hardhat run chain/deploy/scripts/deploy-resume-from-lib.js --network polygon
-```
-
-Либо:
-
-```bash
-npx hardhat run chain/deploy/scripts/deploy-resume-from-lib.js --network polygon -- --passport-lib 0xYourLibFromLog
-```
-
-Дальше скрипт делает то же, что **`deploy.js`** после библиотеки: связанный реестр, спутники, запись **`deployments/polygon.json`** и **`deployments/abi.json`**.
-
----
-
-## Только спутник `ODPWalletDocumentAnchor` (реестр уже задеплоен)
-
-Если основной **`ObjectDigitalPassport`** уже в сети, а **`ODPWalletDocumentAnchor`** не деплоили (или нужен новый адрес якоря):
-
-```bash
-ODP_REGISTRY_ADDRESS=0xYourObjectDigitalPassport npx hardhat run chain/deploy/scripts/deploy-doc-anchor-only.js --network polygon
-```
-
-Либо:
-
-```bash
-npx hardhat run chain/deploy/scripts/deploy-doc-anchor-only.js --network polygon -- --registry 0xYourObjectDigitalPassport
-```
-
-Скрипт проверит, что по адресу есть байткод, задеплоит спутник с **`constructor(registry)`**, обновит **`deployments/polygon.json`** (поле **`walletDocumentAnchorAddress`**). Дальше пропишите этот адрес в **`NET.docAnchor`** в **`frontend/verify.html`**.
-
-Адреса эталонного деплоя — в таблице «Current Release» в **[`docs/GUIDE.md`](../../docs/GUIDE.md#current-release)** и в **[`SPEC.md`](../../SPEC.md)** §7. Файл **`deployments/polygon.json`** создаётся локально при вашем деплое и в репозиторий не коммитится.
-
----
-
-## Только спутник `ODPCounterfeitConcern` (реестр уже задеплоен)
-
-Если основной **`ObjectDigitalPassport`** уже в сети, а спутник **counterfeit** не деплоили (или нужен новый адрес):
-
-```bash
-ODP_REGISTRY_ADDRESS=0xYourObjectDigitalPassport npx hardhat run chain/deploy/scripts/deploy-counterfeit-concern-only.js --network polygon
-```
-
-Либо:
-
-```bash
-npx hardhat run chain/deploy/scripts/deploy-counterfeit-concern-only.js --network polygon -- --registry 0xYourObjectDigitalPassport
-```
-
-Скрипт задеплоит спутник с **`constructor(registry)`**, обновит **`deployments/polygon.json`** (поле **`counterfeitConcernAddress`**). Пропишите адрес в **`NET.counterfeitConcern`** в **`frontend/passport.html`**, **`frontend/verify.html`** (тот же **`NET.contract`**, что и у этого реестра).
-
----
-
-## Оба спутника под уже существующий реестр
-
-Один запуск: **`ODPWalletDocumentAnchor`** и **`ODPCounterfeitConcern`** (порядок как в полном **`deploy.js`**):
-
-```bash
-ODP_REGISTRY_ADDRESS=0xYourObjectDigitalPassport npx hardhat run chain/deploy/scripts/deploy-satellites-only.js --network polygon
-```
-
-Либо:
-
-```bash
-npx hardhat run chain/deploy/scripts/deploy-satellites-only.js --network polygon -- --registry 0xYourObjectDigitalPassport
-```
-
-Обновляются **`walletDocumentAnchorAddress`** и **`counterfeitConcernAddress`** в **`deployments/{polygon|amoy}.json`** (если деплой одного из контрактов упал — второй всё равно пробуется; в JSON попадут только успешные поля).
-
----
-
-## (Опционально) Верификация на Polygonscan
-
-Если в `.env` задан **`POLYGONSCAN_API_KEY`**, после деплоя можно верифицировать контракт через Hardhat/etherscan-плагин (команда зависит от вашей версии toolbox; при необходимости см. документацию Nomic Foundation).
-
----
-
-## Тестнет Amoy (если понадобится проверить пайплайн)
-
-```bash
-npm run deploy:testnet
-```
-
-На Amoy лимит размера такой же, как на mainnet; для «большого» контракта деплой там тоже **не пройдёт**, пока байткод не уменьшат.
-
----
-
-## Тесты без деплоя в сеть
-
-```bash
-npm test
-```
-
-(из корня репозитория.) Используется встроенная сеть EDR (`default`) с `allowUnlimitedContractSize`.
+After the last creation, all ten entries are reverified through both RPCs before completion. The resulting
+candidate is local evidence; explorer verification and client generation approval follow actual receipts.
+Source verification can use the exact standard-json input embedded in the release. Never substitute freshly
+compiled bytes or an older registry address. No automatic GitHub publication or passport mint is included.

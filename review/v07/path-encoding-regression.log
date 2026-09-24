@@ -1,0 +1,117 @@
+
+> object-digital-passport@0.7.0 check
+> npm run compile && npm run vectors && npm test
+
+
+> object-digital-passport@0.7.0 compile
+> hardhat compile && node deploy/scripts/eip170-report.mjs && node deploy/scripts/export-abi.mjs
+
+
+Compiled 14 Solidity files with solc 0.8.20 (evm target: shanghai)
+ObjectDigitalPassport: 12963/24576 runtime bytes
+ODPEditionUnits: 5230/24576 runtime bytes
+ODPAuthorAttestation: 4380/24576 runtime bytes
+ODPPassportConcerns: 4550/24576 runtime bytes
+ODPHosting: 3821/24576 runtime bytes
+ODPProfileDirectory: 2495/24576 runtime bytes
+ODPRegistryRelations: 7255/24576 runtime bytes
+ODPPassportProofRegistry: 5613/24576 runtime bytes
+ODPWalletDocumentAnchor: 2507/24576 runtime bytes
+Exported 0.7-redesign-1 ABI: 10 interfaces
+
+> object-digital-passport@0.7.0 vectors
+> node tools/check-vectors.mjs
+
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/Andrei/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/GitHub/Object%20Digital%20Passport/specifications/chain/tools/edition_vectors.mjs'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.2
+node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: /Users/Andrei/.hermes/node/bin/node /Users/Andrei/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/GitHub/Object%20Digital%20Passport/specifications/chain/tools/edition_vectors.mjs
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/Andrei/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/GitHub/Object%20Digital%20Passport/specifications/chain/tools/edition_vectors.mjs'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.2
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at checkExecSyncError (node:child_process:916:11)
+    at execFileSync (node:child_process:952:15)
+    at file:///Users/Andrei/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/GitHub/Object%20Digital%20Passport/specifications/chain/tools/check-vectors.mjs:13:4
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  status: 1,
+  signal: null,
+  output: [
+    null,
+    '',
+    'node:internal/modules/cjs/loader:1433\n' +
+      '  throw err;\n' +
+      '  ^\n' +
+      '\n' +
+      "Error: Cannot find module '/Users/Andrei/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/GitHub/Object%20Digital%20Passport/specifications/chain/tools/edition_vectors.mjs'\n" +
+      '    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)\n' +
+      '    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)\n' +
+      '    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)\n' +
+      '    at Function._load (node:internal/modules/cjs/loader:1216:25)\n' +
+      '    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n' +
+      '    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n' +
+      '    at node:internal/main/run_main_module:36:49 {\n' +
+      "  code: 'MODULE_NOT_FOUND',\n" +
+      '  requireStack: []\n' +
+      '}\n' +
+      '\n' +
+      'Node.js v22.23.2\n'
+  ],
+  pid: 36533,
+  stdout: '',
+  stderr: 'node:internal/modules/cjs/loader:1433\n' +
+    '  throw err;\n' +
+    '  ^\n' +
+    '\n' +
+    "Error: Cannot find module '/Users/Andrei/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/GitHub/Object%20Digital%20Passport/specifications/chain/tools/edition_vectors.mjs'\n" +
+    '    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)\n' +
+    '    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)\n' +
+    '    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1216:25)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n' +
+    '    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n' +
+    '    at node:internal/main/run_main_module:36:49 {\n' +
+    "  code: 'MODULE_NOT_FOUND',\n" +
+    '  requireStack: []\n' +
+    '}\n' +
+    '\n' +
+    'Node.js v22.23.2\n'
+}
+
+Node.js v22.23.2

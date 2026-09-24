@@ -1,0 +1,310 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "name": "getCreator",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "creatorId",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes1",
+            "name": "typePrefix",
+            "type": "bytes1"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IODPRegistry.CreatorRecord",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      }
+    ],
+    "name": "getCreatorByWallet",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportClassification",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint8",
+            "name": "contentClass",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "lifecycleStatus",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "aiStatus",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "verificationMethod",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "editionModel",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "revoked",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "revokedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "revocationReasonHash",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct IODPRegistry.PassportClassificationView",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportHeader",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "passportId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint8",
+            "name": "contractVersion",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "creator",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "creatorId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint32",
+            "name": "year",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "month",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "authorName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "shortDescription",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "domain",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "objectType",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct IODPRegistry.PassportHeaderView",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportMedia",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "dataHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "imageHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "previewHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anchorsHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "anchorTypesMask",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "editionCommitment",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct IODPRegistry.PassportMediaView",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "name": "getPassportReleaseState",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "revocationDeadline",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "printFinalizedAt",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IODPRegistry.PassportReleaseView",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "name": "passportExists",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

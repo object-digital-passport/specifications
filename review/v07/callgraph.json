@@ -1,0 +1,6 @@
+{
+  "functionsWithBody": 122,
+  "resolvedCallEdges": 97,
+  "recursiveCycles": 0,
+  "scope": "Solidity FunctionDefinition/FunctionCall referencedDeclaration graph; library calls included; not a full optimizer proof"
+}

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ODP 0.7 bundle generation",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "odp-bundle-generation-0.7"
+    },
+    "odpVersion": {
+      "const": "0.7"
+    },
+    "generationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "chainId": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "registry": {
+      "type": "string",
+      "pattern": "^0x(?!0{40}$)[0-9a-f]{40}$"
+    },
+    "abiGeneration": {
+      "type": "string",
+      "minLength": 1
+    },
+    "registryRuntimeCodeHash": {
+      "type": "string",
+      "pattern": "^0x[0-9a-f]{64}$"
+    },
+    "registryDeploymentBlock": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "build": {
+      "type": "object",
+      "properties": {
+        "sourceCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "compilerVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "buildInfoHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "sourceCommit",
+        "compilerVersion",
+        "buildInfoHash"
+      ],
+      "additionalProperties": false
+    },
+    "satellites": {
+      "type": "array",
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "enum": [
+              "concerns",
+              "hosting",
+              "profile-directory",
+              "institutional-proofs",
+              "author-attestation",
+              "wallet-document-anchor",
+              "relations",
+              "edition-units",
+              "statement-journal"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "pattern": "^0x(?!0{40}$)[0-9a-f]{40}$"
+          },
+          "abiGeneration": {
+            "type": "string",
+            "minLength": 1
+          },
+          "runtimeCodeHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-f]{64}$"
+          },
+          "deploymentBlock": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$"
+          }
+        },
+        "required": [
+          "role",
+          "address",
+          "abiGeneration",
+          "runtimeCodeHash",
+          "deploymentBlock"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "absentSatelliteRoles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "concerns",
+          "hosting",
+          "profile-directory",
+          "institutional-proofs",
+          "author-attestation",
+          "wallet-document-anchor",
+          "relations",
+          "edition-units",
+          "statement-journal"
+        ]
+      }
+    }
+  },
+  "required": [
+    "format",
+    "odpVersion",
+    "generationId",
+    "chainId",
+    "registry",
+    "abiGeneration",
+    "registryRuntimeCodeHash",
+    "registryDeploymentBlock",
+    "build",
+    "satellites",
+    "absentSatelliteRoles"
+  ],
+  "additionalProperties": false
+}

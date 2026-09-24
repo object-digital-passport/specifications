@@ -1,3 +1,5 @@
+> **Historical / superseded for ABI `0.7-redesign-8`.** Do not implement the old derivation, openEdition call or anchor example below. ABI6 prepares nonce/context/root/list before mint, passes operationId and editionCommitment, then opens with nonce; exact signatures come from chain/abi. The current app handoff replaces this task. Current rules: [SPEC](../SPEC.md), [app handoff](../ODP_07_APP_HANDOFF.md), [glossary](GLOSSARY.md), [documentation delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md). No wallet or external-network actions are authorized by this page.
+
 # Edition issuer tool — implementation handoff
 
 *Everything needed to build the issuer-side tool for SPEC 0.7 §20, written for someone starting cold. Normative rules live in [`SPEC.md` §20](../SPEC.md); this document tells you which parts you must implement and where the traps are.*

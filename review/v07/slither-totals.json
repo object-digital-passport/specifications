@@ -1,0 +1,17 @@
+{
+  "bySeverity": {
+    "Informational": 22,
+    "High": 4,
+    "Medium": 8,
+    "Low": 17
+  },
+  "byDetector": {
+    "dead-code": 11,
+    "solc-version": 9,
+    "weak-prng": 4,
+    "incorrect-equality": 8,
+    "timestamp": 17,
+    "assembly": 2
+  },
+  "note": "Per-entry results; shared dependencies repeat. High weak-prng are accepted ID/bucket uses, not unit-key generation."
+}

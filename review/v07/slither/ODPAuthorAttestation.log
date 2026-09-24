@@ -1,0 +1,31 @@
+
+Detector: timestamp
+ODPAuthorAttestation.attestAuthor(string,address,bytes) (ODPAuthorAttestation.sol#116-143) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _attestation[passportId].authorSigner != address(0) (ODPAuthorAttestation.sol#122)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Detector: assembly
+ODPAuthorAttestation._recover(bytes32,bytes) (ODPAuthorAttestation.sol#173-188) uses assembly
+	- INLINE ASM (ODPAuthorAttestation.sol#178-182)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Detector: dead-code
+ODPSatellite._institution() (ODPSatellite.sol#19-23) is never used and should be removed
+ODPSatellite._page(string[],uint256,uint256) (ODPSatellite.sol#24-32) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (IODPRegistry.sol#2)
+	- ^0.8.20 (ODPAuthorAttestation.sol#2)
+	- ^0.8.20 (ODPErrors.sol#2)
+	- ^0.8.20 (ODPSatellite.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+ODPAuthorAttestation.sol analyzed (3 contracts with 102 detectors), 5 result(s) found
+'/private/tmp/odp-astra-cache/compilers-v3/macosx-amd64/solc-macosx-amd64-v0.8.20+commit.a1b79de6 --version' running
+'/private/tmp/odp-astra-cache/compilers-v3/macosx-amd64/solc-macosx-amd64-v0.8.20+commit.a1b79de6 ODPAuthorAttestation.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --optimize-runs 1 --evm-version shanghai --allow-paths .,/Users/Andrei/Проекты/GitHub/Object Digital Passport/specifications/chain/contracts' running

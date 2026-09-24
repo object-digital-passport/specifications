@@ -1,0 +1,19 @@
+
+> object-digital-passport@0.7.0 check
+> npm run compile && npm run vectors && npm test
+
+
+> object-digital-passport@0.7.0 compile
+> hardhat compile && node deploy/scripts/eip170-report.mjs && node deploy/scripts/export-abi.mjs
+
+
+Unhandled promise rejection:
+
+Error: spawn Unknown system error -86
+    at ChildProcess.spawn (node:internal/child_process:420:11)
+    at spawn (node:child_process:787:9)
+    at <anonymous> (/Users/Andrei/Проекты/GitHub/Object Digital Passport/specifications/chain/node_modules/hardhat/src/internal/builtin-plugins/solidity/build-system/compiler/compiler.ts:64:26) {
+  errno: -86,
+  code: 'Unknown system error -86',
+  syscall: 'spawn'
+}

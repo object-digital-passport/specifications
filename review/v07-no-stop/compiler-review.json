@@ -1,0 +1,78 @@
+{
+  "compiler": "0.8.20+commit.a1b79de6",
+  "settings": {
+    "evmVersion": "shanghai",
+    "metadata": {
+      "bytecodeHash": "none"
+    },
+    "optimizer": {
+      "enabled": true,
+      "runs": 1
+    },
+    "outputSelection": {
+      "*": {
+        "": [
+          "ast"
+        ],
+        "*": [
+          "abi",
+          "evm.bytecode.linkReferences",
+          "evm.bytecode.object",
+          "evm.bytecode.opcodes",
+          "evm.bytecode.sourceMap",
+          "evm.deployedBytecode.immutableReferences",
+          "evm.deployedBytecode.linkReferences",
+          "evm.deployedBytecode.object",
+          "evm.deployedBytecode.opcodes",
+          "evm.deployedBytecode.sourceMap",
+          "evm.methodIdentifiers"
+        ]
+      }
+    },
+    "remappings": [],
+    "viaIR": true
+  },
+  "functionCount": 132,
+  "recursiveCycles": [],
+  "sourceInputHash": "0240b8a462cd06297ceffca6c6ae4ad7a4dd4ed7e2c105c81d16cbb50dd975de",
+  "officialBugsSource": "https://raw.githubusercontent.com/ethereum/solidity/develop/docs/bugs.json",
+  "bugsFileSha256": "bb504a299e08cde52a48fb6a158a9ce61e2a70a8bea676550edbd6e89718ef2b",
+  "assessment": [
+    {
+      "id": "SOL-2026-5",
+      "name": "MemoryByteArrayElementDeleteClearsWholeWord",
+      "reason": "Excluded by viaIR=true."
+    },
+    {
+      "id": "SOL-2026-4",
+      "name": "SpillSlotCollisionAcrossMutualRecursion",
+      "reason": "No recursive Solidity function-call cycles; no recursive user Yul functions or recursive aggregate types in production sources."
+    },
+    {
+      "id": "SOL-2026-2",
+      "name": "UnsoundSpillInMutualRecursion",
+      "reason": "No recursive Solidity function-call cycles; no recursive user Yul functions or recursive aggregate types in production sources."
+    },
+    {
+      "id": "SOL-2025-1",
+      "name": "LostStorageArrayWriteOnSlotOverflow",
+      "reason": "No custom storage layout or assembly storage writes. Dynamic arrays use hashed slots; no intentional boundary-straddling storage arrays. Cryptographic slot-overflow probability remains a model assumption."
+    },
+    {
+      "id": "SOL-2023-3",
+      "name": "VerbatimInvalidDeduplication",
+      "reason": "No verbatim blocks; Solidity frontend compilation, not custom Yul input."
+    },
+    {
+      "id": "SOL-2023-2",
+      "name": "FullInlinerNonExpressionSplitArgumentEvaluationOrder",
+      "reason": "Default optimizer sequence; no custom optimizerSteps. Trigger requires non-expression-split custom sequence."
+    },
+    {
+      "id": "SOL-2023-1",
+      "name": "MissingSideEffectsOnSelectorAccess",
+      "reason": "Excluded by viaIR=true."
+    }
+  ],
+  "limitation": "Source/settings trigger screening, not a proof that the compiler has no unknown bugs."
+}

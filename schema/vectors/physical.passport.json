@@ -1,6 +1,6 @@
 {
   "version": "0.7",
-  "passportId": "ODP-2026-03-004829301",
+  "passportId": null,
   "title": "Object Community #1",
   "authorName": "Example Holder",
   "shortDescription": "Mixed-media painting, canvas/oil, 2025",
@@ -12,7 +12,9 @@
   "contentClass": "static",
   "aiStatus": "assisted",
   "verificationMethod": "nfc",
-  "edition": { "model": "limited", "number": 1, "total": 3 },
+  "edition": {
+    "model": "unique"
+  },
   "idGranularity": "item",
   "authorship": {
     "author": {
@@ -25,24 +27,40 @@
   "anchors": [
     {
       "type": "photo",
-      "data": { "role": "primary" },
+      "data": {
+        "role": "primary"
+      },
       "hash": "sha256:a3f1c2d4e5b6978810aabbccddeeff00112233445566778899aabbccddeeff00"
     },
     {
       "type": "dimensions",
-      "data": { "width": 60, "height": 40, "unit": "CMT", "depth": 2 }
+      "data": {
+        "width": 60,
+        "height": 40,
+        "unit": "CMT",
+        "depth": 2
+      }
     },
     {
       "type": "materials",
-      "data": { "list": ["canvas", "oil paint"] }
+      "data": {
+        "list": [
+          "canvas",
+          "oil paint"
+        ]
+      }
     },
     {
       "type": "distinguishing_features",
-      "data": { "text": "Craquelure lower-left quadrant; retouched 2 cm scratch near frame edge" }
+      "data": {
+        "text": "Craquelure lower-left quadrant; retouched 2 cm scratch near frame edge"
+      }
     },
     {
       "type": "marks",
-      "data": { "text": "Signed on reverse, studio stamp on stretcher" }
+      "data": {
+        "text": "Signed on reverse, studio stamp on stretcher"
+      }
     },
     {
       "type": "nfc",
@@ -56,13 +74,17 @@
   ],
   "year": 2026,
   "month": 3,
-  "registeredAt": 1748000000,
+  "registeredAt": 1774204245,
   "registration": {
     "ianaTimeZone": "UTC",
     "localIso8601": "2026-03-22T18:30:45+00:00",
     "utcIso8601": "2026-03-22T18:30:45Z"
   },
-  "refinementTags": ["artwork", "mixed_media", "signed"],
+  "refinementTags": [
+    "artwork",
+    "mixed_media",
+    "signed"
+  ],
   "physical": {
     "category": "artwork",
     "medium": "mixed media"

@@ -1,0 +1,29 @@
+{
+  "environment": "local EDR chain137, pinned release ABI6",
+  "gasUsed": {
+    "ObjectDigitalPassport": 2572318,
+    "ODPEditionUnits": 1419165,
+    "ODPAuthorAttestation": 1057236,
+    "ODPPassportConcerns": 1017355,
+    "ODPHosting": 783074,
+    "ODPProfileDirectory": 573741,
+    "ODPRegistryRelations": 1561942,
+    "ODPPassportProofRegistry": 1502754,
+    "ODPWalletDocumentAnchor": 537084,
+    "ODPStatementJournal": 1415542
+  },
+  "totalGasUsed": 12440211,
+  "suggestedGasLimits": {
+    "ObjectDigitalPassport": "3220000",
+    "ODPEditionUnits": "1780000",
+    "ODPAuthorAttestation": "1330000",
+    "ODPPassportConcerns": "1280000",
+    "ODPHosting": "980000",
+    "ODPProfileDirectory": "720000",
+    "ODPRegistryRelations": "1960000",
+    "ODPPassportProofRegistry": "1880000",
+    "ODPWalletDocumentAnchor": "680000",
+    "ODPStatementJournal": "1770000"
+  },
+  "totalGasLimit": 15600000
+}

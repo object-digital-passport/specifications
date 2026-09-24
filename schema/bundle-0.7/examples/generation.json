@@ -1,0 +1,81 @@
+{
+  "format": "odp-bundle-generation-0.7",
+  "odpVersion": "0.7",
+  "generationId": "0.7-local-fixture",
+  "chainId": "31337",
+  "registry": "0x1111111111111111111111111111111111111111",
+  "abiGeneration": "0.7-redesign-8",
+  "registryRuntimeCodeHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "registryDeploymentBlock": "1",
+  "build": {
+    "sourceCommit": "0000000000000000000000000000000000000000",
+    "compilerVersion": "0.8.20",
+    "buildInfoHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "satellites": [
+    {
+      "role": "concerns",
+      "address": "0x2222222222222222222222222222222222222222",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "2"
+    },
+    {
+      "role": "hosting",
+      "address": "0x3333333333333333333333333333333333333333",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "3"
+    },
+    {
+      "role": "profile-directory",
+      "address": "0x4444444444444444444444444444444444444444",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "4"
+    },
+    {
+      "role": "institutional-proofs",
+      "address": "0x5555555555555555555555555555555555555555",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "5"
+    },
+    {
+      "role": "author-attestation",
+      "address": "0x6666666666666666666666666666666666666666",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "6"
+    },
+    {
+      "role": "wallet-document-anchor",
+      "address": "0x7777777777777777777777777777777777777777",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "7"
+    },
+    {
+      "role": "relations",
+      "address": "0x8888888888888888888888888888888888888888",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "8"
+    },
+    {
+      "role": "edition-units",
+      "address": "0x9999999999999999999999999999999999999999",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "9"
+    },
+    {
+      "role": "statement-journal",
+      "address": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "deploymentBlock": "10"
+    }
+  ],
+  "absentSatelliteRoles": []
+}

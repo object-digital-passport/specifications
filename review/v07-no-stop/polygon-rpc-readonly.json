@@ -1,0 +1,32 @@
+{
+  "readOnly": true,
+  "checkedAt": "2026-09-18T16:27:12.278Z",
+  "observations": [
+    {
+      "url": "https://polygon-bor-rpc.publicnode.com",
+      "chainId": "0x89",
+      "finalized": {
+        "number": "0x59ac58c",
+        "hash": "0x2712468680b7bc2808314b33d51dcd94a50aca3a2b9222df8d3b69c2c4367677",
+        "timestamp": "0x6aad665b"
+      },
+      "commonBlock": {
+        "number": "0x59ac58b",
+        "hash": "0xf89fa7cc7f485adc882916b8e68e26724c5bf35dbf0e440346e8d8d908480e6e"
+      }
+    },
+    {
+      "url": "https://polygon.drpc.org",
+      "chainId": "0x89",
+      "finalized": {
+        "number": "0x59ac58b",
+        "hash": "0xf89fa7cc7f485adc882916b8e68e26724c5bf35dbf0e440346e8d8d908480e6e",
+        "timestamp": "0x6aad665a"
+      },
+      "commonBlock": {
+        "number": "0x59ac58b",
+        "hash": "0xf89fa7cc7f485adc882916b8e68e26724c5bf35dbf0e440346e8d8d908480e6e"
+      }
+    }
+  ]
+}

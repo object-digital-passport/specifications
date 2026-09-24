@@ -1,0 +1,17 @@
+[
+  {
+    "input": "{\"2\":\"b\",\"10\":\"a\",\"z\":1e21,\"a\":-0,\"s\":\"e\\u0301\"}",
+    "canonical": "{\"10\":\"a\",\"2\":\"b\",\"a\":0,\"s\":\"é\",\"z\":1e+21}",
+    "sha256": "0x3315f7cba42a288e6a0899f58a6e161d160b3fabbe4c9ba471755e9c7cbd457d"
+  },
+  {
+    "input": "{\"anchors\":[{\"type\":\"file_hash\",\"hash\":\"sha256:abababababababababababababababababababababababababababababababab\"}],\"passportId\":null}",
+    "canonical": "{\"anchors\":[{\"hash\":\"sha256:abababababababababababababababababababababababababababababababab\",\"type\":\"file_hash\"}],\"passportId\":null}",
+    "sha256": "0x1a7b11a1470255912b712ba1d6ee0ff3c324981eff3be1758ef8352258a24569"
+  },
+  {
+    "input": "{\"😀\":1,\"�\":2,\"tiny\":1e-7,\"small\":0.000001}",
+    "canonical": "{\"small\":0.000001,\"tiny\":1e-7,\"😀\":1,\"�\":2}",
+    "sha256": "0x25a02d9f11b856556a8e5a72851bfd93e4fbdf72bba582c27c0af9fd4eb778b0"
+  }
+]

@@ -25,7 +25,10 @@ jobs:
           cache: npm
           cache-dependency-path: chain/package-lock.json
       - run: npm ci
-      - run: npm test
+      - run: npx hardhat clean
+      - run: npm run check
+      - name: Generated TypeChain matches sources
+        run: git diff --exit-code -- types abi
 
   schema:
     name: passport.json schema validation
@@ -37,11 +40,9 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - name: Validate 0.7 examples against the 0.7 schema
-        run: >
-          npx --yes ajv-cli@5 validate --spec=draft2020
-          -s schema/passport-0.7.schema.json
-          -d "schema/examples/0.7/*.json"
+      - run: npm ci --prefix chain
+      - name: Validate examples, canonical hashes and edition vectors
+        run: npm run vectors --prefix chain
 
   release-notes:
     name: release note style
@@ -70,7 +71,7 @@ jobs:
           python-version: "3.12"
       - name: Install slither + solc 0.8.20
         run: |
-          pip install slither-analyzer solc-select
+          pip install slither-analyzer==0.11.6 solc-select
           solc-select install 0.8.20
           solc-select use 0.8.20
       - name: Run slither (fail on high)
@@ -78,10 +79,11 @@ jobs:
         run: |
           status=0
           for f in ObjectDigitalPassport.sol ODPPassportProofRegistry.sol \
-                   ODPRegistryRelations.sol ODPCounterfeitConcern.sol \
-                   ODPWalletDocumentAnchor.sol ODPExtensionMintRouter.sol; do
+                   ODPRegistryRelations.sol ODPPassportConcerns.sol \
+                   ODPWalletDocumentAnchor.sol ODPHosting.sol ODPProfileDirectory.sol \
+                   ODPAuthorAttestation.sol ODPEditionUnits.sol ODPStatementJournal.sol; do
             echo "::group::$f"
-            slither "$f" --fail-high --solc-args "--via-ir --optimize" || status=1
+            slither "$f" --fail-high --solc-args "--via-ir --optimize --optimize-runs 1 --evm-version shanghai" || status=1
             echo "::endgroup::"
           done
           exit $status
