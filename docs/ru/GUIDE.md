@@ -255,6 +255,27 @@ ODP **не заменяет** человеческую экспертизу, и�
 
 ## Текущий релиз
 
+**Текущая линия — v0.7** (поколение `odp-0.7-redesign-8-polygon-20260925`), развёрнута в **Polygon mainnet** (`chainId` 137)
+2026-09-25 из утверждённого release-бандла `sha256:7392c821…a414d7`. Аутентифицированный манифест —
+[`chain/generations.json`](../../chain/generations.json); правила и требования к клиентам — [SPEC](SPEC.md) §7 и §22.
+Живые страницы сайта пока смотрят на v0.6, пока их не переведут на v0.7.
+
+| Роль | Контракт | Адрес | Блок |
+|---|---|---|---|
+| Registry (core) | `ObjectDigitalPassport` | [`0x3281492981DCD492cc2F7c17398134e1D3B5CA1F`](https://polygonscan.com/address/0x3281492981DCD492cc2F7c17398134e1D3B5CA1F) | 94434863 |
+| edition-units | `ODPEditionUnits` | [`0x3DBf163b8Ec7c251565E4aCD7b4F6b310B60d0fe`](https://polygonscan.com/address/0x3DBf163b8Ec7c251565E4aCD7b4F6b310B60d0fe) | 94434870 |
+| author-attestation | `ODPAuthorAttestation` | [`0x7973D5894f45755D87166518304654bFD56fFDD9`](https://polygonscan.com/address/0x7973D5894f45755D87166518304654bFD56fFDD9) | 94434876 |
+| concerns | `ODPPassportConcerns` | [`0xdda4740c9dFae9b827B1CA500533A555B0578C27`](https://polygonscan.com/address/0xdda4740c9dFae9b827B1CA500533A555B0578C27) | 94434881 |
+| hosting | `ODPHosting` | [`0x7cFB16693fFd0E26Fc6380fd7503b360BA02FCC3`](https://polygonscan.com/address/0x7cFB16693fFd0E26Fc6380fd7503b360BA02FCC3) | 94434888 |
+| profile-directory | `ODPProfileDirectory` | [`0x5aA960C6608052b2249f47f5184FE7F8A4996a72`](https://polygonscan.com/address/0x5aA960C6608052b2249f47f5184FE7F8A4996a72) | 94434895 |
+| relations | `ODPRegistryRelations` | [`0x9F27bcc97EDd3A8700991A6827a14bD9e53201F7`](https://polygonscan.com/address/0x9F27bcc97EDd3A8700991A6827a14bD9e53201F7) | 94434900 |
+| institutional-proofs | `ODPPassportProofRegistry` | [`0x49472AAa75a667198C4FF86f8Fe7B359f417eA22`](https://polygonscan.com/address/0x49472AAa75a667198C4FF86f8Fe7B359f417eA22) | 94434906 |
+| wallet-document-anchor | `ODPWalletDocumentAnchor` | [`0x6Bc2fC372E38f03f9e2aaA53206bcd49B78A9CdE`](https://polygonscan.com/address/0x6Bc2fC372E38f03f9e2aaA53206bcd49B78A9CdE) | 94434912 |
+| statement-journal | `ODPStatementJournal` | [`0xcf6375B52C5888e51eE20b1B61c623D08604859c`](https://polygonscan.com/address/0xcf6375B52C5888e51eE20b1B61c623D08604859c) | 94434917 |
+
+Всё ниже в этом разделе описывает **прежнюю линию v0.6**, она остаётся доступной для чтения.
+
+
 **Снимок кода:** **v0.6** — см. **[docs/V0.6.md](../V0.6.md)** ([по-русски](V0.6.md)). Исторические заметки: [docs/V0.5.md](../V0.5.md), [docs/V0.4.md](../V0.4.md), [RELEASE_v0.4.1.md](RELEASE_v0.4.1.md).
 
 **Задеплоенный эталонный реестр** (**основная сеть Polygon**, `chainId` 137) — деплой **v0.6**, на который по умолчанию указывает статический UI:

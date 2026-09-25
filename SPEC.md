@@ -1,6 +1,6 @@
 # Object Digital Passport — specification 0.7
 
-**Redesigned generation `0.7-redesign-8`. Local contract candidate for independent audit; no deployed, approved production generation.**
+**Redesigned generation `0.7-redesign-8`, deployed on Polygon mainnet on 2026-09-25 (§7). Not yet independently audited.**
 The earlier `0.7-redesign-7` snapshot and its approved release bundle are history; they do not describe the current sources.
 
 This document is normative for the sources in `chain/contracts/`. MUST, MUST NOT and SHOULD express
@@ -249,13 +249,30 @@ technologies need their own specified model string and verification recipe befor
 
 ## 7. Networks and generations
 
-There is no approved deployment produced by this change. Never substitute a 0.6 address or infer an address
-from the version byte. The selected target is Polygon mainnet (chainId 137), with fixed registry/satellite addresses after a separately authorized deployment. Polygon Amoy is not used, neither as a preliminary deployment nor for testing (owner decision 2026-09-24). No deployment has been performed and no addresses exist; deployment requires its own explicit authorization. The current instruction prohibits wallet connection, public-network access, deployment and publication; a target network is not authorization.
+The one approved generation of 0.7 is `odp-0.7-redesign-8-polygon-20260925`, deployed on Polygon mainnet
+(chainId 137) on 2026-09-25 from the owner-approved release bundle `sha256:7392c821…a414d7` and approved by the
+project owner the same day. Its authenticated manifest is `chain/generations.json`; the full deployment record is
+`chain/deploy/output/odp-0.7-redesign-8-polygon-20260925.json`. Never substitute a 0.6 address or infer an address
+from the version byte. Polygon Amoy is not used (owner decision 2026-09-24).
+
+| Role | Contract | Address | Deployment block |
+|---|---|---|---|
+| Registry (core) | `ObjectDigitalPassport` | [`0x3281492981DCD492cc2F7c17398134e1D3B5CA1F`](https://polygonscan.com/address/0x3281492981DCD492cc2F7c17398134e1D3B5CA1F) | 94434863 |
+| edition-units | `ODPEditionUnits` | [`0x3DBf163b8Ec7c251565E4aCD7b4F6b310B60d0fe`](https://polygonscan.com/address/0x3DBf163b8Ec7c251565E4aCD7b4F6b310B60d0fe) | 94434870 |
+| author-attestation | `ODPAuthorAttestation` | [`0x7973D5894f45755D87166518304654bFD56fFDD9`](https://polygonscan.com/address/0x7973D5894f45755D87166518304654bFD56fFDD9) | 94434876 |
+| concerns | `ODPPassportConcerns` | [`0xdda4740c9dFae9b827B1CA500533A555B0578C27`](https://polygonscan.com/address/0xdda4740c9dFae9b827B1CA500533A555B0578C27) | 94434881 |
+| hosting | `ODPHosting` | [`0x7cFB16693fFd0E26Fc6380fd7503b360BA02FCC3`](https://polygonscan.com/address/0x7cFB16693fFd0E26Fc6380fd7503b360BA02FCC3) | 94434888 |
+| profile-directory | `ODPProfileDirectory` | [`0x5aA960C6608052b2249f47f5184FE7F8A4996a72`](https://polygonscan.com/address/0x5aA960C6608052b2249f47f5184FE7F8A4996a72) | 94434895 |
+| relations | `ODPRegistryRelations` | [`0x9F27bcc97EDd3A8700991A6827a14bD9e53201F7`](https://polygonscan.com/address/0x9F27bcc97EDd3A8700991A6827a14bD9e53201F7) | 94434900 |
+| institutional-proofs | `ODPPassportProofRegistry` | [`0x49472AAa75a667198C4FF86f8Fe7B359f417eA22`](https://polygonscan.com/address/0x49472AAa75a667198C4FF86f8Fe7B359f417eA22) | 94434906 |
+| wallet-document-anchor | `ODPWalletDocumentAnchor` | [`0x6Bc2fC372E38f03f9e2aaA53206bcd49B78A9CdE`](https://polygonscan.com/address/0x6Bc2fC372E38f03f9e2aaA53206bcd49B78A9CdE) | 94434912 |
+| statement-journal | `ODPStatementJournal` | [`0xcf6375B52C5888e51eE20b1B61c623D08604859c`](https://polygonscan.com/address/0xcf6375B52C5888e51eE20b1B61c623D08604859c) | 94434917 |
+
 Its deployment manifest MUST bind the generation identifier to chain ID, registry address, deployed runtime
 hashes, ABI identities, deployment blocks and source/build identity. A generation identifier MUST NOT later
 be reassigned to different addresses. Clients may embed the authenticated fixed manifest; an online mutable
-generation directory is not required for this model. The current sources identify as 0.7-redesign-8;
-this does not claim that the release is already deployed. Document version 0.7 alone does not identify an ABI.
+generation directory is not required for this model. The current sources identify as 0.7-redesign-8 and
+match the deployed runtime above. Document version 0.7 alone does not identify an ABI.
 
 Every issued .odpass MUST carry its generation and full contract addresses as specified in §15. An embedded
 manifest is an identification artifact, not its own trust root: clients MUST authenticate the deployment
@@ -1158,17 +1175,17 @@ non-unique-edition rejection below, and used a single 72-hour window for every p
 The ten-contract roster is the core plus concerns, hosting, profile directory, institutional proofs,
 author attestation, wallet document anchor, relations, edition units and statement journal.
 A release bundle pins complete compiler input/output and exact ABI/creation/runtime/immutable bindings.
-The existing bundles describe earlier sources: `0.7-redesign-6` (sealed audit package) and `0.7-redesign-7`
-(`review/v07-abi7-release/`, hash approved by the owner on 2026-09-21). Neither matches `0.7-redesign-8`.
-Until a bundle is built and approved for the current sources, no pinned release corresponds to this
-specification, and the procedure below is unexecutable. No deployment has been performed; approving a bundle
-does not authorize one.
+The bundle for `0.7-redesign-8` is `review/v07-abi8-release/` (hash approved by the owner on 2026-09-24), and
+the generation in §7 was deployed from it on 2026-09-25. The earlier bundles describe earlier sources:
+`0.7-redesign-6` (sealed audit package) and `0.7-redesign-7` (`review/v07-abi7-release/`). Approving a bundle
+does not by itself authorize a deployment.
 Deployment uses pinned release bytes with compilation disabled, a checked manifest/resume identity,
 write-ahead transaction plans, exclusive manifest lock, nonce sequence and explicit gas/fee/total spend caps.
 On Polygon, two separate RPC services verify transactions, canonical receipts, runtime and finalized blocks;
 all ten contracts are rechecked before a generation candidate is emitted. Unknown submissions must be
 reconciled, never blindly redeployed. Two RPCs remain a trust assumption, not a light-client proof.
-See [deployment procedure](chain/deploy/README.md). A local candidate is not production approval.
+See [deployment procedure](chain/deploy/README.md). A local candidate is not production approval; the
+deployed generation was approved separately (§7).
 
 ## 22. Client application requirements (normative)
 

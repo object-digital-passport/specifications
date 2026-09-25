@@ -177,7 +177,7 @@ set. An `open` model does not authorize appending units to an existing passport.
 | Mint agent, `on-behalf` issuance, `tx.origin` path, extension router | Absent. Issuance delegation is deferred, not implemented. |
 | Unit passports, owner, transfer, activation-triggered revocation lock | Absent. Only expiry or explicit print finalization closes revocation. |
 | `governance`, freeze, admin pause, wallet rotation, key recovery | Absent. A lost or stolen key has no recovery path. |
-| Amoy testnet deployment | Not used, including for testing (owner decision 2026-09-24). Polygon mainnet (137) is the selected target; selecting a target is not authorization, and nothing is deployed. |
+| Amoy testnet deployment | Not used, including for testing (owner decision 2026-09-24). Polygon mainnet (137) is the only network; the one approved generation was deployed there on 2026-09-25 (SPEC §7). |
 | v0.6 mutable status / owner model, old glossary in `GUIDE.md` | Historical. See [GUIDE.md](GUIDE.md) for the v0.6 line only. |
 
 ## Status words used in this repository
