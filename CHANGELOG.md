@@ -13,6 +13,10 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
+### Changed
+
+- **The mainnet preflight accepts a fee cap between the current gas price and twice the base fee.** It used to require `maxFeePerGas` of at least twice the base fee plus the priority fee, so the balance had to cover the whole deployment at that price even when the current price was far lower. Now it fails only when the cap is below the current price, and reports a warning when the cap is below the conservative value, because a creation may then wait for the price to fall. The deployment script and the approved release bundle are unchanged.
+
 ## [0.7] - 2026-09-24 — pre-release
 
 **The 0.7 line, redesigned before its first deployment, and still not deployed.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the current ABI generation is `0.7-redesign-8`. There is no mainnet deployment and no contract address. No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation. The project owner approved the `0.7-redesign-8` release bundle on 2026-09-24 (`sha256:7392c821…a414d7`). This version will be dated on the day of its Polygon mainnet deployment.

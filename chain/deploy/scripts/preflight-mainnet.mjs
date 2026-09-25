@@ -8,7 +8,7 @@ import {parseJSONBytes} from '../../tools/canonical.mjs';
 export async function preflightMainnet({providers,deployer,release,approvedHash,spendPolicy}) {
  if(release.abiGeneration!=='0.7-redesign-8'||releaseHash(release)!==approvedHash)throw Error('Unapproved release');
  if(providers.length!==2||providers[0]===providers[1])throw Error('Two RPC providers required');
- deployer=getAddress(deployer);const policy=validateSpendPolicy(spendPolicy),observations=[];
+ deployer=getAddress(deployer);const policy=validateSpendPolicy(spendPolicy),observations=[],warnings=new Set();
  for(const provider of providers){
   if((await provider.getNetwork()).chainId!==137n)throw Error('Polygon chain137 required');
   const latest=await provider.getTransactionCount(deployer,'latest'),pending=await provider.getTransactionCount(deployer,'pending'),finalized=await provider.getBlock('finalized');
@@ -18,16 +18,18 @@ export async function preflightMainnet({providers,deployer,release,approvedHash,
   const head=await provider.getBlock('latest');
   if(head?.baseFeePerGas==null)throw Error('EIP1559 base fee unavailable');
   const priority=BigInt(await provider.send('eth_maxPriorityFeePerGas',[]));
-  const fees={maxFeePerGas:2n*head.baseFeePerGas+priority,maxPriorityFeePerGas:priority};
-  if(fees.maxFeePerGas>BigInt(policy.maxFeePerGas)||fees.maxPriorityFeePerGas>BigInt(policy.maxPriorityFeePerGas))throw Error('Current fee quote exceeds configured caps');
-  observations.push({nonce:pending,balanceWei:String(await provider.getBalance(deployer,'pending')),finalizedNumber:finalized.number,fees:{maxFeePerGas:String(fees.maxFeePerGas),maxPriorityFeePerGas:String(fees.maxPriorityFeePerGas)}});
+  // A cap below today's price cannot be included now; a cap below twice the base fee only risks waiting if the price rises.
+  const fees={currentFeePerGas:head.baseFeePerGas+priority,conservativeMaxFeePerGas:2n*head.baseFeePerGas+priority,maxPriorityFeePerGas:priority};
+  if(fees.currentFeePerGas>BigInt(policy.maxFeePerGas)||fees.maxPriorityFeePerGas>BigInt(policy.maxPriorityFeePerGas))throw Error('Current fee exceeds configured caps');
+  if(fees.conservativeMaxFeePerGas>BigInt(policy.maxFeePerGas))warnings.add('maxFeePerGas is below twice the current base fee plus priority fee: a creation may wait until the base fee falls back under the cap');
+  observations.push({nonce:pending,balanceWei:String(await provider.getBalance(deployer,'pending')),finalizedNumber:finalized.number,fees:Object.fromEntries(Object.entries(fees).map(([k,v])=>[k,String(v)]))});
  }
  if(observations[0].nonce!==observations[1].nonce)throw Error('RPC nonce disagreement');
  const blockNumber=Math.min(...observations.map(o=>o.finalizedNumber)),blocks=await Promise.all(providers.map(p=>p.getBlock(blockNumber)));
  if(!blocks[0]||!blocks[1]||blocks[0].hash!==blocks[1].hash)throw Error('RPC finalized block disagreement');
  const predicted=Object.fromEntries(Object.keys(roles).map((name,i)=>[name,getCreateAddress({from:deployer,nonce:observations[0].nonce+i})]));
  for(const provider of providers)for(const address of Object.values(predicted))if(await provider.getCode(address)!=='0x')throw Error('Predicted address already has code');
- return {format:'odp-mainnet-preflight-0.7',observedAt:new Date().toISOString(),chainId:'137',deployer,releaseHash:approvedHash,spendPolicy:policy,observations,commonFinalized:{number:blockNumber,hash:blocks[0].hash},predicted,warning:'Read-only observation, not deployment approval or a reservation of nonce/fees. Use an exclusive deployment account; rerun immediately before deployment.'};
+ return {format:'odp-mainnet-preflight-0.7',observedAt:new Date().toISOString(),chainId:'137',deployer,releaseHash:approvedHash,spendPolicy:policy,observations,commonFinalized:{number:blockNumber,hash:blocks[0].hash},predicted,feeWarnings:[...warnings],warning:'Read-only observation, not deployment approval or a reservation of nonce/fees. Use an exclusive deployment account; rerun immediately before deployment.'};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  const urls=[process.env.ODP_POLYGON_RPC_URL,process.env.ODP_VERIFY_RPC_URL];
