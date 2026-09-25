@@ -95,4 +95,12 @@ describe('Polygon137 complete deployment path over two local HTTP RPCs',function
   assert.ok(!h.observers.some(o=>o.calls.some(m=>m==='eth_sendTransaction'||m==='eth_sendRawTransaction')));
  });
 
+ it('accepts a fee cap between the current price and twice the base fee, with a warning',async()=>{
+  const head=await h.provider.getBlock('latest'),priority=BigInt(await h.provider.send('eth_maxPriorityFeePerGas',[]));
+  const cap=head.baseFeePerGas+priority+1n;
+  const report=await preflightMainnet({...options,spendPolicy:{...options.spendPolicy,maxFeePerGas:String(cap),maxPriorityFeePerGas:String(priority)},providers:[h.provider,h.verificationProvider],deployer:options.expectedDeployer});
+  assert.equal(report.feeWarnings.length,1);
+  await assert.rejects(preflightMainnet({...options,spendPolicy:{...options.spendPolicy,maxFeePerGas:String(head.baseFeePerGas),maxPriorityFeePerGas:'1'},providers:[h.provider,h.verificationProvider],deployer:options.expectedDeployer}),/Current fee exceeds/);
+ });
+
 });
