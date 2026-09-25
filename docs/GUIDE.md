@@ -253,6 +253,27 @@ The consequence is worth stating plainly: **scanning an ODP tag or QR does nothi
 
 ## Current Release
 
+**Current line — v0.7** (generation `odp-0.7-redesign-8-polygon-20260925`), deployed on **Polygon mainnet** (`chainId` 137)
+on 2026-09-25 from the approved release bundle `sha256:7392c821…a414d7`. The authenticated manifest is
+[`chain/generations.json`](../chain/generations.json); rules and client requirements are in [SPEC.md](../SPEC.md) §7 and §22.
+The live pages of the website still point at v0.6 until they are moved to v0.7.
+
+| Role | Contract | Address | Block |
+|---|---|---|---|
+| Registry (core) | `ObjectDigitalPassport` | [`0x3281492981DCD492cc2F7c17398134e1D3B5CA1F`](https://polygonscan.com/address/0x3281492981DCD492cc2F7c17398134e1D3B5CA1F) | 94434863 |
+| edition-units | `ODPEditionUnits` | [`0x3DBf163b8Ec7c251565E4aCD7b4F6b310B60d0fe`](https://polygonscan.com/address/0x3DBf163b8Ec7c251565E4aCD7b4F6b310B60d0fe) | 94434870 |
+| author-attestation | `ODPAuthorAttestation` | [`0x7973D5894f45755D87166518304654bFD56fFDD9`](https://polygonscan.com/address/0x7973D5894f45755D87166518304654bFD56fFDD9) | 94434876 |
+| concerns | `ODPPassportConcerns` | [`0xdda4740c9dFae9b827B1CA500533A555B0578C27`](https://polygonscan.com/address/0xdda4740c9dFae9b827B1CA500533A555B0578C27) | 94434881 |
+| hosting | `ODPHosting` | [`0x7cFB16693fFd0E26Fc6380fd7503b360BA02FCC3`](https://polygonscan.com/address/0x7cFB16693fFd0E26Fc6380fd7503b360BA02FCC3) | 94434888 |
+| profile-directory | `ODPProfileDirectory` | [`0x5aA960C6608052b2249f47f5184FE7F8A4996a72`](https://polygonscan.com/address/0x5aA960C6608052b2249f47f5184FE7F8A4996a72) | 94434895 |
+| relations | `ODPRegistryRelations` | [`0x9F27bcc97EDd3A8700991A6827a14bD9e53201F7`](https://polygonscan.com/address/0x9F27bcc97EDd3A8700991A6827a14bD9e53201F7) | 94434900 |
+| institutional-proofs | `ODPPassportProofRegistry` | [`0x49472AAa75a667198C4FF86f8Fe7B359f417eA22`](https://polygonscan.com/address/0x49472AAa75a667198C4FF86f8Fe7B359f417eA22) | 94434906 |
+| wallet-document-anchor | `ODPWalletDocumentAnchor` | [`0x6Bc2fC372E38f03f9e2aaA53206bcd49B78A9CdE`](https://polygonscan.com/address/0x6Bc2fC372E38f03f9e2aaA53206bcd49B78A9CdE) | 94434912 |
+| statement-journal | `ODPStatementJournal` | [`0xcf6375B52C5888e51eE20b1B61c623D08604859c`](https://polygonscan.com/address/0xcf6375B52C5888e51eE20b1B61c623D08604859c) | 94434917 |
+
+Everything below in this section describes the **previous line, v0.6**, which stays readable.
+
+
 **Code snapshot:** **v0.6** — see **[docs/V0.6.md](V0.6.md)**. Historical notes: [docs/V0.5.md](V0.5.md), [docs/V0.4.md](V0.4.md), [docs/RELEASE_v0.4.1.md](RELEASE_v0.4.1.md).
 
 **Deployed reference registry** (**Polygon mainnet**, `chainId` 137) — the **v0.6** deployment the static UI defaults point to:

@@ -4,7 +4,7 @@
 
 [Запечатанный пакет аудитору](../../review/audit-handoff-abi6/README.md) описывает прежнюю ABI `0.7-redesign-6` и текущие исходники не подтверждает; его hashes и отчёты сохранены. Утверждённый release-бандл `0.7-redesign-7` (`review/v07-abi7-release/`) тоже прошлый снимок. Поколение `0.7-redesign-8` добавляет неизменяемый `previewHash` (SPEC §8, §9, §22.19). Архитектурные ревью, прежние решения/ADR, аудиты, guides v0.6 и старые модели тиражей ниже — исторические материалы. Их diagrams/errors не описывают текущее поколение: profile stop, mint-agent, unit-passport hooks, governance/freeze, единое окно отзыва 72 часа и обязательный Amoy заменены текущей SPEC.
 
-Bundle содержит `passport.json`, `generation.json`, `receipt.json`, `manifest.json` и `files/<sha256hex>`, в том числе облегчённую публичную копию фото, если она есть. Reference validator проверяет распакованные entries, но не ZIP и не chain evidence. Контракты — локальный кандидат; готовность приложения и выдачи отдельно не приняты. Цель — Polygon mainnet, Amoy не используется; ничего не развёрнуто, production generation не утверждена. Кошелёк, внешняя сеть, deployment и публикация сейчас запрещены.
+Bundle содержит `passport.json`, `generation.json`, `receipt.json`, `manifest.json` и `files/<sha256hex>`, в том числе облегчённую публичную копию фото, если она есть. Reference validator проверяет распакованные entries, но не ZIP и не chain evidence. Контракты развёрнуто в Polygon mainnet 2026-09-25 (реестр `0x3281492981DCD492cc2F7c17398134e1D3B5CA1F`, все адреса — SPEC §7); готовность приложения и выдачи отдельно не приняты. Amoy не используется. Кошелёк, внешняя сеть, deployment и публикация сейчас запрещены.
 
 ## Исторический каталог и общие инструкции репозитория
 

@@ -33,4 +33,4 @@ Reference tools реализуют strict UTF-8, custom bit31, полный addr
 
 Локальные тесты включают отрицательные проверки прав, точные границы 72/24 часа, квоты, concern lifecycle, Merkle mutations, domains и document-to-EVM roundtrips. Они ограничивают известные риски, но не доказывают отсутствие ошибок и не заменяют независимый аудит.
 
-Цель — Polygon mainnet, Amoy не используется. Ничего не развёрнуто, production generation не утверждена. Release/manifest/resume, nonce/spend limits и два RPC/finality уменьшают операционные риски, но не доказывают честность RPC. Сейчас запрещены кошелёк, внешняя сеть, deployment и публикация.
+Сеть — только Polygon mainnet, Amoy не используется. Утверждённое поколение развёрнуто там 2026-09-25 (SPEC §7, `chain/generations.json`). Release/manifest/resume, nonce/spend limits и два RPC/finality уменьшают операционные риски, но не доказывают честность RPC. Сейчас запрещены кошелёк, внешняя сеть, deployment и публикация.

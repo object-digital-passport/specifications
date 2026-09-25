@@ -13,13 +13,9 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
-### Changed
+## [0.7] - 2026-09-25
 
-- **The mainnet preflight accepts a fee cap between the current gas price and twice the base fee.** It used to require `maxFeePerGas` of at least twice the base fee plus the priority fee, so the balance had to cover the whole deployment at that price even when the current price was far lower. Now it fails only when the cap is below the current price, and reports a warning when the cap is below the conservative value, because a creation may then wait for the price to fall. The deployment script and the approved release bundle are unchanged.
-
-## [0.7] - 2026-09-24 — pre-release
-
-**The 0.7 line, redesigned before its first deployment, and still not deployed.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the current ABI generation is `0.7-redesign-8`. There is no mainnet deployment and no contract address. No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation. The project owner approved the `0.7-redesign-8` release bundle on 2026-09-24 (`sha256:7392c821…a414d7`). This version will be dated on the day of its Polygon mainnet deployment.
+**The 0.7 line, redesigned before its first deployment and deployed on Polygon mainnet on 2026-09-25.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the ABI generation is `0.7-redesign-8`. It was deployed from the release bundle the project owner approved on 2026-09-24 (`sha256:7392c821…a414d7`), and the generation `odp-0.7-redesign-8-polygon-20260925` was approved on the day of deployment; the registry is [`0x3281492981DCD492cc2F7c17398134e1D3B5CA1F`](https://polygonscan.com/address/0x3281492981DCD492cc2F7c17398134e1D3B5CA1F), and all ten addresses are in [`SPEC.md` §7](SPEC.md). No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation.
 
 ### Added
 
@@ -41,6 +37,7 @@ its own history; what is recorded here from now on is the protocol.
 
 ### Changed
 
+- **The mainnet preflight accepts a fee cap between the current gas price and twice the base fee.** It used to require `maxFeePerGas` of at least twice the base fee plus the priority fee, so the balance had to cover the whole deployment at that price even when the current price was far lower. Now it fails only when the cap is below the current price, and reports a warning when the cap is below the conservative value, because a creation may then wait for the price to fall. The deployment script and the approved release bundle are unchanged.
 - **Every issuer must publish its profile ID, and the multisig month warning has a number.** Publishing the profile ID and the full wallet address on a channel the issuer controls was a recommendation; it is now required of every issuer, and organizations (`B`, `P`, `M`) must also serve `/.well-known/odp.json` ([`SPEC.md` §3](SPEC.md)). The registry cannot enforce it, so an unpublished profile is simply unidentified. A client warns when a Safe mint or proof proposal is created less than 24 hours before the end of the UTC month (CA-5.8). The example deployment spend policy again carries a 25 % margin over the measured `0.7-redesign-8` deployment gas: 3 500 000 for the core and 1 780 000 for the statement journal.
 
 - **Contract-wallet issuers can prove their wallet, and the identity file names its format and wallet.** The off-chain creator wallet proof now accepts ERC-1271 `isValidSignature` for issuers registered to a Safe or another contract wallet, with the block of the check recorded ([`SPEC.md` §11](SPEC.md)). `/.well-known/odp.json` carries `"odp": 1` and an optional full `wallet` per profile, matching the [ODP Profile Directory format](https://github.com/object-digital-passport/odp-profile-directory); a listed wallet that differs from the registry does not count. Edition master seeds MAY also be backed up on paper as SLIP-39 shares next to the `.odpsecret` file (CA-7.7), and large print runs SHOULD use an ISO 14298 printer (CA-7.8). The ESPR article references in §18.0 were checked against the Official Journal text.
@@ -93,7 +90,7 @@ its own history; what is recorded here from now on is the protocol.
 - **The 0.7 registry was audited before it could ship, and every finding is backed by a test.** The audit made 36 findings, 4 of them critical: `tx.origin` substitution behind the extension router; a unit-key signature that did not cover the card; a governance-named `editionUnits` address that could mint under any profile and remove any passport's revocation remedy; and a relations satellite that, by simply lying, granted mint-agent and publishing rights. Each finding has an executable proof of concept. All four critical findings were closed by removing the code that contained them, and the rest were answered by satellite, specification and client work. Reports and evidence are under `review/`.
 - **A usage-safety review of how people will actually hold keys, print labels and hand objects over.** Each of its 19 items has a decision recorded in `review/usage-safety-abi6/CLOSURE.md`, including the 2026-09-24 revision, and the decisions are normative in SPEC §22. None of this is implemented or accepted in a client application yet.
 - **A logic recheck of `0.7-redesign-7` (2026-09-24) found no defect in the contracts** and matched them against SPEC §2–§8, §13 and §20. Its main operational finding, the UTC month boundary for multisignature proposals, is now a client rule (CA-5.8–5.10). Two lower findings remain notes for client work: pending affiliation requests never expire, and self-declared `P`/`M` profiles have no issuance limit. Slither was not run on the redesigned contracts.
-- **What is not covered yet:** no independent audit of `0.7-redesign-8`; the sealed audit package describes `0.7-redesign-6` only; the `0.7-redesign-8` release bundle is approved, but nothing has been deployed.
+- **What is not covered yet:** no independent audit of `0.7-redesign-8`; the sealed audit package describes `0.7-redesign-6` only; the contracts are deployed and their source code is not yet verified on Polygonscan.
 
 ## [0.7-preview] - 2026-08-22 — pre-release
 

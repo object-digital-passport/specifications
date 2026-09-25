@@ -56,6 +56,6 @@ AlreadyCommitted error. Exact replay survives later lifecycle/calendar changes a
 Strict UTF-8, custom bit31 and full list/tree validation are implemented in reference tools; safe ZIP,
 URL fetch/redirect/private-IP limits, client finality and identity UI remain separate open work.
 
-Polygon mainnet is the selected target; Amoy is not used. Nothing is deployed and no production generation is approved here.
+Polygon mainnet is the only network; Amoy is not used. The approved generation was deployed there on 2026-09-25 (SPEC §7, `chain/generations.json`).
 Pinned release, verified resume, nonce/spend limits and two-RPC finality reduce deployment mistakes; they do
 not prove RPC honesty or constitute permission to deploy. Current work forbids wallet/network access.

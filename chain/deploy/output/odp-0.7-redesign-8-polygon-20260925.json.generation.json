@@ -1,0 +1,81 @@
+{
+  "format": "odp-bundle-generation-0.7",
+  "odpVersion": "0.7",
+  "generationId": "odp-0.7-redesign-8-polygon-20260925",
+  "chainId": "137",
+  "registry": "0x3281492981dcd492cc2f7c17398134e1d3b5ca1f",
+  "abiGeneration": "0.7-redesign-8",
+  "registryRuntimeCodeHash": "0x9da6429fcf47e638377081bab80189877574ef33a6d1468dd4ac466bbc5ea7ec",
+  "registryDeploymentBlock": "94434863",
+  "build": {
+    "sourceCommit": "feb674362c538ec083fcfa66a84f76bf03dbdeb3",
+    "compilerVersion": "0.8.20+commit.a1b79de6",
+    "buildInfoHash": "sha256:5c196725347d176f2ba68c297f0832d937546cb2043c56eb389971c135216577"
+  },
+  "satellites": [
+    {
+      "role": "edition-units",
+      "address": "0x3dbf163b8ec7c251565e4acd7b4f6b310b60d0fe",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0x4e7ac33b4c47fab6bed608685bb45ee04c97c8ced6f29bd9da817f0d9e65552b",
+      "deploymentBlock": "94434870"
+    },
+    {
+      "role": "author-attestation",
+      "address": "0x7973d5894f45755d87166518304654bfd56ffdd9",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0x0c654feb83c86e96d68a47db951cbec31a18a6fb9ade4fa3727aac846aa57041",
+      "deploymentBlock": "94434876"
+    },
+    {
+      "role": "concerns",
+      "address": "0xdda4740c9dfae9b827b1ca500533a555b0578c27",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0x66e2d9d42283a1cba7f500a0406c477bc53dc4c7bd0bcdd37ab2abec0a289d23",
+      "deploymentBlock": "94434881"
+    },
+    {
+      "role": "hosting",
+      "address": "0x7cfb16693ffd0e26fc6380fd7503b360ba02fcc3",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0x5ddf7544a8a61d7105da871eb5aac35a999629af421142f5ed8581ceb842941a",
+      "deploymentBlock": "94434888"
+    },
+    {
+      "role": "profile-directory",
+      "address": "0x5aa960c6608052b2249f47f5184fe7f8a4996a72",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0x6b2c84508075a9e11aa51be0b5c725df7ae5947f7b7e33fa6da93835f09c7ca2",
+      "deploymentBlock": "94434895"
+    },
+    {
+      "role": "relations",
+      "address": "0x9f27bcc97edd3a8700991a6827a14bd9e53201f7",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xf53b1edce37f0cf5b711ff221cf63b24155c802977fcb5603feab7de8ad259c9",
+      "deploymentBlock": "94434900"
+    },
+    {
+      "role": "institutional-proofs",
+      "address": "0x49472aaa75a667198c4ff86f8fe7b359f417ea22",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0xa7c905a22d46158a64c2f37f36e4dc063a084c4fb2e645a25021c4635d4adffe",
+      "deploymentBlock": "94434906"
+    },
+    {
+      "role": "wallet-document-anchor",
+      "address": "0x6bc2fc372e38f03f9e2aaa53206bcd49b78a9cde",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0x0067288b1d59ecbc580708d430872e16ed6d0166241cf09a59bf8ed5b8b3d974",
+      "deploymentBlock": "94434912"
+    },
+    {
+      "role": "statement-journal",
+      "address": "0xcf6375b52c5888e51ee20b1b61c623d08604859c",
+      "abiGeneration": "0.7-redesign-8",
+      "runtimeCodeHash": "0x5b55bd197741e83a7f4b4d7b739b0c0b10702aa0499b546168628617cf0b0385",
+      "deploymentBlock": "94434917"
+    }
+  ],
+  "absentSatelliteRoles": []
+}
