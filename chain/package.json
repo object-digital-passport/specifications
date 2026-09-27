@@ -17,7 +17,7 @@
     "test:tools": "node --test tools/test/*.test.mjs"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.7",
+    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^4.0.0",
     "ajv": "8.20.0",
     "hardhat": "^3.17.0"
   },
