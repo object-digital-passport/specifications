@@ -15,7 +15,7 @@ its own history; what is recorded here from now on is the protocol.
 
 ### Changed
 
-- **SPEC CA-5.9 now states that a failed Safe execution is not visible on chain.** With `safeTxGas = 0` and `gasPrice = 0`, Safe v1.4.1 reverts the whole `execTransaction` (`GS013`): no `ExecutionFailure` log, no nonce spent. A missing event or an unconsumed nonce proves neither success nor the absence of an attempt, so a client shows "not executed" or "unexecutable", never "the attempt failed", and confirms only from the satellite's own record. A clarification of existing behaviour: no contract, ABI or deployment change.
+- **SPEC CA-5.9 now states that a failed Safe execution is not visible on chain.** With `safeTxGas = 0` and `gasPrice = 0`, Safe v1.4.1 reverts the whole `execTransaction` (`GS013`): no `ExecutionFailure` log, no nonce spent. In that configuration a missing event or an unconsumed nonce proves neither success nor the absence of an attempt, so a client shows "not executed" or "unexecutable", never "the attempt failed". An exact `ExecutionFailure` of another configuration (non-zero `safeTxGas` or `gasPrice`) may prove the outcome of the Safe proposal, but never replaces the check of the ODP satellite's own record. A clarification of existing behaviour: no contract, ABI or deployment change.
 
 ## [0.7] - 2026-09-25
 
