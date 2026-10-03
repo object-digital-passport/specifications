@@ -1268,6 +1268,13 @@ valid. Rationale and acceptance scenarios:
   the job for the new month under the same `operationId`. Before reuse, it MUST confirm through
   `getMintOperation` or `proofOperations` that the operation is not committed; the reverted proposal reserved
   nothing (§3). Re-preparation changes hashed bytes (§2) and needs a new confirmation by the co-signers (CA-5.2).
+  For the same reason a failed execution attempt cannot be observed on chain: a reverted `execTransaction` leaves
+  no `ExecutionFailure` log and does not consume the Safe nonce. Absence of an execution event, or an unconsumed
+  nonce, proves neither that no attempt was made nor that one failed. The client MUST NOT present "the attempt
+  failed" as a chain fact, and MUST NOT treat a missing event as success or as proof that nothing was tried. It
+  shows "not executed" while the window is open and "unexecutable" after it (above, CA-5.10). Any `ExecutionFailure`
+  log that does appear (for example from a Safe configured with a non-zero `safeTxGas` or `gasPrice`) is not
+  evidence the client can rely on for ODP's own state; confirmation always comes from the satellite's own record.
 - CA-5.10. A Safe revocation proposal can execute only inside the role's window (§8; 24 hours for B/P/M). The
   client MUST show the window's end on the proposal and warn that slow co-signers can miss it. After the end the
   proposal MUST be shown as unexecutable (`EC(132)`), with the rejection transaction of CA-5.9 offered to free
