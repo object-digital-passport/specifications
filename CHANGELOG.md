@@ -13,6 +13,10 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
+### Changed
+
+- **SPEC CA-5.9 now states that a failed Safe execution is not visible on chain.** With `safeTxGas = 0` and `gasPrice = 0`, Safe v1.4.1 reverts the whole `execTransaction` (`GS013`): no `ExecutionFailure` log, no nonce spent. A missing event or an unconsumed nonce proves neither success nor the absence of an attempt, so a client shows "not executed" or "unexecutable", never "the attempt failed". Non-zero `safeTxGas` or `gasPrice` lift only `GS013`: `handlePayment` (`GS011`, `GS012`) and the guard's `checkAfterExecution` can still revert the whole outer call, event and nonce included, so an `ExecutionFailure` is evidence only when the outer transaction completed successfully on the canonical chain, and it never replaces the check of the ODP satellite's own record. A clarification of existing behaviour: no contract, ABI or deployment change.
+
 ## [0.7] - 2026-09-25
 
 **The 0.7 line, redesigned before its first deployment and deployed on Polygon mainnet on 2026-09-25.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the ABI generation is `0.7-redesign-8`. It was deployed from the release bundle the project owner approved on 2026-09-24 (`sha256:7392c821…a414d7`), and the generation `odp-0.7-redesign-8-polygon-20260925` was approved on the day of deployment; the registry is [`0x3281492981DCD492cc2F7c17398134e1D3B5CA1F`](https://polygonscan.com/address/0x3281492981DCD492cc2F7c17398134e1D3B5CA1F), and all ten addresses are in [`SPEC.md` §7](SPEC.md). No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation.
