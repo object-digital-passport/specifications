@@ -1273,11 +1273,15 @@ valid. Rationale and acceptance scenarios:
   nonce. Here the absence of an `ExecutionFailure` log, or an unconsumed nonce, proves neither that no attempt was
   made nor that one failed. The client MUST NOT present "the attempt failed" as a chain fact, and MUST NOT treat a
   missing event as success or as proof that nothing was tried. It shows "not executed" while the window is open and
-  "unexecutable" after it (above, CA-5.10). This holds only for that configuration. A Safe v1.4.1 transaction with a
-  non-zero `safeTxGas` or `gasPrice` does not revert on a failed inner call: it emits `ExecutionFailure` and consumes
-  the nonce. An exact such log (this Safe's address, this proposal's hash, a finalized block) may therefore prove
-  the outcome of that Safe proposal, and nothing more: it never replaces the check of the ODP satellite's own record,
-  which alone confirms the call itself (§3).
+  "unexecutable" after it (above, CA-5.10). In Safe v1.4.1 a non-zero `safeTxGas` or `gasPrice` lifts only `GS013`;
+  it does not make the outer `execTransaction` unrevertable. After the inner call it still runs `handlePayment`,
+  which can revert (`GS011`, `GS012`), emits `ExecutionSuccess` or `ExecutionFailure`, and then calls the guard's
+  `checkAfterExecution`, which can revert the whole outer call, event and nonce included
+  ([Safe.sol v1.4.1](https://raw.githubusercontent.com/safe-global/safe-smart-account/v1.4.1/contracts/Safe.sol)).
+  So an `ExecutionFailure` log is evidence only when the outer transaction itself completed successfully on the
+  canonical chain (this Safe's address, this proposal's hash, a finalized block); it then proves the outcome of that
+  Safe proposal and nothing more. The absence of any event proves nothing in any configuration, and no such log ever
+  replaces the check of the ODP satellite's own record, which alone confirms the call itself (§3).
 - CA-5.10. A Safe revocation proposal can execute only inside the role's window (§8; 24 hours for B/P/M). The
   client MUST show the window's end on the proposal and warn that slow co-signers can miss it. After the end the
   proposal MUST be shown as unexecutable (`EC(132)`), with the rejection transaction of CA-5.9 offered to free
