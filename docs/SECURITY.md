@@ -1,6 +1,6 @@
 # Security model — redesigned 0.7, ABI `0.7-redesign-8`
 
-Normative behavior: [SPEC](../SPEC.md). Terms: [glossary](GLOSSARY.md). Release evidence: [sealed `0.7-redesign-6` checks](../review/audit-handoff-abi6/TESTS_AND_ANALYSIS.md), which do not cover the current sources, and [the delta after that package](../ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian).
+Normative behavior: [SPEC](../SPEC.md). Terms: [glossary](GLOSSARY.md). Release evidence: [sealed `0.7-redesign-6` checks](../review/audit-handoff-abi6/TESTS_AND_ANALYSIS.md), which do not cover the current sources.
 The earlier security guide is archived under `review/astra/legacy-docs/docs/SECURITY.md`.
 
 | Surface | Enforced | Not established |

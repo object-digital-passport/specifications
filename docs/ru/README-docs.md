@@ -1,6 +1,6 @@
 # Актуальная документация ODP 0.7 — ABI 0.7-redesign-8
 
-Нормативна [английская SPEC](../../SPEC.md). Начните с [дельты и открытых решений](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md), [плана](../../ODP_07_ACTION_PLAN.md), [app handoff](../../ODP_07_APP_HANDOFF.md), [безопасности](SECURITY.md), [глоссария](GLOSSARY.md), [tools](../../chain/tools/README.md) и [deployment](../../chain/deploy/README.md).
+Нормативна [английская SPEC](../../SPEC.md). Начните с [безопасности](SECURITY.md), [глоссария](GLOSSARY.md), [tools](../../chain/tools/README.md) и [deployment](../../chain/deploy/README.md).
 
 [Запечатанный пакет аудитору](../../review/audit-handoff-abi6/README.md) описывает прежнюю ABI `0.7-redesign-6` и текущие исходники не подтверждает; его hashes и отчёты сохранены. Утверждённый release-бандл `0.7-redesign-7` (`review/v07-abi7-release/`) тоже прошлый снимок. Поколение `0.7-redesign-8` добавляет неизменяемый `previewHash` (SPEC §8, §9, §22.19). Архитектурные ревью, прежние решения/ADR, аудиты, guides v0.6 и старые модели тиражей ниже — исторические материалы. Их diagrams/errors не описывают текущее поколение: profile stop, mint-agent, unit-passport hooks, governance/freeze, единое окно отзыва 72 часа и обязательный Amoy заменены текущей SPEC.
 

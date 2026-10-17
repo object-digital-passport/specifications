@@ -13,7 +13,7 @@ their snapshot remains in [the sealed source](../review/audit-handoff-abi6/SOURC
 Mint-agent, profile stop, governance/pause, owner transfer, key recovery and unit-passport hooks are absent.
 Print finalization is a registry flag: the core observes no printer and cannot prevent external printing,
 and the application-side print gate is not implemented here. The sealed `0.7-redesign-6` package and the approved `0.7-redesign-7` bundle do not
-certify this ABI; see [the delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md).
+certify this ABI.
 Author EIP-712 attestation exists in its satellite, with an immutable issuer-chosen one-shot slot and separate
 signer withdrawal; it does not establish human identity. Core never calls a satellite. EIP-170 is enforced
 locally; see [size policy](EIP170_STRATEGY.md). Storage, publication and payment rules are in SPEC §22.19; the hash-derived IPFS address still needs a test

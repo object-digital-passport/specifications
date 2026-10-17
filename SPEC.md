@@ -6,9 +6,8 @@ The earlier `0.7-redesign-7` snapshot and its approved release bundle are histor
 This document is normative for the sources in `chain/contracts/`. MUST, MUST NOT and SHOULD express
 requirements. The previous 0.7 ABI is incompatible. Its specification is preserved for audit in
 [BASELINE_SPEC_5d1db8f.md](review/astra/BASELINE_SPEC_5d1db8f.md), not as an alternative implementation target.
-The older audit/design documents describe inputs to this implementation; [ODP_ASTRA_REVIEW.md](ODP_ASTRA_REVIEW.md)
-records which claims survived independent reproduction. Deployment and client integration status live in
-[ODP_07_IMPLEMENTATION.md](ODP_07_IMPLEMENTATION.md).
+The older audit and design documents were working material and are not published. This specification, the
+contracts and the [changelog](CHANGELOG.md) are the record; the deployment is described in §7.
 This English file is the only normative text. Translations under `docs/<language>/` are informative and may
 contain mistakes; see [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md).
 
