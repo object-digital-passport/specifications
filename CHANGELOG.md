@@ -13,6 +13,15 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
+### Changed
+
+- **The README is the front page again.** The rewrite for ABI `0.7-redesign-7` had replaced it with an audit-status page. The cover, badges, the note to prospective contributors, the quick start, the plain-words explanation, the diagrams, the profile types and the FAQ are back, updated to what v0.7 is: a registration fact rather than a diary, a short withdrawal window, separate check results instead of one verdict, ten contracts with nobody in charge, and the deployed registry address. `README.ru.md` is restored the same way.
+
+### Removed
+
+- **Sixteen internal working notes (`ODP_*.md`) no longer sit in the repository root.** They were audit briefs, plans and hand-off tasks written while the 0.7 line was being designed, not part of the standard. The root holds the standard, the changelog and the README again. What they concluded is in `SPEC.md`, this changelog and the documents the decisions changed; the files stay in the git history. Every link to them was removed, and the `docs/TRANSLATIONS.md` rows for them are gone.
+
+
 ## [0.7] - 2026-09-25
 
 **The 0.7 line, redesigned before its first deployment and deployed on Polygon mainnet on 2026-09-25.** The registry published as the 0.7 pre-release is replaced by a core that records registration facts and nothing else, plus nine satellites; the ABI generation is `0.7-redesign-8`. It was deployed from the release bundle the project owner approved on 2026-09-24 (`sha256:7392c821…a414d7`), and the generation `odp-0.7-redesign-8-polygon-20260925` was approved on the day of deployment; the registry is [`0x3281492981DCD492cc2F7c17398134e1D3B5CA1F`](https://polygonscan.com/address/0x3281492981DCD492cc2F7c17398134e1D3B5CA1F), and all ten addresses are in [`SPEC.md` §7](SPEC.md). No independent audit covers `0.7-redesign-8`: the sealed audit package describes `0.7-redesign-6` and certifies neither later generation.

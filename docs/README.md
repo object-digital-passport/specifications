@@ -1,6 +1,6 @@
 # Current ODP 0.7 documentation — ABI 0.7-redesign-8
 
-[English SPEC](../SPEC.md) is normative. Start with [the post-audit-package delta and open decisions](../ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian), [current action plan](../ODP_07_ACTION_PLAN.md), [app handoff](../ODP_07_APP_HANDOFF.md), [security](SECURITY.md), [glossary](GLOSSARY.md), [tools](../chain/tools/README.md) and [deployment](../chain/deploy/README.md). [Russian index](ru/README-docs.md).
+[English SPEC](../SPEC.md) is normative. Start with [security](SECURITY.md), [glossary](GLOSSARY.md), [tools](../chain/tools/README.md) and [deployment](../chain/deploy/README.md). [Russian index](ru/README-docs.md).
 
 The [sealed audit package](../review/audit-handoff-abi6/README.md) describes the earlier ABI `0.7-redesign-6` and does not certify the current sources; its hashes and reports are unchanged. The approved `0.7-redesign-7` release bundle (`review/v07-abi7-release/`) is also a past snapshot; `0.7-redesign-8` adds the immutable `previewHash` (SPEC §8, §9, §22.19). Architecture reviews, release decisions, ADRs, old audit/task briefs, v0.6 guides and legacy edition designs below are historical inputs, not instructions for this generation. In particular, profile stop, mint-agent, unit-passport hooks, governance/freeze, a single 72-hour revocation window and mandatory Amoy no longer describe this implementation. Old diagrams and error tables apply only to their named historical line.
 

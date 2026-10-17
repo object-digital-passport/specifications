@@ -185,7 +185,7 @@ set. An `open` model does not authorize appending units to an existing passport.
 **Local candidate** — compiled and tested locally; not audited, not deployed, not approved.
 
 **Sealed audit package** — `review/audit-handoff-abi6/`, a snapshot of ABI `0.7-redesign-6`. It does not
-certify the current ABI. See [the delta](../ODP_07_ABI6_DOCUMENTATION_DELTA.md).
+certify the current ABI.
 
 **Unsupported** — a reader that cannot perform a declared check MUST report it as `unsupported`, distinct
 from failed, from missing evidence and from a counterfeiting verdict.
