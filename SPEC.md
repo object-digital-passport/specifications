@@ -519,7 +519,7 @@ C2PA assertion of its own.
    in that order; constructing a JS object and calling JSON.stringify can reorder integer-like keys.
 4. Preserve array order. Use ECMAScript JSON string escapes and finite binary64 number serialization:
    negative zero is `0`, `1e21` is `1e+21`, `1e-7` is `1e-7`. Arbitrary precision values must use strings.
-5. Emit compact UTF-8 with no BOM, spaces outside strings, or trailing newline.
+5. Emit compact UTF-8 with no BOM, no spaces outside strings, and no trailing newline.
 6. `dataHash = SHA256(canonical(passport.json))`; `passportId` MUST already be null. Do not replace a
    supplied assigned ID silently. `anchorsHash = SHA256(canonical(passport.json.anchors))` independently.
 
