@@ -2,7 +2,7 @@
 name: Standard gap
 about: Propose what is missing, unclear, or underspecified in SPEC — community input for the specification
 title: "[spec-gap] "
-labels: ["spec", "discussion"]
+labels: ["spec"]
 ---
 
 <!--
