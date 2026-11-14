@@ -83,7 +83,7 @@ canonical hash `sha256:7392c8214e7f1258e3dc886ce89f5b5df30f65bca6d0ace2d1b7b3006
 `approvedHash` until the owner reviews and approves it. The owner-approved ABI7 hash
 (`review/v07-abi7-release/`, `sha256:91c9ee4a…76f7`) no longer describes the current sources.
 
-Sealed `0.7-redesign-6` evidence: [audit handoff](../../review/audit-handoff-abi6/README.md); earlier rehearsal: `review/v07-prelaunch/README.md` at repository root. Code and documentation delta after that package, with the open conflicts: [report](../../ODP_07_ABI6_DOCUMENTATION_DELTA.md) (Russian).
+Sealed `0.7-redesign-6` evidence: [audit handoff](../../review/audit-handoff-abi6/README.md); earlier rehearsal: `review/v07-prelaunch/README.md` at repository root.
 
 Polygon now requires `ODP_DEPLOYER_ADDRESS` to match the signer and `ODP_SPEND_POLICY` to identify a JSON
 file containing exactly ten `gasLimits`, `maxFeePerGas`, `maxPriorityFeePerGas`, and `maxTotalFeeWei`.

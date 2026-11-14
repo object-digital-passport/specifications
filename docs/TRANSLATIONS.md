@@ -98,32 +98,3 @@ node tools/check-translations.mjs
 ```
 
 Add `--all` to list every soft finding instead of the first few per file.
-
-## Redesigned generation review
-
-| English | Russian | Status |
-| --- | --- | --- |
-| `ODP_07_CONTRACT_REVIEW.md` | — | none: historical Russian audit input |
-| `ODP_07_RELEASE_DECISIONS.md` | — | none: historical Russian audit input |
-| `ODP_ASTRA_AUDIT_BRIEF.md` | — | none: historical Russian audit input |
-| `ODP_CONCERNS_SATELLITE.md` | — | none: historical Russian audit input |
-| `ODP_REGISTRY_REDESIGN.md` | — | none: historical Russian audit input |
-| `ODP_ASTRA_REVIEW.md` | — | none: independent review authored in Russian |
-| `ODP_07_IMPLEMENTATION.md` | — | none: implementation report authored in Russian |
-
-Historical guides do not define the redesigned ABI.
-
-| `ODP_07_ACTION_PLAN.md` | — | russian only |
-| `ODP_07_APP_CHANGES.md` | — | russian only |
-| `ODP_07_APP_HANDOFF.md` | — | russian only |
-| `ODP_07_ARCHITECTURE_OPTIONS.md` | — | russian only |
-| `ODP_07_ARCHITECTURE_REVIEW.md` | — | russian only |
-| `ODP_V1_ACTION_PLAN.md` | — | russian only |
-
-| `ODP_07_INDEPENDENT_AUDIT_TASK.md` | — | russian only |
-| `ODP_07_CONSOLIDATED_REMEDIATION_PLAN.md` | — | russian only |
-| `ODP_07_ABI6_DOCUMENTATION_DELTA.md` | — | russian only |
-
-The delta report is written in Russian with an English summary at the top, like the other documents in
-this block. It records what changed after the sealed `0.7-redesign-6` audit package; the normative English
-text remains `SPEC.md`.

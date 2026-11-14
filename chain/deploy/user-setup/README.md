@@ -9,7 +9,7 @@
 
 ## Входы будущего запуска
 
-Несекретные шаблоны: [mainnet.env.example](../mainnet.env.example), [spend policy](../mainnet-spend-policy.example.json). Они не являются утверждёнными параметрами mainnet. **Release-бандла для текущей ABI сейчас не существует**, поэтому заполнить `ODP_RELEASE_BUNDLE`/`ODP_RELEASE_HASH` нечем: см. [дельту, раздел 5.3](../../../ODP_07_ABI6_DOCUMENTATION_DELTA.md). Нужны фиксированные `ODP_RELEASE_BUNDLE`/`ODP_RELEASE_HASH`, `ODP_GENERATION_ID`, `ODP_DEPLOY_MANIFEST`, chainId 137, подтверждения, deployer address, два отдельных RPC и утверждённые ограничения gas/fee/total POL. Placeholder fee caps намеренно невалидны.
+Несекретные шаблоны: [mainnet.env.example](../mainnet.env.example), [spend policy](../mainnet-spend-policy.example.json). Они не являются утверждёнными параметрами mainnet. Release-бандл для текущей ABI утверждён: `review/v07-abi8-release/release.json`, хеш `sha256:7392c8214e7f1258e3dc886ce89f5b5df30f65bca6d0ace2d1b7b3006ca414d7`. Нужны фиксированные `ODP_RELEASE_BUNDLE`/`ODP_RELEASE_HASH`, `ODP_GENERATION_ID`, `ODP_DEPLOY_MANIFEST`, chainId 137, подтверждения, deployer address, два отдельных RPC и утверждённые ограничения gas/fee/total POL. Placeholder fee caps намеренно невалидны.
 
 После нового разрешения read-only preflight запускается из `chain/` командой `node deploy/scripts/preflight-mainnet.mjs`; он обращается к двум RPC, хотя не загружает ключ. Сам deployment — `npm run deploy:mainnet` из `chain/`, с opt-in и всеми проверенными входами. Он использует `--no-compile` и только release bytes.
 

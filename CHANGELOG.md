@@ -15,7 +15,14 @@ its own history; what is recorded here from now on is the protocol.
 
 ### Changed
 
-- **SPEC CA-5.9 now states that a failed Safe execution is not visible on chain.** With `safeTxGas = 0` and `gasPrice = 0`, Safe v1.4.1 reverts the whole `execTransaction` (`GS013`): no `ExecutionFailure` log, no nonce spent. A missing event or an unconsumed nonce proves neither success nor the absence of an attempt, so a client shows "not executed" or "unexecutable", never "the attempt failed". Non-zero `safeTxGas` or `gasPrice` lift only `GS013`: `handlePayment` (`GS011`, `GS012`) and the guard's `checkAfterExecution` can still revert the whole outer call, event and nonce included, so an `ExecutionFailure` is evidence only when the outer transaction completed successfully on the canonical chain, and it never replaces the check of the ODP satellite's own record. A clarification of existing behaviour: no contract, ABI or deployment change.
+- **Clarify Safe execution evidence (CA-5.9).** A mined reverted outer transaction remains visible through its failed receipt, although its logs and Safe nonce changes are rolled back. Distinguish that receipt from an absent execution event, simulation failure, and the status of the ODP operation itself. No contract, ABI or deployment change.
+
+- **The README is the front page again.** The rewrite for ABI `0.7-redesign-7` had replaced it with an audit-status page. The cover, badges, the note to prospective contributors, the quick start, the plain-words explanation, the diagrams, the profile types and the FAQ are back, updated to what v0.7 is: a registration fact rather than a diary, a short withdrawal window, separate check results instead of one verdict, ten contracts with nobody in charge, and the deployed registry address. `README.ru.md` is restored the same way.
+
+### Removed
+
+- **Sixteen internal working notes (`ODP_*.md`) no longer sit in the repository root.** They were audit briefs, plans and hand-off tasks written while the 0.7 line was being designed, not part of the standard. The root holds the standard, the changelog and the README again. What they concluded is in `SPEC.md`, this changelog and the documents the decisions changed; the files stay in the git history. Every link to them was removed, and the `docs/TRANSLATIONS.md` rows for them are gone.
+
 
 ## [0.7] - 2026-09-25
 
