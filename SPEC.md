@@ -6,9 +6,8 @@ The earlier `0.7-redesign-7` snapshot and its approved release bundle are histor
 This document is normative for the sources in `chain/contracts/`. MUST, MUST NOT and SHOULD express
 requirements. The previous 0.7 ABI is incompatible. Its specification is preserved for audit in
 [BASELINE_SPEC_5d1db8f.md](review/astra/BASELINE_SPEC_5d1db8f.md), not as an alternative implementation target.
-The older audit/design documents describe inputs to this implementation; [ODP_ASTRA_REVIEW.md](ODP_ASTRA_REVIEW.md)
-records which claims survived independent reproduction. Deployment and client integration status live in
-[ODP_07_IMPLEMENTATION.md](ODP_07_IMPLEMENTATION.md).
+The older audit and design documents were working material and are not published. This specification, the
+contracts and the [changelog](CHANGELOG.md) are the record; the deployment is described in §7.
 This English file is the only normative text. Translations under `docs/<language>/` are informative and may
 contain mistakes; see [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md).
 
@@ -520,7 +519,7 @@ C2PA assertion of its own.
    in that order; constructing a JS object and calling JSON.stringify can reorder integer-like keys.
 4. Preserve array order. Use ECMAScript JSON string escapes and finite binary64 number serialization:
    negative zero is `0`, `1e21` is `1e+21`, `1e-7` is `1e-7`. Arbitrary precision values must use strings.
-5. Emit compact UTF-8 with no BOM, spaces outside strings, or trailing newline.
+5. Emit compact UTF-8 with no BOM, no spaces outside strings, and no trailing newline.
 6. `dataHash = SHA256(canonical(passport.json))`; `passportId` MUST already be null. Do not replace a
    supplied assigned ID silently. `anchorsHash = SHA256(canonical(passport.json.anchors))` independently.
 
@@ -1268,6 +1267,20 @@ valid. Rationale and acceptance scenarios:
   the job for the new month under the same `operationId`. Before reuse, it MUST confirm through
   `getMintOperation` or `proofOperations` that the operation is not committed; the reverted proposal reserved
   nothing (§3). Re-preparation changes hashed bytes (§2) and needs a new confirmation by the co-signers (CA-5.2).
+  A reverted outer `execTransaction` removes its logs and state changes, including the Safe nonce increment.
+  It does not erase a transaction included in a block: its receipt records `status = 0`.
+  The client MAY report "execution transaction reverted" only after checking the transaction, its receipt and
+  finalized block against this Safe and the saved proposal calldata. This establishes failure of that outer
+  transaction, not the reason for failure or the outcome of another attempt to execute the proposal.
+  A simulation failure or an attempt that was never included in a block has no such receipt.
+  Absence of an `ExecutionFailure` event, or an unchanged Safe nonce, alone proves neither success nor that no
+  attempt was made. The proposal remains "not executed" while executable, or "unexecutable" after its deadline.
+  A non-zero `safeTxGas` or `gasPrice` lifts only `GS013`: payment handling (`GS011`, `GS012`) or the guard's
+  `checkAfterExecution` can still revert the outer transaction and its logs
+  ([Safe.sol v1.4.1](https://raw.githubusercontent.com/safe-global/safe-smart-account/v1.4.1/contracts/Safe.sol)).
+  An `ExecutionFailure` event is evidence of a failed inner call only in a successful, finalized outer
+  transaction from this Safe for this proposal hash. It never replaces checking the ODP registry or satellite's
+  own record to determine whether the intended ODP operation has committed (§3).
 - CA-5.10. A Safe revocation proposal can execute only inside the role's window (§8; 24 hours for B/P/M). The
   client MUST show the window's end on the proposal and warn that slow co-signers can miss it. After the end the
   proposal MUST be shown as unexecutable (`EC(132)`), with the rejection transaction of CA-5.9 offered to free

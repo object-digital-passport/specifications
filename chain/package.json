@@ -19,10 +19,10 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^4.0.0",
     "ajv": "8.20.0",
-    "hardhat": "^3.17.0"
+    "hardhat": "^3.21.2"
   },
   "dependencies": {
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.9",
     "ethers": "6.17.0"
   },
   "overrides": {

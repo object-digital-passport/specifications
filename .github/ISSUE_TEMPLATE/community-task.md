@@ -2,7 +2,7 @@
 name: Community task
 about: A clear, beginner-friendly task for community contributors
 title: ""
-labels: "community"
+labels: ["help wanted"]
 assignees: ""
 ---
 
