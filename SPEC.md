@@ -1267,6 +1267,20 @@ valid. Rationale and acceptance scenarios:
   the job for the new month under the same `operationId`. Before reuse, it MUST confirm through
   `getMintOperation` or `proofOperations` that the operation is not committed; the reverted proposal reserved
   nothing (§3). Re-preparation changes hashed bytes (§2) and needs a new confirmation by the co-signers (CA-5.2).
+  A reverted outer `execTransaction` removes its logs and state changes, including the Safe nonce increment.
+  It does not erase a transaction included in a block: its receipt records `status = 0`.
+  The client MAY report "execution transaction reverted" only after checking the transaction, its receipt and
+  finalized block against this Safe and the saved proposal calldata. This establishes failure of that outer
+  transaction, not the reason for failure or the outcome of another attempt to execute the proposal.
+  A simulation failure or an attempt that was never included in a block has no such receipt.
+  Absence of an `ExecutionFailure` event, or an unchanged Safe nonce, alone proves neither success nor that no
+  attempt was made. The proposal remains "not executed" while executable, or "unexecutable" after its deadline.
+  A non-zero `safeTxGas` or `gasPrice` lifts only `GS013`: payment handling (`GS011`, `GS012`) or the guard's
+  `checkAfterExecution` can still revert the outer transaction and its logs
+  ([Safe.sol v1.4.1](https://raw.githubusercontent.com/safe-global/safe-smart-account/v1.4.1/contracts/Safe.sol)).
+  An `ExecutionFailure` event is evidence of a failed inner call only in a successful, finalized outer
+  transaction from this Safe for this proposal hash. It never replaces checking the ODP registry or satellite's
+  own record to determine whether the intended ODP operation has committed (§3).
 - CA-5.10. A Safe revocation proposal can execute only inside the role's window (§8; 24 hours for B/P/M). The
   client MUST show the window's end on the proposal and warn that slow co-signers can miss it. After the end the
   proposal MUST be shown as unexecutable (`EC(132)`), with the rejection transaction of CA-5.9 offered to free

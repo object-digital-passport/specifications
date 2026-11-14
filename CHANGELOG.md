@@ -15,6 +15,8 @@ its own history; what is recorded here from now on is the protocol.
 
 ### Changed
 
+- **Clarify Safe execution evidence (CA-5.9).** A mined reverted outer transaction remains visible through its failed receipt, although its logs and Safe nonce changes are rolled back. Distinguish that receipt from an absent execution event, simulation failure, and the status of the ODP operation itself. No contract, ABI or deployment change.
+
 - **The README is the front page again.** The rewrite for ABI `0.7-redesign-7` had replaced it with an audit-status page. The cover, badges, the note to prospective contributors, the quick start, the plain-words explanation, the diagrams, the profile types and the FAQ are back, updated to what v0.7 is: a registration fact rather than a diary, a short withdrawal window, separate check results instead of one verdict, ten contracts with nobody in charge, and the deployed registry address. `README.ru.md` is restored the same way.
 
 ### Removed
