@@ -44,7 +44,12 @@
 
 - **Уточнено правило 5 канонического JSON (§10).** Компактный UTF-8 без BOM, без пробелов вне строк и без завершающего перевода строки. Канонические байты и хеши не изменились. Спасибо [@tylrcc за #184](https://github.com/object-digital-passport/specifications/pull/184).
 - **Вычитаны английское и русское руководства.** Убран повтор раздела о чтении NFC-пломб, добавлена ссылка из оглавления и исправлено оформление имён файлов и идентификаторов. Спасибо [@kamrullab за #191](https://github.com/object-digital-passport/specifications/pull/191).
+- Исправлен пример автономной команды подготовки тиража: перед файлом со списком адресов указан обязательный тип зарегистрированного издателя.
 - Предварительная проверка деплоя разрешает потолок комиссии ниже двойной базовой ставки, если он покрывает текущую базовую ставку и приоритетную надбавку. См. [#160](https://github.com/object-digital-passport/specifications/pull/160).
+
+### Безопасность
+
+- В тестовых инструментах minimatch обновлён до 11.0.9, serialize-javascript — до 7.1.4, glob для Mocha — до 14.0.6. См. [minimatch](https://github.com/advisories/GHSA-g3hv-75wg-m249), [serialize-javascript](https://github.com/advisories/GHSA-m5mm-p8h7-m29v) и [glob](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4).
 
 ### Удалено
 

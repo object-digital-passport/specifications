@@ -29,15 +29,15 @@ inputs; durable wallet submission/replacement/reorg handling remains client inte
 `preparePassport(document, {issuerType})` optionally takes the registered profile type (`C`/`B`/`P`/`M`). When supplied, a non-unique edition model or unit anchors from a non-B profile are rejected with `Only B profiles may issue editions`, matching core `EC(121)`. Verifiers omit it. `prepareIssuance` always requires it.
 
 Edition documents require the issuer wallet address before preparation: `preparePassport(document, {issuer})`
-or `node tools/passport.mjs prepare passport.json 0xFULL_ISSUER_ADDRESS`. `edition-commitment.mjs` encodes
+or pass the issuer address and registered profile type to the CLI. `edition-commitment.mjs` encodes
 the exact core-to-satellite commitment. `verifyPassport` recomputes it using the supplied chain header's issuer;
 callers still authenticate that header and the chain/registry/satellite context separately.
 
-For an edition, the CLI requires the complete public address-list file after the issuer:
+For an edition, pass the issuer address, its registered profile type `B`, and the complete public address-list file:
 
 ```sh
 # From chain/; local files only, example issuer must be replaced with the intended issuer.
-node tools/passport.mjs prepare ../schema/examples/0.7/edition.json 0x1111111111111111111111111111111111111111 /path/to/address-list.txt
+node tools/passport.mjs prepare ../schema/examples/0.7/edition.json 0x1111111111111111111111111111111111111111 B /path/to/address-list.txt
 ```
 
 The list must match that document; this placeholder command is not a production-ready fixture.
