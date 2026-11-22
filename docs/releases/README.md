@@ -11,6 +11,7 @@ version is [`CHANGELOG.md`](../../CHANGELOG.md).
 
 | Version | | |
 |---|---|---|
+| [v0.8 Preview](v0.8-preview.md) | object history and evidence | proposal preview for public feedback |
 | [v0.7.1](v0.7.1.md) | clearer rules and guides | documentation and tooling pre-release for v0.7 |
 | [**v0.7**](v0.7.md) | a registry nobody can override | current deployed line, live since 25 Sep 2026 |
 | [v0.7 preview](v0.7-preview.md) | passports for things made in thousands | pre-release of 22 Aug 2026, never deployed, replaced by v0.7 |
