@@ -13,6 +13,16 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
+## [0.8-preview] - 2026-11-22
+
+**Proposal preview.** ODP 0.7 remains the deployed protocol. The proposed work below is open to feedback in the [community discussion](https://github.com/orgs/object-digital-passport/discussions/192) and tracked against the [public roadmap](https://github.com/orgs/object-digital-passport/projects/3).
+
+- **Object history and evidence.** Prototype a repair record with a diagnostic PDF and a restoration record with a report and photographs. Independent participants add records linked to the original passport by chain, registry address and passport ID. Distinguish the claimed event date from the publication date. Hash each attachment and store files off-chain. Show the publisher, verification of the organisation's identity, file integrity and file availability separately.
+- **GS1 interoperability.** Map GTIN, batch or lot, serial number and expiry date to ODP data. Test representative [EPCIS 2.0](https://ref.gs1.org/standards/epcis/2.0.0/) import and export examples and document which meanings survive the round trip. Use **Object history and evidence** as the proposal name because `ObjectEvent` already names an EPCIS event type.
+- **QR codes in regular camera apps.** Compare the existing `odp://` and issuer HTTPS links on iOS and Android with and without an ODP app. Check lookup by printed passport ID when the issuer's domain is unavailable, and check that a production-run label opens the intended unit.
+- **Medicine batches and packs.** Explore a possible Bangladesh pilot with a manufacturer, pharmacy, laboratory and regulator. Examine how quality documents, warnings and recalls could refer to a batch or individual pack. Show each result and its freshness separately. Scanning a code or activating a pack does not establish the identity or condition of its contents.
+- **Prototype and compare.** Draft a schema, SDK example and independent verifier for repair and restoration. Evaluate the existing `ODPStatementJournal` first, then compare a separate satellite for publication rights, corrections, withdrawals, privacy, fees and long-term access. Check altered and missing attachments, matching passport IDs in different registries and verification without an ODP service.
+
 ## [0.7.1] - 2026-11-22
 
 **Documentation and tooling pre-release for the deployed 0.7 generation.** The Polygon registry, contract sources, ABI `0.7-redesign-8` and `passport.json` schema 0.7 stay the same.
@@ -299,7 +309,8 @@ First tagged release of the reference implementation: specification, Solidity co
 - Static web UI: `creator.html`, `passport.html`, `verify.html`.
 - Hardhat deploy scripts and CLI minting tool.
 
-[Unreleased]: https://github.com/object-digital-passport/specifications/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/object-digital-passport/specifications/compare/v0.8-preview...HEAD
+[0.8-preview]: https://github.com/object-digital-passport/specifications/releases/tag/v0.8-preview
 [0.7.1]: https://github.com/object-digital-passport/specifications/compare/v0.7...v0.7.1
 [0.7]: https://github.com/object-digital-passport/specifications/compare/v0.6...v0.7
 [0.7-preview]: https://github.com/object-digital-passport/specifications/releases/tag/v.0.7.0
