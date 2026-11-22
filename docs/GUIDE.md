@@ -67,7 +67,7 @@ On competing or duplicate passports, v0.6 is deliberately honest: the protocol d
 
 1. **Profile.** You sign up as yourself or an organization and get a lasting **Profile ID** with a letter prefix (**C / B / P / M**) so the role is clear at a glance.
 2. **Object passport.** You fill in the form — including the mandatory identification anchors — and confirm on-chain. The registry stores the **card**, **hashes** (`dataHash`, `anchorsHash`, image/file), an optional **public file URL**, and metadata per **[SPEC.md](../SPEC.md)** — that ties "this passport" to "this deployment".
-3. **What to share.** People usually pass along the **Passport ID** (`ODP-…`) and, when needed, the `**.odpass`** file, **raw `passport.json`** offline, or a **public HTTPS URL** that serves the **§15 `.odpass`** ZIP (not bare JSON at that URL), so anyone can obtain bytes and check them against `**dataHash**`.
+3. **What to share.** People usually pass along the **Passport ID** (`ODP-…`) and, when needed, the `.odpass` file, **raw `passport.json`** offline, or a **public HTTPS URL** that serves the **§15 `.odpass`** ZIP (not bare JSON at that URL), so anyone can obtain bytes and check them against `dataHash`.
 4. **Verification.** Anyone (or any tool) takes **your file or link**, reads **public** chain state, and checks that the content **matches** what was committed — including that the card matches byte-for-byte and the anchors match `anchorsHash`. That is read-only for the verifier — no permission to edit the registry.
 
 **Public profile identity is mandatory.** Participants (**C / B / P / M**) **must** publish their **short Profile ID** together with the **full wallet address** (0x…). This is a **protocol requirement**, not etiquette: otherwise on-chain data looks anonymous and you **cannot tell** honest issuance from **spam** or impersonation. When the same **short ID** and **wallet** appear on your official site and other channels, a verifier can see the record was made by a **real** person or organisation — not an arbitrary address. Normative wording and examples are in **[SPEC.md](../SPEC.md)** (Public identity requirement).
@@ -94,8 +94,8 @@ Museum on museum.com:
 **If you read JSON or code**
 
 - The human-facing number is the **Passport ID** (`ODP-YYYY-MM-…`).
-- In `**passport.json`**, the same value is field `**passportId`**.
-- In low-level contract calls it may appear as `**humanId**` on older deployments — same meaning, historic name.
+- In `passport.json`, the same value is field `passportId`.
+- In low-level contract calls it may appear as `humanId` on older deployments — same meaning, historic name.
 
 ---
 
@@ -120,6 +120,7 @@ You **do not** need deep blockchain expertise to try the **[live demo pages](#li
 - [Start Here](#start-here)
 - [Quick Start (5 minutes)](#quick-start-5-minutes)
 - [Live Demo](#live-demo)
+- [Reading an NFC seal](#reading-an-nfc-seal)
 
 **Technical reference**
 
@@ -154,7 +155,7 @@ If you are new, follow this order:
 ### 2) Register your profile
 
 - Open [Profile](https://object-digital-passport.github.io/creator.html).
-- Register once to receive your **profile ID** — a string starting with `**C-`**, `**B-`**, `**P-**`, or `**M-**` (you pick the type at registration; it does not change on its own later).
+- Register once to receive your **profile ID** — a string starting with `C-`, `B-`, `P-`, or `M-` (you pick the type at registration; it does not change on its own later).
 
 **What the letter means**
 
@@ -175,27 +176,27 @@ In short: you fill in the form — **including the identification anchors** — 
 
 1. Open [Passport](https://object-digital-passport.github.io/passport.html) and complete the fields. For a **physical object** the v0.6 line requires the identification minimum: at least one **photo**, **dimensions**, **materials**, and **distinguishing features** (the details a copy would not reproduce). A digital object requires its exact **file hash**. A seal (NFC chip / numbered) is optional on top.
 2. Confirm the transaction in your wallet — that **writes the passport on-chain**: the readable card, the fingerprints, and the anchors commitment (a small network fee applies; there is no separate "ODP fee").
-3. **Download** the `**.odpass`** file on the success screen and **store it somewhere safe**. The demo **does not** keep your file: if you leave without saving, you cannot fetch the same package from this site later.
+3. **Download** the `.odpass` file on the success screen and **store it somewhere safe**. The demo **does not** keep your file: if you leave without saving, you cannot fetch the same package from this site later.
 
-**What you downloaded.** A ZIP bundle per SPEC §15, named with a `**.odpass`** extension: the main file is `**passport.json`** (that content is hashed into `**dataHash`** on-chain; its `anchors` array is additionally hashed into `**anchorsHash**`), plus `**manifest.json`** and `**originals/`** for attachments — exact layout in **[SPEC.md](../SPEC.md)**.
+**What you downloaded.** A ZIP bundle per SPEC §15, named with a `.odpass` extension: the main file is `passport.json` (that content is hashed into `dataHash` on-chain; its `anchors` array is additionally hashed into `anchorsHash`), plus `manifest.json` and `originals/` for attachments — exact layout in **[SPEC.md](../SPEC.md)**.
 
-**Why the file matters.** The registry holds the card and **fingerprints**, not the full human-readable passport inside the transaction. To show text, images, and attachments — and to match `**dataHash`** — verifiers need the same bytes you had at issuance: your `**.odpass`** or **raw `passport.json`** offline. For **automatic fetch from the web**, the public `**dataUrl`** must serve the **§15 `.odpass`** ZIP — **not** bare JSON at that URL (see step 4 and **SPEC §9**). **Passport ID alone**, with no file, yields the on-chain card plus IDs and digests — legible, but not the full passport view.
+**Why the file matters.** The registry holds the card and **fingerprints**, not the full human-readable passport inside the transaction. To show text, images, and attachments — and to match `dataHash` — verifiers need the same bytes you had at issuance: your `.odpass` or **raw `passport.json`** offline. For **automatic fetch from the web**, the public `dataUrl` must serve the **§15 `.odpass`** ZIP — **not** bare JSON at that URL (see step 4 and **SPEC §9**). **Passport ID alone**, with no file, yields the on-chain card plus IDs and digests — legible, but not the full passport view.
 
-**Public URL now or later.** In the form you can set an HTTPS `**dataUrl`** (**folder on your site**, **full file URL**, or **leave it blank**). Undecided? You can **add or change** `dataUrl` later with another transaction ("Update hosting links" on the Passport page).
+**Public URL now or later.** In the form you can set an HTTPS `dataUrl` (**folder on your site**, **full file URL**, or **leave it blank**). Undecided? You can **add or change** `dataUrl` later with another transaction ("Update hosting links" on the Passport page).
 
 ### 4) Host the same file at a link (optional — helps strangers verify)
 
 Use this when you want anyone to open [Verify](https://object-digital-passport.github.io/verify.html), enter `ODP-…`, and **automatically fetch** the passport from the web — without emailing a `.odpass` file.
 
-- Whatever you put at `**dataUrl`** must return **the §15 `.odpass` ZIP** whose extracted `passport.json` matches `**dataHash`** — [Verify](https://object-digital-passport.github.io/verify.html) fetches that ZIP and does **not** treat a bare `.json` URL as valid hosting.
+- Whatever you put at `dataUrl` must return **the §15 `.odpass` ZIP** whose extracted `passport.json` matches `dataHash` — [Verify](https://object-digital-passport.github.io/verify.html) fetches that ZIP and does **not** treat a bare `.json` URL as valid hosting.
 - The link must be **HTTPS** and return the **file itself**, not a login page, HTML shell, or a cloud "preview" that doesn't serve raw bytes.
-- After the URL is on-chain, **do not replace** the hosted file with different content — the hash will no longer match `**dataHash`**.
+- After the URL is on-chain, **do not replace** the hosted file with different content — the hash will no longer match `dataHash`.
 
 ### 5) Verify
 
 - Open [Verify](https://object-digital-passport.github.io/verify.html).
-- Enter a Passport ID, paste an `odp://...` link, or drop a `**.odpass`** file.
-- On a v0.6 registry the verifier also compares the on-chain **card** byte-for-byte with the file and recomputes `**anchorsHash**` — any mismatch is reported as tampering, not a warning.
+- Enter a Passport ID, paste an `odp://...` link, or drop a `.odpass` file.
+- On a v0.6 registry the verifier also compares the on-chain **card** byte-for-byte with the file and recomputes `anchorsHash` — any mismatch is reported as tampering, not a warning.
 - What goes on a tag or a printed label is the `odp://` URI — [`SPEC.md` §12.2](../SPEC.md) is normative that no hostname is printed. An HTTPS record is a choice with a permanent consequence, not the default; see [Reading an NFC seal](#reading-an-nfc-seal). `odp://...` remains the normative URI layer in `SPEC.md` and the intended stable-v1 first-link target once resolver/app context is ready.
 
 ## Live Demo
@@ -215,14 +216,6 @@ Pages:
 ## Reading an NFC seal
 
 A browser cannot reach an NFC chip, so this is the one part of verification the website cannot do. It needs an app on a device with an NFC reader.
-
-**Status: there is no public implementation yet, on any platform.** Of every anchor type in [SPEC.md](../SPEC.md) §9, `nfc` is the only one you cannot check today with something you can install. If you are deciding whether to buy NTAG 424 DNA tags for a run, weigh that before you order.
-
-The reference implementation is in development as the **ODP app for iOS**. It scans on iPhone. No Mac has NFC hardware, so on macOS the app receives an already-verified result from the phone instead of scanning — a transfer, not a scan.
-
-What a verifier must do is specified without reference to any of this: the EV2 challenge-response, the TagTamper conditions and the high-assurance profile are in [SPEC.md](../SPEC.md) §6, and anyone can implement them.
-
-Groundwork that does exist in the website repository: the web-to-app handoff in [`frontend/js/odp-android-companion.js`](https://github.com/object-digital-passport/object-digital-passport.github.io/blob/main/frontend/js/odp-android-companion.js) and its [`docs/ANDROID.md`](https://github.com/object-digital-passport/object-digital-passport.github.io/blob/main/docs/ANDROID.md), plus the chip workflow in [ANDROID_NTAG424DNA_TAGTAMPER.md](ANDROID_NTAG424DNA_TAGTAMPER.md). They were written for an Android verifier that was never finished, and are kept because the handoff shape is worth reusing.
 
 **Status: there is no public implementation yet, on any platform.** Of every anchor type in [SPEC.md](../SPEC.md) §9, `nfc` is the only one you cannot check today with something you can install. If you are deciding whether to buy NTAG 424 DNA tags for a run, weigh that before you order.
 
@@ -312,7 +305,7 @@ For terms of the current generation, use the [current glossary](GLOSSARY.md).
 | Anchors         | The `anchors[]` identification block (photos, dimensions, materials, features, marks, seals, hashes), fingerprinted on-chain as `anchorsHash` |
 | Passport events | Append-only history records (status / location / condition / damage / restoration …) — added, never rewritten |
 | `passport.json` | Canonical off-chain object document                                             |
-| `dataUrl`       | Optional HTTPS location for the `**.odpass`** bundle                            |
+| `dataUrl`       | Optional HTTPS location for the `.odpass` bundle                            |
 | Verify          | Read-only checks (no wallet, no protocol fee)                                   |
 
 
@@ -325,8 +318,8 @@ For threat model and trust boundaries:
 Verification basics:
 
 - On-chain hashes are the anchor for what was registered.
-- `**passport.json`** (or the bytes inside `**.odpass`**) must match the stored `**dataHash`**; on v0.6 the `anchors` array must also match `**anchorsHash**`, and the card fields must match byte-for-byte.
-- `**manifest.json**` inside `**.odpass**` is packaging metadata for tools, not a separate trust root.
+- `passport.json` (or the bytes inside `.odpass`) must match the stored `dataHash`; on v0.6 the `anchors` array must also match `anchorsHash`, and the card fields must match byte-for-byte.
+- `manifest.json` inside `.odpass` is packaging metadata for tools, not a separate trust root.
 
 Normative rules:
 
