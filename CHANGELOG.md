@@ -13,11 +13,32 @@ its own history; what is recorded here from now on is the protocol.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-22
+
+**Documentation and tooling pre-release for the deployed 0.7 generation.** The Polygon registry, contract sources, ABI `0.7-redesign-8` and `passport.json` schema 0.7 stay the same.
+
+### Added
+
+- Published the approved Polygon mainnet generation manifest and deployment record for the v0.7 registry and its nine satellites. All ten contracts were source-verified on Polygonscan from the pinned compiler input. See [the deployment table](SPEC.md#7-networks-and-generations), [#161](https://github.com/object-digital-passport/specifications/pull/161) and [#162](https://github.com/object-digital-passport/specifications/pull/162).
+
 ### Changed
 
 - **Clarify Safe execution evidence (CA-5.9).** A mined reverted outer transaction remains visible through its failed receipt, although its logs and Safe nonce changes are rolled back. Distinguish that receipt from an absent execution event, simulation failure, and the status of the ODP operation itself. No contract, ABI or deployment change.
 
 - **The README is the front page again.** The rewrite for ABI `0.7-redesign-7` had replaced it with an audit-status page. The cover, badges, the note to prospective contributors, the quick start, the plain-words explanation, the diagrams, the profile types and the FAQ are back, updated to what v0.7 is: a registration fact rather than a diary, a short withdrawal window, separate check results instead of one verdict, ten contracts with nobody in charge, and the deployed registry address. `README.ru.md` is restored the same way.
+
+- Updated Hardhat to 3.22.0, its Mocha/Ethers toolbox to 4.0.0, dotenv to 18.0.10 and the Markdown renderer to marked 18.2.0. Issue templates use the repository's existing labels. The [versioning guide](docs/VERSIONING_AND_RELEASES.md) now identifies the approved deployment.
+
+### Fixed
+
+- **Clarified canonical JSON (§10, rule 5).** Compact UTF-8 has no BOM, no spaces outside strings and no trailing newline. The canonical bytes and hashes are unchanged. Thanks to [@tylrcc in #184](https://github.com/object-digital-passport/specifications/pull/184).
+- **Proofread the English and Russian guides.** Removed the duplicated NFC section, linked it from the contents and fixed formatting of file names and identifiers. Thanks to [@kamrullab in #191](https://github.com/object-digital-passport/specifications/pull/191).
+- Fixed the offline edition CLI example to pass the required registered issuer type before the address-list file.
+- The mainnet deployment preflight allows a fee cap below twice the base fee when it still covers the current base fee and priority fee. See [#160](https://github.com/object-digital-passport/specifications/pull/160).
+
+### Security
+
+- Updated the test toolchain to minimatch 11.0.9, serialize-javascript 7.1.4 and glob 14.0.6 for Mocha. See [minimatch](https://github.com/advisories/GHSA-g3hv-75wg-m249), [serialize-javascript](https://github.com/advisories/GHSA-m5mm-p8h7-m29v) and [glob](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4).
 
 ### Removed
 
@@ -283,7 +304,8 @@ First tagged release of the reference implementation: specification, Solidity co
 - Static web UI: `creator.html`, `passport.html`, `verify.html`.
 - Hardhat deploy scripts and CLI minting tool.
 
-[Unreleased]: https://github.com/object-digital-passport/specifications/compare/v0.7...HEAD
+[Unreleased]: https://github.com/object-digital-passport/specifications/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/object-digital-passport/specifications/compare/v0.7...v0.7.1
 [0.7]: https://github.com/object-digital-passport/specifications/compare/v0.6...v0.7
 [0.7-preview]: https://github.com/object-digital-passport/specifications/releases/tag/v.0.7.0
 [0.6]: https://github.com/object-digital-passport/specifications/compare/v0.5...v0.6
