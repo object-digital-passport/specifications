@@ -26,14 +26,14 @@ Or paste the file through the web UI: **`.github` repo → `profile/README.md` �
 ## Two things the org page needs besides this file
 
 - **Pinned repositories.** The overview lists whatever is pinned, in pin order. Pin
-  `object-digital-passport` first, then `object-digital-passport.github.io`. Private repositories
+  `specifications` first, then `object-digital-passport.github.io`. Private repositories
   cannot be pinned on a public org page — they show to members only.
 - **Organization display name, avatar, and URL** live in **Settings → Profile**, not in this file.
   The website field should point at <https://object-digital-passport.github.io/>.
 
 ## When you change it
 
-The README hard-codes the deployed registry address, the version table, and the docs links. Anything
-that moves those — a new deployment, a renamed doc, a repository rename — needs this file updated in
-the same change, then re-synced. Repository-relative links are checked by the `profile-links` job in
+The README links to the protocol releases, the deployed registry manifest, the reference site and
+the public repositories. Check the links and component statuses when a release, deployment or
+repository changes, then re-sync the profile. Repository-relative links are checked by the `profile-links` job in
 [`ci.yml`](../workflows/ci.yml); external links and the org page itself are not.
