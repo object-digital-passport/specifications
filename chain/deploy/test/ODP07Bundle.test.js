@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import fs from 'node:fs';
-import { ethers,deploy,register,tx,event,fails,inputs,mint,hash } from './ODP07.test.js';
+import { ethers,deploy,register,tx,event,fails,inputs,hash } from './ODP07.test.js';
 import { preparePassport,verifyPassport,verifyEditionAnchor } from '../../tools/passport.mjs';
-import { canonicalize,canonicalHash,parseJSON,sha256 } from '../../tools/canonical.mjs';
+import { parseJSON,sha256 } from '../../tools/canonical.mjs';
 import { editionContext,deriveUnit,treeOf,leafOf } from '../../tools/edition.mjs';
 
 describe('0.7 canonical bundle to local EVM and back',()=>{
@@ -50,7 +50,7 @@ describe('0.7 canonical bundle to local EVM and back',()=>{
 describe('0.7 quota and pagination boundaries',()=>{
  it('1000 direct mints exhaust C bucket; rejected mint is atomic; pages stay bounded',async function(){
   this.timeout(120000);
-  const [issuer,agent]=await ethers.getSigners(),c=await deploy('ObjectDigitalPassport'),id=await register(c,issuer);
+  const [issuer,agent]=await ethers.getSigners(),c=await deploy('ObjectDigitalPassport');await register(c,issuer);
   const m=await inputs();
   await fails(c.mintPhysical({...m,dataHash:ethers.ZeroHash},ethers.hexlify(ethers.randomBytes(32))),c,30);
   for(let i=0;i<1000;i++)await tx(c.connect(issuer).mintPhysical(m,ethers.zeroPadValue(ethers.toBeHex(i+1),32)));

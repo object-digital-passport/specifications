@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ethers,deploy,register,inputs,mint,hash,tx,event } from './ODP07.test.js';
+import { ethers,deploy,register,inputs,hash,tx,event } from './ODP07.test.js';
 
 describe('0.7 measured registration costs',()=>{
  it('records gas for the new indexed concern model rather than reusing the legacy number',async()=>{

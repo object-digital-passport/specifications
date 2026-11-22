@@ -1,11 +1,9 @@
 let operationSequence=0;
 import { expect } from 'chai';
 import { network, artifacts } from 'hardhat';
-import crypto from 'node:crypto';
 const { ethers } = await network.connect();
 const hash = s => ethers.sha256(ethers.toUtf8Bytes(s));
 const Z = ethers.ZeroHash;
-const A = ethers.ZeroAddress;
 async function tx(p) { return (await p).wait(); }
 function event(c, r, name) { return r.logs.map(l=>{try{return c.interface.parseLog(l)}catch{return null}}).find(x=>x?.name===name); }
 async function deploy(name, ...args) { const c=await (await ethers.getContractFactory(name)).deploy(...args); await c.waitForDeployment(); return c; }
