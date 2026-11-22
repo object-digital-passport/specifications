@@ -6,7 +6,7 @@
 
 See also **[`docs/README.md`](README.md)** for an index of all docs in this folder and pointers to **`SPEC.md`**.
 
-Current ODP 0.7 uses ABI `0.7-redesign-8` and packed byte 7. Earlier ABI0.7 generations, including `0.7-redesign-7`, are incompatible. Select a decoder by independently trusted chain/address/runtime/ABI, never the version byte. No production generation is approved. Normative rules: [SPEC §7/§14](../SPEC.md).
+Current ODP 0.7 uses ABI `0.7-redesign-8` and packed byte 7. The approved generation `odp-0.7-redesign-8-polygon-20260925` was deployed on Polygon mainnet on 25 September 2026. Earlier 0.7 ABI snapshots, including `0.7-redesign-7`, are incompatible. Select a decoder by independently trusted chain/address/runtime/ABI, never the version byte. See [SPEC §7/§14](../SPEC.md) for the normative rules.
 
 This document explains how **product versions** (e.g. **v0.1**), **`main`**, and **git tags** work together — and what “I don’t want to change v0.1 anymore” means in practice.
 

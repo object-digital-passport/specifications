@@ -11,6 +11,7 @@ version is [`CHANGELOG.md`](../../CHANGELOG.md).
 
 | Version | | |
 |---|---|---|
+| [v0.7.1](v0.7.1.md) | clearer rules and guides | documentation and tooling pre-release for v0.7 |
 | [**v0.7**](v0.7.md) | a registry nobody can override | current deployed line, live since 25 Sep 2026 |
 | [v0.7 preview](v0.7-preview.md) | passports for things made in thousands | pre-release of 22 Aug 2026, never deployed, replaced by v0.7 |
 | [v0.6](v0.6.md) | what a passport stores, redesigned | previous line, live since 24 Jul 2026, still readable |
@@ -21,5 +22,4 @@ version is [`CHANGELOG.md`](../../CHANGELOG.md).
 | [v0.2](v0.2.md) | no fees, and fewer things forced on you | |
 | [v0.1](v0.1.md) | the first working version | |
 
-Release notes are English only. Russian translations of the narrative documents live under
-`web/frontend/localization/ru/`.
+Release notes are English only. The [Russian changelog](../ru/CHANGELOG.md) records the same changes.
