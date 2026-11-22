@@ -33,7 +33,12 @@ its own history; what is recorded here from now on is the protocol.
 
 - **Clarified canonical JSON (§10, rule 5).** Compact UTF-8 has no BOM, no spaces outside strings and no trailing newline. The canonical bytes and hashes are unchanged. Thanks to [@tylrcc in #184](https://github.com/object-digital-passport/specifications/pull/184).
 - **Proofread the English and Russian guides.** Removed the duplicated NFC section, linked it from the contents and fixed formatting of file names and identifiers. Thanks to [@kamrullab in #191](https://github.com/object-digital-passport/specifications/pull/191).
+- Fixed the offline edition CLI example to pass the required registered issuer type before the address-list file.
 - The mainnet deployment preflight allows a fee cap below twice the base fee when it still covers the current base fee and priority fee. See [#160](https://github.com/object-digital-passport/specifications/pull/160).
+
+### Security
+
+- Updated the test toolchain to minimatch 11.0.9, serialize-javascript 7.1.4 and glob 14.0.6 for Mocha. See [minimatch](https://github.com/advisories/GHSA-g3hv-75wg-m249), [serialize-javascript](https://github.com/advisories/GHSA-m5mm-p8h7-m29v) and [glob](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4).
 
 ### Removed
 
