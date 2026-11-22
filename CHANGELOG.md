@@ -314,8 +314,8 @@ First tagged release of the reference implementation: specification, Solidity co
 - Static web UI: `creator.html`, `passport.html`, `verify.html`.
 - Hardhat deploy scripts and CLI minting tool.
 
-[Unreleased]: https://github.com/object-digital-passport/specifications/compare/v0.8-preview...HEAD
-[0.8-preview]: https://github.com/object-digital-passport/specifications/releases/tag/v0.8-preview
+[Unreleased]: https://github.com/object-digital-passport/specifications/compare/v0.8...HEAD
+[0.8-preview]: https://github.com/object-digital-passport/specifications/releases/tag/v0.8
 [0.7.1]: https://github.com/object-digital-passport/specifications/compare/v0.7...v0.7.1
 [0.7]: https://github.com/object-digital-passport/specifications/compare/v0.6...v0.7
 [0.7-preview]: https://github.com/object-digital-passport/specifications/releases/tag/v.0.7.0
