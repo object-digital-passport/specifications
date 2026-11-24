@@ -48,6 +48,7 @@ promoted to hard.
 | `SPEC.md` | `docs/ru/SPEC.md` | translated |
 | `README.md` | `README.ru.md` | translated |
 | `CHANGELOG.md` | `docs/ru/CHANGELOG.md` | translated |
+| `SECURITY_MODEL.md` | — | none: a threat model for security scans, kept in step with the code rather than with a translation; the protocol-level security model is translated in `docs/ru/SECURITY.md` |
 | `docs/ANDROID_NTAG424DNA_TAGTAMPER.md` | `docs/ru/ANDROID_NTAG424DNA_TAGTAMPER.md` | translated |
 | `docs/ANDROID_VERIFIER_MVP.md` | `docs/ru/ANDROID_VERIFIER_MVP.md` | translated |
 | `docs/CODE_OF_CONDUCT.md` | `docs/ru/CODE_OF_CONDUCT.md` | translated |
